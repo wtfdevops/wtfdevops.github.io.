@@ -461,7 +461,11 @@ html[data-dark] .crit-tip{background:var(--primary-lt);color:#93C5FD}
       <div class="htitle" id="examPhaseLabel">🎓 Introduction</div>
       <div class="htopic" id="examTopicLabel"></div>
     </div>
-    <div class="exam-counter" id="exchCount"></div>
+    <div style="display:flex;align-items:center;gap:8px">
+      <button id="ttsToggle" onclick="toggleTTS()" title="Examiner voice on/off"
+        style="background:rgba(255,255,255,.2);border:none;border-radius:20px;padding:4px 10px;font-size:15px;cursor:pointer;line-height:1">🔊</button>
+      <div class="exam-counter" id="exchCount"></div>
+    </div>
   </div>
 
   <div class="phase-bar" id="phaseBar">
@@ -709,6 +713,7 @@ function startExam(){
   const s1   = pool.splice(i1,1)[0];
   convSubjects = [s1, pool[Math.floor(Math.random()*pool.length)]];
 
+  window.speechSynthesis && window.speechSynthesis.cancel();
   history    = [];
   phaseCount = {intro:0, phase1:0, phase2:0};
   qHintShown = {phase1:false, phase2:false};
@@ -1141,6 +1146,42 @@ function tryAgain(){
   else startExam();
 }
 
+// ── TTS (Examiner Voice) ──────────────────────────────────────────
+let ttsOn = localStorage.getItem('tts') !== '0'; // default ON
+
+function toggleTTS(){
+  ttsOn = !ttsOn;
+  localStorage.setItem('tts', ttsOn ? '1' : '0');
+  document.getElementById('ttsToggle').textContent = ttsOn ? '🔊' : '🔇';
+  if(!ttsOn) window.speechSynthesis.cancel();
+}
+
+function speakExaminer(text){
+  if(!ttsOn || !window.speechSynthesis) return;
+  window.speechSynthesis.cancel();
+  // Strip emoji and markdown
+  const clean = text.replace(/[\u{1F000}-\u{1FFFF}]|[☀-➿]/gu,'').replace(/\*+/g,'').trim();
+  const utt = new SpeechSynthesisUtterance(clean);
+  utt.lang = 'en-GB';
+  utt.rate = 0.92;
+  utt.pitch = 1.0;
+  // Prefer a female en-GB voice if available
+  const voices = window.speechSynthesis.getVoices();
+  const preferred = voices.find(v=>v.lang==='en-GB' && /female|woman|serena|kate|amy|google uk/i.test(v.name))
+                 || voices.find(v=>v.lang==='en-GB')
+                 || voices.find(v=>v.lang.startsWith('en'));
+  if(preferred) utt.voice = preferred;
+  window.speechSynthesis.speak(utt);
+}
+
+// Voices load asynchronously on some browsers
+if(window.speechSynthesis) window.speechSynthesis.onvoiceschanged = ()=>{};
+
+(function initTTS(){
+  const btn = document.getElementById('ttsToggle');
+  if(btn) btn.textContent = ttsOn ? '🔊' : '🔇';
+})();
+
 // ── UI HELPERS ────────────────────────────────────────────────────
 function addBubble(role, text){
   const area  = document.getElementById('chatArea');
@@ -1152,6 +1193,7 @@ function addBubble(role, text){
     <div class="bubble">${text.replace(/\n/g,'<br>')}</div>`;
   area.insertBefore(d,typing);
   area.scrollTop=area.scrollHeight;
+  if(role==='examiner') speakExaminer(text);
 }
 
 function addQHint(){
