@@ -589,7 +589,7 @@ html[data-dark] .crit-tip{background:var(--primary-lt);color:#93C5FD}
 ══════════════════════════════════════════════════ -->
 <script>
 // ── CONFIG ────────────────────────────────────────────────────────
-const WORKER_URL = 'https://dry-bush-add7.jingplus.workers.dev';
+const WORKER_URL = 'dry-bush-add7.jingplus.workers.dev';
 
 // ── TOPICS (must NOT match the 6 Conversation subjects) ───────────
 const TOPICS = [
@@ -691,17 +691,7 @@ function pickMode(m){
 
 function afterModeSelect(){
   if(!practiceMode) return;
-  // Phase 1 and Full need a topic; Intro and Phase 2 do not
-  if(practiceMode==='phase1'||practiceMode==='full'){
-    // Reset topic selection
-    document.querySelectorAll('.topic-card').forEach(c=>c.classList.remove('selected'));
-    document.getElementById('startBtn').disabled = true;
-    selectedTopic = null;
-    showScreen('s-topic');
-  } else {
-    selectedTopic = null;
-    startExam();
-  }
+  startExam();
 }
 
 function pickTopic(i){
@@ -713,8 +703,6 @@ function pickTopic(i){
 
 // ── START EXAM ────────────────────────────────────────────────────
 function startExam(){
-  if((practiceMode==='phase1'||practiceMode==='full') && !selectedTopic) return;
-
   // Pick 2 random conversation subjects for Phase 2
   const pool = [...CONV_SUBJECTS];
   const i1   = Math.floor(Math.random()*pool.length);
@@ -730,10 +718,8 @@ function startExam(){
   else if(practiceMode==='phase1'){ phase='phase1'; }
   else { phase='intro'; }
 
-  const topicLabel = selectedTopic
-    ? `${selectedTopic.e} ${selectedTopic.en} / ${selectedTopic.zh}`
-    : `💬 ${convSubjects[0]} & ${convSubjects[1]}`;
-  document.getElementById('examTopicLabel').textContent = topicLabel;
+  const modeLabels = {intro:'Brief Introduction',phase1:'Phase 1: Topic',phase2:`Phase 2: Conversation`,full:'Full Exam'};
+  document.getElementById('examTopicLabel').textContent = modeLabels[practiceMode] || '';
   document.getElementById('chatArea').innerHTML=`
     <div class="typing show" id="typing">
       <div class="typing-dots">
@@ -797,7 +783,10 @@ async function handleStudent(txt){
     const clean=stripKeys(reply);
     history.push({role:'model',parts:[{text:clean}]});
     addBubble('examiner',clean);
-    setTimeout(()=>enterPhase('phase2'),700);
+    setTimeout(async()=>{
+      enterPhase('phase2');
+      await autoTrigger(); // examiner asks first Phase 2 question automatically
+    },700);
     return;
   }
   if(reply.includes('[DONE]')){
@@ -835,7 +824,7 @@ function enterPhase(newPhase){
 
 function addPhaseMarker(p){
   const labels={
-    phase1:`📝 Phase 1: Topic — ${selectedTopic?selectedTopic.en:''}`,
+    phase1:`📝 Phase 1: Topic Discussion`,
     phase2:`💬 Phase 2: Conversation — ${convSubjects[0]} & ${convSubjects[1]}`,
   };
   const el=document.createElement('div');
@@ -854,10 +843,10 @@ function buildPrompt(){
   if(phase==='phase1' && practiceMode==='phase1' && n===0){
     return `You are a Trinity College London GESE Grade 5 (B1) English examiner.
 Start Phase 1: Topic Discussion directly (no introduction needed for this practice).
-Say something like: "Let's practise the Topic Phase. What is your topic today?"
-The student's topic is: "${selectedTopic?.en}"
+Open with: "Let's practise the Topic Phase. What is your topic today?"
+Wait for the student to name and describe their topic. Then ask natural follow-up questions.
 Keep responses SHORT — 1-2 sentences, one question at a time.
-Ask about different aspects of the topic, encourage B1 language (present perfect, will, prefer/rather, because, for/since).
+Encourage B1 language: present perfect, will for future, I prefer/I'd rather, because, for/since.
 After ${max} student responses, end warmly and write [DONE].`;
   }
 
@@ -893,7 +882,7 @@ ${isLast
   if(phase==='phase1'){
     const isLast = n+1>=PHASE_MAX.phase1;
     return `You are a Trinity College London GESE Grade 5 (B1) English examiner — Phase 1: Topic Discussion.
-Student's topic: "${selectedTopic?.en}"
+The student has chosen their own topic (stated earlier in the conversation). Follow up on it.
 Exchange ${n+1} of ${PHASE_MAX.phase1}.
 - Ask natural follow-up questions about different aspects of the topic (aim for 4+ angles)
 - ONE short question per response (1-2 sentences max)
@@ -938,9 +927,30 @@ async function callGemini(systemInstruction, contents){
       body:JSON.stringify({dailyPassword, payload}),
     });
     const data=await r.json();
-    return data?.candidates?.[0]?.content?.parts?.[0]?.text??null;
-  }catch{
-    return 'Sorry, there was a connection error. Please try again.';
+    const text=data?.candidates?.[0]?.content?.parts?.[0]?.text;
+    if(text) return text;
+    // Surface the actual Gemini error so the user can see what's wrong
+    const errDetail = data?.error?.message || data?.error?.status || JSON.stringify(data).substring(0,120);
+    console.error('Gemini error:', errDetail);
+    return `⚠️ API error: ${errDetail}`;
+  }catch(err){
+    console.error('Fetch error:', err);
+    return `⚠️ Cannot reach server. Check Worker URL and network. (${err.message})`;
+  }
+}
+
+// ── AUTO-TRIGGER (phase transition → examiner asks first question) ─
+async function autoTrigger(){
+  showTyping();
+  // Add a hidden user nudge so history stays valid (must alternate user/model)
+  const trigger=[...history,{role:'user',parts:[{text:'Please go ahead.'}]}];
+  const reply=await callGemini(buildPrompt(), trigger);
+  hideTyping();
+  if(reply){
+    const clean=stripKeys(reply);
+    history.push({role:'user',parts:[{text:'Please go ahead.'}]});
+    history.push({role:'model',parts:[{text:clean}]});
+    addBubble('examiner',clean);
   }
 }
 
@@ -971,7 +981,6 @@ async function generateScoring(){
   const scoringPrompt=`You are a Trinity College London GESE Grade 5 (B1) examiner writing a candidate assessment.
 
 Practice mode: ${modeLabel(practiceMode)}${modeNote}
-${selectedTopic?`Topic: ${selectedTopic.en}`:''}
 ${convSubjects.length?`Conversation subjects: ${convSubjects.join(', ')}`:'' }
 
 Conversation transcript:
@@ -1070,21 +1079,7 @@ function displayScoring(s, errMsg){
 
   const oc = scoreColor(s.overall);
 
-  function crit(label, data, emoji){
-    const c = scoreColor(data.score);
-    return `
-    <div class="crit-card">
-      <div class="crit-header">
-        <span>${emoji}</span>
-        <span class="crit-label">${label}</span>
-        <span class="crit-score" style="color:${c}">${data.score}/10</span>
-      </div>
-      <div class="bar-wrap"><div class="bar-fill" style="width:${data.score*10}%;background:${c}"></div></div>
-      <p class="crit-text">${data.text.replace(/\n/g,'<br>')}</p>
-      ${data.tip?`<div class="crit-tip">💡 ${data.tip}</div>`:''}
-    </div>`;
-  }
-
+  // Uses the global crit(label, emoji, data) defined below
   const modeNote = practiceMode==='intro'
     ? '<div class="mode-note">* Introduction is not assessed in the real exam — this feedback is for practice only.</div>'
     : '';
