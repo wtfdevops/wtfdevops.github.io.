@@ -242,4 +242,668 @@ html[data-dark] .ns-title { color: #A78BFA; }
 
       <div id="conversationSubjectField" class="input-group" style="display:none">
         <label class="label" for="convoSubject">Choose a Spontaneous Subject Area</label>
-        <select
+        <select id="convoSubject">
+          <option value="Festivals">Festivals / Celebrations</option>
+          <option value="Means of Transport">Means of Transport</option>
+          <option value="Special Occasions">Special Occasions (e.g. weddings, birthdays)</option>
+          <option value="Entertainment">Entertainment (e.g. cinema, music, television)</option>
+          <option value="Music">Music</option>
+          <option value="Recent Personal Experiences">Recent Personal Experiences</option>
+        </select>
+        <span class="helper-text">The AI will choose one during the real exam; you can pick here to guide your practice.</span>
+      </div>
+
+      <div class="err" id="setupErr"></div>
+      <button class="btn" onclick="startExamSession()">🚀 Start Practice Session</button>
+      <button class="btn btn-sec" onclick="switchView('viewDashboard')">← Back to Dashboard</button>
+    </div>
+
+    <div class="view" id="viewChat">
+      <div class="exam-header">
+        <div class="exam-title" id="examRoomTitle">Examiner Room</div>
+        <div class="timer" id="examTimer">00:00</div>
+      </div>
+
+      <div class="chat-box" id="chatBox">
+        </div>
+
+      <div class="status-txt" id="statusText">Initialising session...</div>
+      
+      <div class="controls-area">
+        <button class="mic-btn" id="micBtn" onclick="handleMicClick()" disabled>🎙️</button>
+        <button class="btn btn-danger" id="finishExamBtn" onclick="confirmFinishExam()" style="display:none;width:auto;padding:8px 16px;font-size:13px;margin:0">Finish & Grade Exam</button>
+      </div>
+    </div>
+
+    <div class="view" id="viewScoring">
+      <div class="score-header">
+        <div class="score-icon" id="scoringIcon">📊</div>
+        <div class="score-title">Performance Feedback Report</div>
+      </div>
+
+      <div class="scoring-scroll" id="scoringContent">
+        </div>
+
+      <button class="btn" id="tryAgainBtn" onclick="restartSameMode()" style="display:none">🔄 Practice This Component Again</button>
+      <button class="btn btn-sec" id="changeTopicBtn" onclick="switchView('viewDashboard')" style="display:none">🏠 Return to Dashboard</button>
+    </div>
+
+    <div class="view" id="viewTeacherLogin">
+      <div class="input-group" style="margin-top:20px">
+        <label class="label" for="masterPasswordInput">Master System Password</label>
+        <input type="password" id="masterPasswordInput" placeholder="Enter secure admin password"/>
+      </div>
+      <div class="err" id="teacherErr"></div>
+      <button class="btn" onclick="authenticateTeacher()">Admin Login →</button>
+      <button class="btn btn-sec" onclick="switchView('viewPassword')">← Back to Student Access</button>
+    </div>
+
+    <div class="view" id="viewTeacherDash">
+      <div class="dash-card" style="background:var(--ph2-lt);border-left-color:var(--ph2);margin-bottom:16px">
+        <strong>Teacher Portal</strong> — Access tokens and real-time environment telemetry.
+      </div>
+      
+      <div class="overall-wrap" style="padding:12px;margin-bottom:16px">
+        <div class="label" style="margin-bottom:2px">Today's Daily Password</div>
+        <div style="font-size:28px;font-weight:800;letter-spacing:2px;color:var(--ph2)" id="tTodayPassword">------</div>
+        <div style="font-size:12px;color:var(--muted);margin-top:4px" id="tTodayDate">Date: -----</div>
+      </div>
+
+      <div id="statsBlock" style="display:none">
+        <div class="chart-title">Usage Statistics</div>
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="sc-label">Today's Calls</div>
+            <div class="sc-val" id="stCalls">0</div>
+            <div class="sc-sub" id="stCostToday">$0.00 est.</div>
+          </div>
+          <div class="stat-card">
+            <div class="sc-label">Today's Tokens</div>
+            <div class="sc-val" id="stTokens">0</div>
+            <div class="sc-sub" id="stTokenBreakdown">in:0 out:0</div>
+          </div>
+          <div class="stat-card">
+            <div class="sc-label">Total Calls</div>
+            <div class="sc-val" id="stTotalCalls">0</div>
+            <div class="sc-sub">all time</div>
+          </div>
+          <div class="stat-card">
+            <div class="sc-label">Est. Total Cost</div>
+            <div class="sc-val" id="stTotalCost">$0.00</div>
+            <div class="sc-sub">Gemini 2.0 Flash</div>
+          </div>
+        </div>
+        <div class="chart-title" id="chartTitle">API Traffic Trend</div>
+        <div id="chartContainer" style="display:flex;align-items:flex-end;gap:6px;height:100px;padding:12px;background:var(--surface2);border-radius:9px;margin-bottom:14px"></div>
+      </div>
+      
+      <button class="btn btn-sec" onclick="switchView('viewPassword')">🚪 Exit Admin Portal</button>
+    </div>
+
+    <footer class="footer-note">
+      Aligned with CEFR B1 • Trinity GESE Grade 5 Spec • Secure Cloud Architecture
+    </footer>
+  </div>
+
+  <script>
+    // ⚠️ 關鍵配置：請修改為你自己的 Cloudflare Worker 網址
+    const WORKER_URL = 'https://b1-trinity.你的帳號名稱.workers.dev';
+
+    let dailyPassword = '';
+    let practiceMode  = ''; // 'intro', 'topic', 'conversation'
+    let history       = [];  // Gemini full semantic payload conversation context
+    
+    // Audio / Speech State
+    let recognition       = null;
+    let isRecording       = false;
+    let currentUtterance  = null;
+    let audioSynthesizer  = window.speechSynthesis;
+    let speechTokenBox    = []; // Accumulates tokens during live speech capture
+
+    // Timer state
+    let examTimeSeconds   = 0;
+    let timerInterval     = null;
+    let masterTeacherPwd  = '';
+
+    // Initialize application state
+    window.addEventListener('DOMContentLoaded', () => {
+      // Setup Web Speech API STT
+      const SpeechComp = window.SpeechRecognition || window.webkitSpeechRecognition;
+      if (SpeechComp) {
+        recognition = new SpeechComp();
+        recognition.continuous = true;
+        recognition.interimResults = true;
+        recognition.lang = 'en-GB'; // Strict compliance with UK testing guidelines
+
+        recognition.onstart = () => {
+          isRecording = true;
+          setMicUI(true);
+          updateStatus('Listening... Click the red button 🛑 to STOP and SEND.');
+        };
+
+        recognition.onresult = (e) => {
+          let interimText = '';
+          let finalizedText = '';
+
+          for (let i = e.resultIndex; i < e.results.length; ++i) {
+            if (e.results[i].isFinal) {
+              finalizedText += e.results[i][0].transcript;
+            } else {
+              interimText += e.results[i][0].transcript;
+            }
+          }
+
+          if (finalizedText) {
+            speechTokenBox.push(finalizedText);
+          }
+          renderLiveTranscription(speechTokenBox.join(' ') + ' ' + interimText);
+
+          // ✨ 已移除：2.2 秒自動靜音偵測計時器
+        };
+
+        recognition.onerror = (e) => {
+          if (e.error !== 'no-speech') {
+            console.error('STT Subsystem Fault:', e.error);
+            stopRecordingContext();
+            updateStatus('Microphone error occurred.');
+          }
+        };
+
+        recognition.onend = () => {
+          isRecording = false;
+          setMicUI(false);
+        };
+      } else {
+        updateStatus('Critical Error: Web Speech API unsupported in this browser.', true);
+      }
+
+      // 檢查暗黑模式偏好
+      if (localStorage.getItem('dark-mode') === 'true') {
+        document.documentElement.setAttribute('data-dark', '');
+        document.getElementById('themeBtn').textContent = '☀️';
+      }
+    });
+
+    // ── CRIT 評分卡卡片渲染函式 ──
+    function crit(label, emoji, data){
+      if (!data) return '';
+      const c = scoreColor(data.score);
+      return `
+      <div class="crit-card">
+        <div class="crit-header">
+          <span>${emoji}</span>
+          <span class="crit-label">${label}</span>
+          <span class="crit-score" style="color:${c}">${data.score}/10</span>
+        </div>
+        <div class="bar-wrap"><div class="bar-fill" style="width:${data.score*10}%;background:${c}"></div></div>
+        <p class="crit-text">${data.text.replace(/\n/g,'<br>')}</p>
+        ${data.tip ? `<div class="crit-tip">💡 ${data.tip}</div>` : ''}
+      </div>`;
+    }
+
+    // ── 核心網路代理閘道 ──
+    async function apiRequest(path, payload) {
+      const response = await fetch(`${WORKER_URL}${path}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+      if (!response.ok) {
+        const data = await response.json().catch(() => ({}));
+        throw new Error(data.error || `Server responded with status ${response.status}`);
+      }
+      return response.json();
+    }
+
+    // ── 密碼驗證頁面 ──
+    async function verifyPassword() {
+      const input = document.getElementById('dailyPasswordInput').value.trim().toUpperCase();
+      const errEl = document.getElementById('pwdErr');
+      errEl.classList.remove('show');
+      if (!input) return;
+
+      try {
+        await apiRequest('/chat', { dailyPassword: input, checkOnly: true });
+        dailyPassword = input;
+        switchView('viewDashboard');
+      } catch (err) {
+        errEl.classList.add('show');
+      }
+    }
+
+    function logout() {
+      dailyPassword = '';
+      document.getElementById('dailyPasswordInput').value = '';
+      switchView('viewPassword');
+    }
+
+    function switchView(viewId) {
+      document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+      document.getElementById(viewId).classList.add('active');
+    }
+
+    function toggleDarkMode() {
+      const isDark = document.documentElement.hasAttribute('data-dark');
+      if (isDark) {
+        document.documentElement.removeAttribute('data-dark');
+        document.getElementById('themeBtn').textContent = '🌙';
+        localStorage.setItem('dark-mode', 'false');
+      } else {
+        document.documentElement.setAttribute('data-dark', '');
+        document.getElementById('themeBtn').textContent = '☀️';
+        localStorage.setItem('dark-mode', 'true');
+      }
+    }
+
+    // ── 選擇練習項目 ──
+    function choosePracticeMode(mode) {
+      practiceMode = mode;
+      const introText = document.getElementById('topicIntroText');
+      const formFields = document.getElementById('topicFormFields');
+      const convoField = document.getElementById('conversationSubjectField');
+      
+      formFields.style.display = 'none';
+      convoField.style.display = 'none';
+      document.getElementById('setupErr').classList.remove('show');
+
+      if (mode === 'intro') {
+        introText.innerHTML = `<h3>👋 Component 1: Introduction</h3><p style="margin-top:6px;font-size:13.5px;color:var(--muted)">The examiner will greet you and ask basic background questions about your life, hobbies, or studies to help you settle in.</p>`;
+      } else if (mode === 'topic') {
+        introText.innerHTML = `<h3>📋 Component 2: Topic Phase</h3><p style="margin-top:6px;font-size:13.5px;color:var(--muted)">Please input your pre-prepared Trinity Form details below. The AI examiner will cross-examine you on these exact nodes for 4 minutes.</p>`;
+        formFields.style.display = 'block';
+      } else if (mode === 'conversation') {
+        introText.innerHTML = `<h3>💬 Component 3: Conversation Phase</h3><p style="margin-top:6px;font-size:13.5px;color:var(--muted)">Select a B1 specific subject area. The AI examiner will engage you in a spontaneous discussion on this topic for 2 minutes.</p>`;
+        convoField.style.display = 'block';
+      }
+      switchView('viewTopicSetup');
+    }
+
+    // ── 進入模擬考場 ──
+    function startExamSession() {
+      const errEl = document.getElementById('setupErr');
+      errEl.classList.remove('show');
+
+      let systemInstruction = `You are an expert oral examiner for Trinity College London GESE Grade 5 (CEFR B1 level). Your tone must be formal, encouraging, clear, and perfectly mimicking a British UK examiner. Speak at an appropriate speed for an immigrant or student. 
+
+Crucial Rules:
+1. Ask exactly ONE question at a time. Never group questions.
+2. Keep your spoken responses under 35 words. Be brief to let the candidate speak.
+3. If the candidate gives an extremely short answer, prompt them to expand using B1 vocabulary/structures.
+4. Assess and target B1 structures: Past Simple, Future intentions (going to/inf), Present Perfect, Expressions of preference, reasons (because, because of).`;
+
+      if (practiceMode === 'intro') {
+        document.getElementById('examRoomTitle').textContent = 'Room: Introduction';
+        systemInstruction += `\n\nStart by greeting the candidate warmly, asking their name, and asking a simple introductory question (e.g., about home, work, or hobbies).`;
+      } else if (practiceMode === 'topic') {
+        const title = document.getElementById('topicTitle').value.trim();
+        const pts = [
+          document.getElementById('tp1').value.trim(),
+          document.getElementById('tp2').value.trim(),
+          document.getElementById('tp3').value.trim(),
+          document.getElementById('tp4').value.trim()
+        ].filter(t => t.length > 0);
+
+        if (!title || pts.length < 3) {
+          errEl.textContent = '❌ Please provide a Topic Title and at least 3 discussion points.';
+          errEl.classList.add('show');
+          return;
+        }
+        document.getElementById('examRoomTitle').textContent = `Room: Topic — ${title}`;
+        systemInstruction += `\n\nThe candidate's topic form is titled "${title}". The discussion nodes are:\n${pts.map((p,i) => `- Point ${i+1}: ${p}`).join('\n')}\n\nStart directly by asking the candidate about their topic form or their first point. You must systematically ask questions about these points across 4 minutes.`;
+      } else if (practiceMode === 'conversation') {
+        const subj = document.getElementById('convoSubject').value;
+        document.getElementById('examRoomTitle').textContent = `Room: Conversation — ${subj}`;
+        systemInstruction += `\n\nThe conversation category selected is "${subj}". Engage the candidate in a spontaneous discussion regarding this theme. Start by introducing the subject and asking an introductory question.`;
+      }
+
+      // Reset application state
+      history = [{ role: 'user', parts: [{ text: `SYSTEM_CONFIG: ${systemInstruction}` }] }];
+      document.getElementById('chatBox').innerHTML = '';
+      document.getElementById('finishExamBtn').style.display = 'block';
+      
+      examTimeSeconds = 0;
+      document.getElementById('examTimer').textContent = '00:00';
+      document.getElementById('examTimer').classList.remove('warn');
+      clearInterval(timerInterval);
+      timerInterval = setInterval(() => {
+        examTimeSeconds++;
+        const m = String(Math.floor(examTimeSeconds / 60)).padStart(2, '0');
+        const s = String(examTimeSeconds % 60).padStart(2, '0');
+        document.getElementById('examTimer').textContent = `${m}:${s}`;
+        
+        if (examTimeSeconds >= 240) {
+          document.getElementById('examTimer').classList.add('warn');
+        }
+      }, 1000);
+
+      switchView('viewChat');
+      executeExaminerTurn();
+    }
+
+    // ── 執行考官回合（調用 Gemini） ──
+    async function executeExaminerTurn() {
+      updateStatus('Examiner is thinking...');
+      document.getElementById('micBtn').disabled = true;
+
+      try {
+        const payload = { contents: history };
+        const data = await apiRequest('/chat', { dailyPassword, payload });
+        
+        const responseText = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
+        if (!responseText) throw new Error('Empty response received from API layer.');
+
+        history.push({ role: 'model', parts: [{ text: responseText }] });
+        
+        appendMessage('examiner', responseText);
+        updateStatus('Examiner speaking...');
+        
+        // 文字轉語音 (TTS) 播放考官聲音
+        speakOutputText(responseText, () => {
+          updateStatus('Your turn. Click the mic button 🎙️ to start speaking.');
+          document.getElementById('micBtn').disabled = false;
+          // ✨ 已移除自動錄音：等待使用者主動手動點擊麥克風
+        });
+
+      } catch (err) {
+        console.error(err);
+        updateStatus('Session disruption. Failed to contact Examiner.', true);
+      }
+    }
+
+    // ── 語音合成 (TTS) 子系統 ──
+    function speakOutputText(text, callback) {
+      if (!audioSynthesizer) return callback();
+      audioSynthesizer.cancel();
+
+      const cleanText = text.replace(/SYSTEM_CONFIG:.*$/gi, '').trim();
+      currentUtterance = new SpeechSynthesisUtterance(cleanText);
+      currentUtterance.lang = 'en-GB';
+
+      const voices = audioSynthesizer.getVoices();
+      const ukVoice = voices.find(v => v.lang.startsWith('en-GB') && v.name.includes('Google')) || 
+                      voices.find(v => v.lang.startsWith('en-GB'));
+      if (ukVoice) currentUtterance.voice = ukVoice;
+
+      currentUtterance.onend = () => callback();
+      currentUtterance.onerror = (e) => {
+        console.error('TTS execution error:', e);
+        callback();
+      };
+      audioSynthesizer.speak(currentUtterance);
+    }
+
+    // ── 麥克風手動控制（改為手動按鈕開關） ──
+    function handleMicClick() {
+      if (isRecording) {
+        // 如果正在錄音，按第二下立刻停止並發送
+        commitUserSpeech();
+      } else {
+        // 如果沒在錄音，按第一下開啟錄音
+        startRecordingContext();
+      }
+    }
+
+    function startRecordingContext() {
+      if (!recognition || isRecording) return;
+      if (audioSynthesizer && audioSynthesizer.speaking) audioSynthesizer.cancel();
+      
+      speechTokenBox = [];
+      try {
+        recognition.start();
+      } catch (e) {
+        console.warn('Recognition start exception bypassed:', e);
+      }
+    }
+
+    function stopRecordingContext() {
+      if (!recognition || !isRecording) return;
+      try {
+        recognition.stop();
+      } catch (e) {}
+      isRecording = false;
+      setMicUI(false);
+    }
+
+    function commitUserSpeech() {
+      stopRecordingContext();
+      clearLiveTranscriptionBubble();
+
+      const finalPhrase = speechTokenBox.join(' ').trim();
+      if (!finalPhrase) {
+        updateStatus('No speech captured. Click mic to try again.');
+        document.getElementById('micBtn').disabled = false;
+        return;
+      }
+
+      appendMessage('user', finalPhrase);
+      history.push({ role: 'user', parts: [{ text: finalPhrase }] });
+      executeExaminerTurn();
+    }
+
+    // ── UI 輔助函式 ──
+    function setMicUI(active) {
+      const btn = document.getElementById('micBtn');
+      if (active) {
+        btn.classList.add('recording');
+        btn.textContent = '🛑';
+      } else {
+        btn.classList.remove('recording');
+        btn.textContent = '🎙️';
+      }
+    }
+
+    function updateStatus(txt, isErr = false) {
+      const el = document.getElementById('statusText');
+      el.textContent = txt;
+      if (isErr) el.style.color = 'var(--danger)';
+      else el.style.color = 'var(--muted)';
+    }
+
+    function appendMessage(role, text) {
+      const box = document.getElementById('chatBox');
+      const el = document.createElement('div');
+      el.className = `msg ${role}`;
+      el.textContent = text;
+      box.appendChild(el);
+      box.scrollTop = box.scrollHeight;
+    }
+
+    function renderLiveTranscription(text) {
+      const box = document.getElementById('chatBox');
+      let liveEl = document.getElementById('liveTransBubble');
+      if (!liveEl) {
+        liveEl = document.createElement('div');
+        liveEl.id = 'liveTransBubble';
+        liveEl.className = 'msg live-trans';
+        box.appendChild(liveEl);
+      }
+      liveEl.textContent = text;
+      box.scrollTop = box.scrollHeight;
+    }
+
+    function clearLiveTranscriptionBubble() {
+      const liveEl = document.getElementById('liveTransBubble');
+      if (liveEl) liveEl.remove();
+    }
+
+    function restartSameMode() {
+      choosePracticeMode(practiceMode);
+    }
+
+    // ── 結束考試並進行評分 ──
+    function confirmFinishExam() {
+      if (history.length < 3) {
+        clearInterval(timerInterval);
+        switchView('viewDashboard');
+        return;
+      }
+      if (confirm('Are you ready to submit your spoken text context to the evaluation engine?')) {
+        executeGradingProtocol();
+      }
+    }
+
+    async function executeGradingProtocol() {
+      clearInterval(timerInterval);
+      stopRecordingContext();
+      if (audioSynthesizer) audioSynthesizer.cancel();
+
+      switchView('viewScoring');
+      document.getElementById('tryAgainBtn').style.display = 'none';
+      document.getElementById('changeTopicBtn').style.display = 'none';
+      displayScoring(null, '🔄 Analyzing transcript telemetry and assessing linguistic benchmarks...');
+
+      const exchangeLogs = history.filter(h => !h.parts[0].text.startsWith('SYSTEM_CONFIG:'));
+
+      const gradingPrompt = `You are the lead linguistic grading engine for Trinity College London assessments. Evaluate the following dialogue transcript against CEFR B1 / Grade 5 speaking criteria.
+
+Dialogue Context:
+${exchangeLogs.map(m => `${m.role.toUpperCase()}: ${m.parts[0].text}`).join('\n')}
+
+You MUST respond with a single, valid JSON object matching this exact schema:
+{
+  "overall": 7,
+  "fluency": { "score": 8, "text": "...", "tip": "..." },
+  "vocabulary": { "score": 6, "text": "...", "tip": "..." },
+  "grammar": { "score": 7, "text": "...", "tip": "..." },
+  "communication": { "score": 7, "text": "...", "tip": "..." },
+  "nextSteps": ["...", "..."]
+}
+Scores must be integers between 1 and 10. Do not include markdown code block styling like \`\`\`json outside the object. Respond only with the raw object. Keep commentary brief and clear.`;
+
+      try {
+        const payload = { contents: [{ role: 'user', parts: [{ text: gradingPrompt }] }] };
+        const data = await apiRequest('/chat', { dailyPassword, payload });
+        
+        let rawText = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
+        rawText = rawText.replace(/```json/g, '').replace(/```/g, '').trim();
+        
+        const scoreObj = JSON.parse(rawText);
+        displayScoring(scoreObj, null);
+      } catch (err) {
+        console.error('Grading parsing exception:', err);
+        displayScoring(null, '❌ Failed to parse response from evaluation server. Please try practicing again.');
+      }
+    }
+
+    function displayScoring(s, errMsg){
+      if(errMsg){
+        document.getElementById('scoringContent').innerHTML = `<p class="err show" style="text-align:center;margin:20px 0">${errMsg}</p>`;
+        document.getElementById('tryAgainBtn').style.display = 'block';
+        document.getElementById('changeTopicBtn').style.display = 'block';
+        return;
+      }
+
+      const oc = scoreColor(s.overall);
+      const modeNote = practiceMode === 'intro'
+        ? '<div class="mode-note">* Introduction is not assessed in the real exam — this feedback is for practice only.</div>'
+        : '';
+
+      document.getElementById('scoringContent').innerHTML = `
+        ${modeNote}
+        <div class="overall-wrap">
+          <div class="overall-circle" style="border-color:${oc}">
+            <div class="overall-num" style="color:${oc}">${s.overall}</div>
+            <div class="overall-den">/10</div>
+          </div>
+          <div class="overall-label">${overallLabel(s.overall)}</div>
+        </div>
+        ${crit('Fluency', '🗣️', s.fluency)}
+        ${crit('Vocabulary', '📚', s.vocabulary)}
+        ${crit('Grammar', '✏️', s.grammar)}
+        ${crit('Communication', '💬', s.communication)}
+        ${s.nextSteps && s.nextSteps.length ? `
+        <div class="next-steps">
+          <div class="ns-title">📋 Next Steps / 改善建議</div>
+          <ul class="ns-list">${s.nextSteps.map(t => `<li>${t}</li>`).join('')}</ul>
+        </div>` : ''}`;
+
+      document.getElementById('scoringIcon').textContent = s.overall >= 7 ? '🏆' : '📊';
+      document.getElementById('tryAgainBtn').style.display  = 'block';
+      document.getElementById('changeTopicBtn').style.display = 'block';
+    }
+
+    function scoreColor(v) {
+      if (v >= 8) return 'var(--success)';
+      if (v >= 5) return 'var(--warn)';
+      return 'var(--danger)';
+    }
+
+    function overallLabel(v) {
+      if (v >= 8.5) return 'Distinction (🏆 A)';
+      if (v >= 7.0) return 'Merit (🌟 B)';
+      if (v >= 5.0) return 'Pass (✅ C)';
+      return 'Fail (❌ Insufficient)';
+    }
+
+    // ── 老師/管理員後端入口 ──
+    async function authenticateTeacher() {
+      const pwd = document.getElementById('masterPasswordInput').value;
+      const errEl = document.getElementById('teacherErr');
+      errEl.classList.remove('show');
+
+      try {
+        const data = await apiRequest('/teacher', { masterPassword: pwd });
+        masterTeacherPwd = pwd;
+        
+        document.getElementById('tTodayPassword').textContent = data.password;
+        document.getElementById('tTodayDate').textContent = `Date: ${data.date} (HKT Midnight Clock)`;
+        
+        switchView('viewTeacherDash');
+        fetchTelemetryStats();
+      } catch (err) {
+        errEl.textContent = '❌ Credentials rejected.';
+        errEl.classList.add('show');
+      }
+    }
+
+    async function fetchTelemetryStats() {
+      try {
+        const data = await apiRequest('/stats', { masterPassword: masterTeacherPwd });
+        if (!data.configured) return;
+
+        document.getElementById('statsBlock').style.display = 'block';
+        document.getElementById('stCalls').textContent = data.today?.calls || 0;
+        
+        const todayTok = (data.daily?.[data.today]?.inputTokens || 0) + (data.daily?.[data.today]?.outputTokens || 0);
+        document.getElementById('stTokens').textContent = todayTok.toLocaleString();
+        document.getElementById('stTokenBreakdown').textContent = `in:${(data.daily?.[data.today]?.inputTokens || 0).toLocaleString()} out:${(data.daily?.[data.today]?.outputTokens || 0).toLocaleString()}`;
+        
+        const cToday = ((data.daily?.[data.today]?.inputTokens || 0) * 0.075 / 1000000) + ((data.daily?.[data.today]?.outputTokens || 0) * 0.30 / 1000000);
+        const cTotal = (data.total.inputTokens * 0.075 / 1000000) + (data.total.outputTokens * 0.30 / 1000000);
+        
+        document.getElementById('stCostToday').textContent = `$${cToday.toFixed(4)} est.`;
+        document.getElementById('stTotalCalls').textContent = data.total.calls.toLocaleString();
+        document.getElementById('stTotalCost').textContent = `$${cTotal.toFixed(3)}`;
+
+        renderAnalyticsChart(data.daily);
+      } catch (e) {
+        console.error('Telemetry query failed:', e);
+      }
+    }
+
+    function renderAnalyticsChart(dailyObj) {
+      const container = document.getElementById('chartContainer');
+      container.innerHTML = '';
+      if (!dailyObj) return;
+
+      const days = Object.keys(dailyObj).sort().slice(-14);
+      if (!days.length) {
+        container.innerHTML = `<div style="color:var(--muted);font-size:13px;margin:auto">No dataset logged yet.</div>`;
+        return;
+      }
+
+      const maxCalls = Math.max(...days.map(d => dailyObj[d].calls || 1));
+      document.getElementById('chartTitle').textContent = `API Traffic — Last ${days.length} Days`;
+
+      days.forEach(d => {
+        const node = document.createElement('div');
+        node.className = 'bar-node';
+        const h = ((dailyObj[d].calls || 0) / maxCalls) * 100;
+        node.style.height = `${Math.max(h, 8)}%`;
+        node.setAttribute('data-tip', `${d}: ${dailyObj[d].calls} calls`);
+        container.appendChild(node);
+      });
+    }
+  </script>
+</body>
+</html>
