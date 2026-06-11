@@ -101,7 +101,6 @@ html[data-dark] .dash-card { border-left-color: #3B82F6; }
 @keyframes pulse { 0%, 100% { opacity:1; } 50% { opacity:0.6; } }
 
 .chat-box { flex-grow: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 12px; padding: 4px; margin-bottom: 16px; max-height: 340px; border-bottom: 1px solid var(--border); padding-bottom: 14px; scroll-behavior: smooth; }
-/* Scrollbar styling */
 .chat-box::-webkit-scrollbar { width: 5px; }
 .chat-box::-webkit-scrollbar-track { background: transparent; }
 .chat-box::-webkit-scrollbar-thumb { background: var(--border); border-radius: 10px; }
@@ -110,8 +109,6 @@ html[data-dark] .dash-card { border-left-color: #3B82F6; }
 @keyframes bubbleUp { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
 .msg.examiner { background: var(--ex-bubble); color: var(--text); align-self: flex-start; border-top-left-radius: 2px; }
 .msg.user { background: var(--primary); color: #fff; align-self: flex-end; border-top-right-radius: 2px; }
-
-/* Live transcription bubble */
 .msg.live-trans { background: transparent; border: 1px dashed var(--muted); color: var(--muted); align-self: flex-end; font-style: italic; border-top-right-radius: 2px; }
 
 .controls-area { display: flex; flex-direction: column; gap: 10px; align-items: center; justify-content: center; min-height: 80px; }
@@ -193,29 +190,37 @@ html[data-dark] .ns-title { color: #A78BFA; }
 
     <div class="view" id="viewDashboard">
       <div class="dash-card">
-        Welcome to the Trinity College London <strong>GESE Grade 5 (B1)</strong> Practice System. Choose a component to practice with the AI examiner.
+        Welcome to the Trinity College London <strong>GESE Grade 5 (B1)</strong> Practice System. Choose your practice path.
       </div>
-      <label class="label">Select Exam Component</label>
+      <label class="label">Select Practice Mode</label>
       <div class="topics-container">
+        <button class="topic-opt" onclick="choosePracticeMode('full')" style="border: 2px solid var(--ph2); background: var(--ph2-lt)">
+          <span>🏆</span>
+          <div style="text-align:left">
+            <div style="font-weight:700;color:var(--ph2)">Full Mock Exam (100% Full Session)</div>
+            <div style="font-size:12px;color:var(--muted);font-weight:400;margin-top:2px">Intro (1 min) ➔ Topic (5 mins) ➔ Conversation (5 mins, AI picks 2 subjects).</div>
+          </div>
+        </button>
+
         <button class="topic-opt" onclick="choosePracticeMode('intro')">
           <span>👋</span>
           <div style="text-align:left">
-            <div>Introduction & Greeting</div>
-            <div style="font-size:12px;color:var(--muted);font-weight:400;margin-top:2px">Warm-up and simple background questions (1-2 mins)</div>
+            <div>Introduction & Greeting (Isolated)</div>
+            <div style="font-size:12px;color:var(--muted);font-weight:400;margin-top:2px">Warm-up and simple background questions (1 min)</div>
           </div>
         </button>
         <button class="topic-opt" onclick="choosePracticeMode('topic')">
           <span>📋</span>
           <div style="text-align:left">
-            <div>Topic Phase</div>
-            <div style="font-size:12px;color:var(--muted);font-weight:400;margin-top:2px">Discuss your pre-prepared topic form (4 mins)</div>
+            <div>Topic Phase (Isolated)</div>
+            <div style="font-size:12px;color:var(--muted);font-weight:400;margin-top:2px">Discuss your 1 main topic and 5 sub-points (5 mins)</div>
           </div>
         </button>
         <button class="topic-opt" onclick="choosePracticeMode('conversation')">
           <span>💬</span>
           <div style="text-align:left">
-            <div>Conversation Phase</div>
-            <div style="font-size:12px;color:var(--muted);font-weight:400;margin-top:2px">Spontaneous exchange on B1 subject areas (2 mins)</div>
+            <div>Conversation Phase (Isolated)</div>
+            <div style="font-size:12px;color:var(--muted);font-weight:400;margin-top:2px">Choose 1 specific subject area to practice intensely (5 mins).</div>
           </div>
         </button>
       </div>
@@ -227,16 +232,17 @@ html[data-dark] .ns-title { color: #A78BFA; }
       
       <div id="topicFormFields" style="display:none">
         <div class="input-group">
-          <label class="label" for="topicTitle">Overall Topic Title</label>
+          <label class="label" for="topicTitle">Overall Topic Title (主標題)</label>
           <input type="text" id="topicTitle" placeholder="e.g., My Festive Trip to Japan" maxlength="50"/>
         </div>
         <div class="input-group" style="margin-bottom:10px">
-          <label class="label">4 Discussion Points (Keywords/Phrases)</label>
-          <input type="text" id="tp1" placeholder="Point 1: Preparing traditional clothing" maxlength="60" style="margin-bottom:8px"/>
-          <input type="text" id="tp2" placeholder="Point 2: Trying local street food" maxlength="60" style="margin-bottom:8px"/>
-          <input type="text" id="tp3" placeholder="Point 3: Visiting historic temples" maxlength="60" style="margin-bottom:8px"/>
-          <input type="text" id="tp4" placeholder="Point 4: Buying souvenirs for my family" maxlength="60"/>
-          <span class="helper-text">Keep points concise, exactly like the real Trinity topic form.</span>
+          <label class="label">5 Discussion Sub-points (分項點)</label>
+          <input type="text" id="tp1" placeholder="Point 1: e.g., Preparing traditional clothing" maxlength="60" style="margin-bottom:8px"/>
+          <input type="text" id="tp2" placeholder="Point 2: e.g., Trying local street food" maxlength="60" style="margin-bottom:8px"/>
+          <input type="text" id="tp3" placeholder="Point 3: e.g., Visiting historic temples" maxlength="60" style="margin-bottom:8px"/>
+          <input type="text" id="tp4" placeholder="Point 4: e.g., Buying souvenirs for my family" maxlength="60" style="margin-bottom:8px"/>
+          <input type="text" id="tp5" placeholder="Point 5: e.g., Travelling on the bullet train" maxlength="60"/>
+          <span class="helper-text">Input your points here. The AI examiner will use natural conversation to cross-examine you.</span>
         </div>
       </div>
 
@@ -245,12 +251,12 @@ html[data-dark] .ns-title { color: #A78BFA; }
         <select id="convoSubject">
           <option value="Festivals">Festivals / Celebrations</option>
           <option value="Means of Transport">Means of Transport</option>
-          <option value="Special Occasions">Special Occasions (e.g. weddings, birthdays)</option>
-          <option value="Entertainment">Entertainment (e.g. cinema, music, television)</option>
+          <option value="Special Occasions (e.g. weddings, birthdays)">Special Occasions (e.g. weddings, birthdays)</option>
+          <option value="Entertainment (e.g. cinema, music, television)">Entertainment (e.g. cinema, music, television)</option>
           <option value="Music">Music</option>
           <option value="Recent Personal Experiences">Recent Personal Experiences</option>
         </select>
-        <span class="helper-text">The AI will choose one during the real exam; you can pick here to guide your practice.</span>
+        <span class="helper-text">Select the topic you want to focus on for this session.</span>
       </div>
 
       <div class="err" id="setupErr"></div>
@@ -264,8 +270,7 @@ html[data-dark] .ns-title { color: #A78BFA; }
         <div class="timer" id="examTimer">00:00</div>
       </div>
 
-      <div class="chat-box" id="chatBox">
-        </div>
+      <div class="chat-box" id="chatBox"></div>
 
       <div class="status-txt" id="statusText">Initialising session...</div>
       
@@ -281,8 +286,7 @@ html[data-dark] .ns-title { color: #A78BFA; }
         <div class="score-title">Performance Feedback Report</div>
       </div>
 
-      <div class="scoring-scroll" id="scoringContent">
-        </div>
+      <div class="scoring-scroll" id="scoringContent"></div>
 
       <button class="btn" id="tryAgainBtn" onclick="restartSameMode()" style="display:none">🔄 Practice This Component Again</button>
       <button class="btn btn-sec" id="changeTopicBtn" onclick="switchView('viewDashboard')" style="display:none">🏠 Return to Dashboard</button>
@@ -346,34 +350,30 @@ html[data-dark] .ns-title { color: #A78BFA; }
   </div>
 
   <script>
-    // ⚠️ 關鍵配置：請修改為你自己的 Cloudflare Worker 網址
+    // ⭐️ 網址已完美預設綁定，以後無需再手動修改！
     const WORKER_URL = 'https://b1-trinity.jingplus.workers.dev';
 
     let dailyPassword = '';
-    let practiceMode  = ''; // 'intro', 'topic', 'conversation'
-    let history       = [];  // Gemini full semantic payload conversation context
+    let practiceMode  = ''; // 'full', 'intro', 'topic', 'conversation'
+    let history       = [];  
     
-    // Audio / Speech State
     let recognition       = null;
     let isRecording       = false;
     let currentUtterance  = null;
     let audioSynthesizer  = window.speechSynthesis;
-    let speechTokenBox    = []; // Accumulates tokens during live speech capture
+    let speechTokenBox    = []; 
 
-    // Timer state
     let examTimeSeconds   = 0;
     let timerInterval     = null;
     let masterTeacherPwd  = '';
 
-    // Initialize application state
     window.addEventListener('DOMContentLoaded', () => {
-      // Setup Web Speech API STT
       const SpeechComp = window.SpeechRecognition || window.webkitSpeechRecognition;
       if (SpeechComp) {
         recognition = new SpeechComp();
         recognition.continuous = true;
         recognition.interimResults = true;
-        recognition.lang = 'en-GB'; // Compliance with UK testing guidelines
+        recognition.lang = 'en-GB';
 
         recognition.onstart = () => {
           isRecording = true;
@@ -384,18 +384,11 @@ html[data-dark] .ns-title { color: #A78BFA; }
         recognition.onresult = (e) => {
           let interimText = '';
           let finalizedText = '';
-
           for (let i = e.resultIndex; i < e.results.length; ++i) {
-            if (e.results[i].isFinal) {
-              finalizedText += e.results[i][0].transcript;
-            } else {
-              interimText += e.results[i][0].transcript;
-            }
+            if (e.results[i].isFinal) finalizedText += e.results[i][0].transcript;
+            else interimText += e.results[i][0].transcript;
           }
-
-          if (finalizedText) {
-            speechTokenBox.push(finalizedText);
-          }
+          if (finalizedText) speechTokenBox.push(finalizedText);
           renderLiveTranscription(speechTokenBox.join(' ') + ' ' + interimText);
         };
 
@@ -406,40 +399,17 @@ html[data-dark] .ns-title { color: #A78BFA; }
             updateStatus('Microphone error occurred.');
           }
         };
-
-        recognition.onend = () => {
-          isRecording = false;
-          setMicUI(false);
-        };
+        recognition.onend = () => { isRecording = false; setMicUI(false); };
       } else {
         updateStatus('Critical Error: Web Speech API unsupported in this browser.', true);
       }
 
-      // Check Dark Mode
       if (localStorage.getItem('dark-mode') === 'true') {
         document.documentElement.setAttribute('data-dark', '');
         document.getElementById('themeBtn').textContent = '☀️';
       }
     });
 
-    // Crit Card Builder
-    function crit(label, emoji, data){
-      if (!data) return '';
-      const c = scoreColor(data.score);
-      return `
-      <div class="crit-card">
-        <div class="crit-header">
-          <span>${emoji}</span>
-          <span class="crit-label">${label}</span>
-          <span class="crit-score" style="color:${c}">${data.score}/10</span>
-        </div>
-        <div class="bar-wrap"><div class="bar-fill" style="width:${data.score*10}%;background:${c}"></div></div>
-        <p class="crit-text">${data.text.replace(/\n/g,'<br>')}</p>
-        ${data.tip ? `<div class="crit-tip">💡 ${data.tip}</div>` : ''}
-      </div>`;
-    }
-
-    // Proxy request handler for /chat (which takes { dailyPassword, payload })
     async function apiRequest(path, payload) {
       const response = await fetch(`${WORKER_URL}${path}`, {
         method: 'POST',
@@ -453,7 +423,6 @@ html[data-dark] .ns-title { color: #A78BFA; }
       return response.json();
     }
 
-    // Student Daily Key Verification
     async function verifyPassword() {
       const input = document.getElementById('dailyPasswordInput').value.trim().toUpperCase();
       const errEl = document.getElementById('pwdErr');
@@ -464,9 +433,7 @@ html[data-dark] .ns-title { color: #A78BFA; }
         await apiRequest('/chat', { dailyPassword: input, checkOnly: true });
         dailyPassword = input;
         switchView('viewDashboard');
-      } catch (err) {
-        errEl.classList.add('show');
-      }
+      } catch (err) { errEl.classList.add('show'); }
     }
 
     function logout() {
@@ -493,7 +460,6 @@ html[data-dark] .ns-title { color: #A78BFA; }
       }
     }
 
-    // Component Choice Logic
     function choosePracticeMode(mode) {
       practiceMode = mode;
       const introText = document.getElementById('topicIntroText');
@@ -504,54 +470,97 @@ html[data-dark] .ns-title { color: #A78BFA; }
       convoField.style.display = 'none';
       document.getElementById('setupErr').classList.remove('show');
 
-      if (mode === 'intro') {
-        introText.innerHTML = `<h3>👋 Component 1: Introduction</h3><p style="margin-top:6px;font-size:13.5px;color:var(--muted)">The examiner will greet you and ask basic background questions about your life, hobbies, or studies to help you settle in.</p>`;
+      if (mode === 'full') {
+        introText.innerHTML = `<h3>🏆 Full Mock Exam (完整模擬考試)</h3><p style="margin-top:6px;font-size:13.5px;color:var(--muted)">AI將精準掌控時間比例：<strong>Phase 1 熱身 (1 分鐘)</strong> ➔ <strong>Phase 2 Topic 盤問 (5 分鐘)</strong> ➔ <strong>Phase 3 隨機雙主題即興交流 (5 分鐘)</strong>。請在下方輸入您的題目：</p>`;
+        formFields.style.display = 'block';
+      } else if (mode === 'intro') {
+        introText.innerHTML = `<h3>👋 Component 1: Introduction</h3><p style="margin-top:6px;font-size:13.5px;color:var(--muted)">The examiner will greet you and ask basic background questions about your life, hobbies, or studies (Target: 1 minute).</p>`;
       } else if (mode === 'topic') {
-        introText.innerHTML = `<h3>📋 Component 2: Topic Phase</h3><p style="margin-top:6px;font-size:13.5px;color:var(--muted)">Please input your pre-prepared Trinity Form details below. The AI examiner will cross-examine you on these exact nodes for 4 minutes.</p>`;
+        introText.innerHTML = `<h3>📋 Component 2: Topic Phase</h3><p style="margin-top:6px;font-size:13.5px;color:var(--muted)">Please input your pre-prepared Topic Form details. The AI will cross-examine you on these 5 nodes (Target: 5 minutes).</p>`;
         formFields.style.display = 'block';
       } else if (mode === 'conversation') {
-        introText.innerHTML = `<h3>💬 Component 3: Conversation Phase</h3><p style="margin-top:6px;font-size:13.5px;color:var(--muted)">Select a B1 specific subject area. The AI examiner will engage you in a spontaneous discussion on this topic for 2 minutes.</p>`;
+        introText.innerHTML = `<h3>💬 Component 3: Conversation Phase (單獨練習)</h3><p style="margin-top:6px;font-size:13.5px;color:var(--muted)">在此模式下，您可以自選單一主題進行密集的 5 分鐘深入對話練習。</p>`;
         convoField.style.display = 'block';
       }
       switchView('viewTopicSetup');
     }
 
-    // Start Exam Session
     function startExamSession() {
       const errEl = document.getElementById('setupErr');
       errEl.classList.remove('show');
 
-      let systemInstruction = `You are an expert oral examiner for Trinity College London GESE Grade 5 (CEFR B1 level). Your tone must be formal, encouraging, clear, and perfectly mimicking a British UK examiner. Speak at an appropriate speed for an immigrant or student. 
+      const allSubjects = [
+        "Festivals / Celebrations",
+        "Means of Transport",
+        "Special Occasions (e.g. weddings, birthdays)",
+        "Entertainment (e.g. cinema, music, television)",
+        "Music",
+        "Recent Personal Experiences"
+      ];
 
-Crucial Rules:
+      let systemInstruction = `You are an expert oral examiner for Trinity College London GESE Grade 5 (CEFR B1 level). Your tone must be formal, encouraging, clear, and perfectly mimicking a British UK examiner. Speak at an appropriate speed for a language learner.
+
+Crucial Instruction Delivery Rules:
 1. Ask exactly ONE question at a time. Never group questions.
 2. Keep your spoken responses under 35 words. Be brief to let the candidate speak.
 3. If the candidate gives an extremely short answer, prompt them to expand using B1 vocabulary/structures.
-4. Assess and target B1 structures: Past Simple, Future intentions (going to/inf), Present Perfect, Expressions of preference, reasons (because, because of).`;
+4. Systematically assess and target B1 structures: Past Simple, Future intentions (going to/inf), Present Perfect, Expressions of preference, reasons (because, because of).`;
 
-      if (practiceMode === 'intro') {
+      if (practiceMode === 'full') {
+        const title = document.getElementById('topicTitle').value.trim();
+        const pts = [
+          document.getElementById('tp1').value.trim(),
+          document.getElementById('tp2').value.trim(),
+          document.getElementById('tp3').value.trim(),
+          document.getElementById('tp4').value.trim(),
+          document.getElementById('tp5').value.trim()
+        ].filter(t => t.length > 0);
+
+        if (!title || pts.length < 5) {
+          errEl.textContent = '❌ Full Mock Exam requires a Topic Title and exactly 5 discussion sub-points.';
+          errEl.classList.add('show');
+          return;
+        }
+
+        const shuffled = [...allSubjects].sort(() => 0.5 - Math.random());
+        const chosenSubj1 = shuffled[0];
+        const chosenSubj2 = shuffled[1];
+
+        document.getElementById('examRoomTitle').textContent = 'Full Mock Exam (B1)';
+        
+        systemInstruction += `\n\n[TIMELINE & SESSION MANAGEMENT PROTOCOL]:
+You must rigorously pace the examination according to these standard guidelines. Do not explicitly tell the candidate about timer thresholds.
+- PHASE 1 (Introduction - Target: 1 Minute): Greet the candidate warmly, confirm their identity, and ask EXACTLY ONE introductory personal or baseline question (e.g., daily routine or hobbies). Maintain this for only 1 or 2 brief conversational exchanges, then immediately pivot.
+- PHASE 2 (Topic Phase - Target: 5 Minutes): Pivot strictly by stating: "Thank you. Now let's move on to your topic form about '${title}'." Systematically and deeply cross-examine the candidate on all 5 of their prepared sub-points through natural back-and-forth dialogue:\n${pts.map((p,i)=>`  Point ${i+1}: ${p}`).join('\n')}\nEnsure this stays active for about 5 full minutes to thoroughly test B1 grammar markers.
+- PHASE 3 (Conversation Phase - Target: 5 Minutes): Transition smoothly by stating: "Thank you. Now let's talk about some other subjects." You must cover exactly TWO distinct subject areas for roughly 2.5 minutes each. For this session, you have selected:
+  1. First Topic: "${chosenSubj1}" (Engage in 2-3 detailed question rounds)
+  2. Second Topic: "${chosenSubj2}" (Pivot dynamically halfway through, engage in 2-3 rounds)
+- CONCLUSION: Once the combined time approaches 11 minutes total, naturally wrap up the final conversation and conclude the text by saying exactly: "Thank you very much. That is the end of the test."`;
+
+      } else if (practiceMode === 'intro') {
         document.getElementById('examRoomTitle').textContent = 'Room: Introduction';
-        systemInstruction += `\n\nStart by greeting the candidate warmly, asking their name, and asking a simple introductory question (e.g., about home, work, or hobbies).`;
+        systemInstruction += `\n\nEngage the candidate in a warm, standard 1-minute greeting and introductory session. Ask basic conversational background questions.`;
       } else if (practiceMode === 'topic') {
         const title = document.getElementById('topicTitle').value.trim();
         const pts = [
           document.getElementById('tp1').value.trim(),
           document.getElementById('tp2').value.trim(),
           document.getElementById('tp3').value.trim(),
-          document.getElementById('tp4').value.trim()
+          document.getElementById('tp4').value.trim(),
+          document.getElementById('tp5').value.trim()
         ].filter(t => t.length > 0);
 
-        if (!title || pts.length < 3) {
-          errEl.textContent = '❌ Please provide a Topic Title and at least 3 discussion points.';
+        if (!title || pts.length < 5) {
+          errEl.textContent = '❌ Please provide a Topic Title and all 5 discussion sub-points.';
           errEl.classList.add('show');
           return;
         }
         document.getElementById('examRoomTitle').textContent = `Room: Topic — ${title}`;
-        systemInstruction += `\n\nThe candidate's topic form is titled "${title}". The discussion nodes are:\n${pts.map((p,i) => `- Point ${i+1}: ${p}`).join('\n')}\n\nStart directly by asking the candidate about their topic form or their first point. You must systematically ask questions about these points across 4 minutes.`;
+        systemInstruction += `\n\nThe candidate's topic form is titled "${title}". The 5 discussion nodes are:\n${pts.map((p,i) => `- Point ${i+1}: ${p}`).join('\n')}\n\nStart directly by asking the candidate about their topic form. Maintain an intense, focused 5-minute conversation covering these 5 sub-points.`;
       } else if (practiceMode === 'conversation') {
         const subj = document.getElementById('convoSubject').value;
         document.getElementById('examRoomTitle').textContent = `Room: Conversation — ${subj}`;
-        systemInstruction += `\n\nThe conversation category selected is "${subj}". Engage the candidate in a spontaneous discussion regarding this theme. Start by introducing the subject and asking an introductory question.`;
+        systemInstruction += `\n\nThe single conversation category selected is "${subj}". Engage the candidate in an immersive 5-minute dialogue entirely focused on this particular subject domain.`;
       }
 
       history = [{ role: 'user', parts: [{ text: `SYSTEM_CONFIG: ${systemInstruction}` }] }];
@@ -568,16 +577,13 @@ Crucial Rules:
         const s = String(examTimeSeconds % 60).padStart(2, '0');
         document.getElementById('examTimer').textContent = `${m}:${s}`;
         
-        if (examTimeSeconds >= 240) {
-          document.getElementById('examTimer').classList.add('warn');
-        }
+        if (examTimeSeconds >= 660) document.getElementById('examTimer').classList.add('warn');
       }, 1000);
 
       switchView('viewChat');
       executeExaminerTurn();
     }
 
-    // Call Cloudflare Gateway -> Gemini LLM
     async function executeExaminerTurn() {
       updateStatus('Examiner is thinking...');
       document.getElementById('micBtn').disabled = true;
@@ -590,7 +596,6 @@ Crucial Rules:
         if (!responseText) throw new Error('Empty response received from API layer.');
 
         history.push({ role: 'model', parts: [{ text: responseText }] });
-        
         appendMessage('examiner', responseText);
         updateStatus('Examiner speaking...');
         
@@ -605,7 +610,6 @@ Crucial Rules:
       }
     }
 
-    // Text to Speech Engine
     function speakOutputText(text, callback) {
       if (!audioSynthesizer) return callback();
       audioSynthesizer.cancel();
@@ -620,39 +624,25 @@ Crucial Rules:
       if (ukVoice) currentUtterance.voice = ukVoice;
 
       currentUtterance.onend = () => callback();
-      currentUtterance.onerror = (e) => {
-        console.error('TTS execution error:', e);
-        callback();
-      };
+      currentUtterance.onerror = (e) => { console.error(e); callback(); };
       audioSynthesizer.speak(currentUtterance);
     }
 
-    // Manual Mic Click Control Toggle
     function handleMicClick() {
-      if (isRecording) {
-        commitUserSpeech();
-      } else {
-        startRecordingContext();
-      }
+      if (isRecording) commitUserSpeech();
+      else startRecordingContext();
     }
 
     function startRecordingContext() {
       if (!recognition || isRecording) return;
       if (audioSynthesizer && audioSynthesizer.speaking) audioSynthesizer.cancel();
-      
       speechTokenBox = [];
-      try {
-        recognition.start();
-      } catch (e) {
-        console.warn('Recognition collision bypassed:', e);
-      }
+      try { recognition.start(); } catch (e) {}
     }
 
     function stopRecordingContext() {
       if (!recognition || !isRecording) return;
-      try {
-        recognition.stop();
-      } catch (e) {}
+      try { recognition.stop(); } catch (e) {}
       isRecording = false;
       setMicUI(false);
     }
@@ -673,23 +663,17 @@ Crucial Rules:
       executeExaminerTurn();
     }
 
-    // UI Feedback Helpers
     function setMicUI(active) {
       const btn = document.getElementById('micBtn');
-      if (active) {
-        btn.classList.add('recording');
-        btn.textContent = '🛑';
-      } else {
-        btn.classList.remove('recording');
-        btn.textContent = '🎙️';
-      }
+      if (active) { btn.classList.add('recording'); btn.textContent = '🛑'; }
+      else { btn.classList.remove('recording'); btn.textContent = '🎙️'; }
     }
 
+    grid = document.getElementById('statusText');
     function updateStatus(txt, isErr = false) {
       const el = document.getElementById('statusText');
       el.textContent = txt;
-      if (isErr) el.style.color = 'var(--danger)';
-      else el.style.color = 'var(--muted)';
+      el.style.color = isErr ? 'var(--danger)' : 'var(--muted)';
     }
 
     function appendMessage(role, text) {
@@ -700,6 +684,17 @@ Crucial Rules:
       box.appendChild(el);
       box.scrollTop = box.scrollHeight;
     }
+
+    document.addEventListener('keydown', (e) => {
+      if (e.code === 'Space' && document.activeElement.tagName !== 'INPUT' && document.activeElement.tagName !== 'SELECT') {
+        const activeView = document.querySelector('.view.active');
+        if (activeView && activeView.id === 'viewChat') {
+          e.preventDefault();
+          const micBtn = document.getElementById('micBtn');
+          if (!micBtn.disabled) handleMicClick();
+        }
+      }
+    });
 
     function renderLiveTranscription(text) {
       const box = document.getElementById('chatBox');
@@ -719,11 +714,8 @@ Crucial Rules:
       if (liveEl) liveEl.remove();
     }
 
-    function restartSameMode() {
-      choosePracticeMode(practiceMode);
-    }
+    function restartSameMode() { choosePracticeMode(practiceMode); }
 
-    // Submit for Grading Evaluation Matrix
     function confirmFinishExam() {
       if (history.length < 3) {
         clearInterval(timerInterval);
@@ -761,21 +753,35 @@ You MUST respond with a single, valid JSON object matching this exact schema:
   "communication": { "score": 7, "text": "...", "tip": "..." },
   "nextSteps": ["...", "..."]
 }
-Scores must be integers between 1 and 10. Do not include markdown code block styling like \`\`\`json outside the object. Respond only with the raw object. Keep commentary brief and clear.`;
+Scores must be integers between 1 and 10. Respond only with the raw object without markdown blocks.`;
 
       try {
         const payload = { contents: [{ role: 'user', parts: [{ text: gradingPrompt }] }] };
         const data = await apiRequest('/chat', { dailyPassword, payload });
-        
         let rawText = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
         rawText = rawText.replace(/```json/g, '').replace(/```/g, '').trim();
-        
         const scoreObj = JSON.parse(rawText);
         displayScoring(scoreObj, null);
       } catch (err) {
-        console.error('Grading evaluation parse crash:', err);
-        displayScoring(null, '❌ Failed to parse response from evaluation server. Please try practicing again.');
+        console.error(err);
+        displayScoring(null, '❌ Failed to parse response from evaluation server.');
       }
+    }
+
+    function crit(label, emoji, data){
+      if (!data) return '';
+      const c = scoreColor(data.score);
+      return `
+      <div class="crit-card">
+        <div class="crit-header">
+          <span>${emoji}</span>
+          <span class="crit-label">${label}</span>
+          <span class="crit-score" style="color:${c}">${data.score}/10</span>
+        </div>
+        <div class="bar-wrap"><div class="bar-fill" style="width:${data.score*10}%;background:${c}"></div></div>
+        <p class="crit-text">${data.text}</p>
+        ${data.tip ? `<div class="crit-tip">💡 ${data.tip}</div>` : ''}
+      </div>`;
     }
 
     function displayScoring(s, errMsg){
@@ -785,14 +791,8 @@ Scores must be integers between 1 and 10. Do not include markdown code block sty
         document.getElementById('changeTopicBtn').style.display = 'block';
         return;
       }
-
       const oc = scoreColor(s.overall);
-      const modeNote = practiceMode === 'intro'
-        ? '<div class="mode-note">* Introduction is not assessed in the real exam — this feedback is for practice only.</div>'
-        : '';
-
       document.getElementById('scoringContent').innerHTML = `
-        ${modeNote}
         <div class="overall-wrap">
           <div class="overall-circle" style="border-color:${oc}">
             <div class="overall-num" style="color:${oc}">${s.overall}</div>
@@ -804,31 +804,16 @@ Scores must be integers between 1 and 10. Do not include markdown code block sty
         ${crit('Vocabulary', '📚', s.vocabulary)}
         ${crit('Grammar', '✏️', s.grammar)}
         ${crit('Communication', '💬', s.communication)}
-        ${s.nextSteps && s.nextSteps.length ? `
-        <div class="next-steps">
-          <div class="ns-title">📋 Next Steps / 改善建議</div>
-          <ul class="ns-list">${s.nextSteps.map(t => `<li>${t}</li>`).join('')}</ul>
-        </div>` : ''}`;
+        ${s.nextSteps ? `<div class="next-steps"><div class="ns-title">📋 Next Steps / 改善建議</div><ul class="ns-list">${s.nextSteps.map(t=>`<li>${t}</li>`).join('')}</ul></div>`:''}`;
 
       document.getElementById('scoringIcon').textContent = s.overall >= 7 ? '🏆' : '📊';
       document.getElementById('tryAgainBtn').style.display  = 'block';
       document.getElementById('changeTopicBtn').style.display = 'block';
     }
 
-    function scoreColor(v) {
-      if (v >= 8) return 'var(--success)';
-      if (v >= 5) return 'var(--warn)';
-      return 'var(--danger)';
-    }
+    function scoreColor(v) { return v >= 8 ? 'var(--success)' : (v >= 5 ? 'var(--warn)' : 'var(--danger)'); }
+    function overallLabel(v) { return v >= 8.5 ? 'Distinction (🏆 A)' : (v >= 7.0 ? 'Merit (🌟 B)' : (v >= 5.0 ? 'Pass (✅ C)' : 'Fail (❌ Insufficient)')); }
 
-    function overallLabel(v) {
-      if (v >= 8.5) return 'Distinction (🏆 A)';
-      if (v >= 7.0) return 'Merit (🌟 B)';
-      if (v >= 5.0) return 'Pass (✅ C)';
-      return 'Fail (❌ Insufficient)';
-    }
-
-    // ✨ 修正後的教師管理員入口 (繞過 apiRequest 代理發送第一層資料) ✨
     async function authenticateTeacher() {
       const pwd = document.getElementById('masterPasswordInput').value;
       const errEl = document.getElementById('teacherErr');
@@ -841,16 +826,13 @@ Scores must be integers between 1 and 10. Do not include markdown code block sty
           body: JSON.stringify({ masterPassword: pwd })
         });
 
-        if (!response.ok) {
-          throw new Error('Rejected');
-        }
+        if (!response.ok) throw new Error('Rejected');
 
         const data = await response.json();
         masterTeacherPwd = pwd;
         
         document.getElementById('tTodayPassword').textContent = data.password;
         document.getElementById('tTodayDate').textContent = `Date: ${data.date} (HKT Midnight Clock)`;
-        
         switchView('viewTeacherDash');
         fetchTelemetryStats();
       } catch (err) {
@@ -859,7 +841,6 @@ Scores must be integers between 1 and 10. Do not include markdown code block sty
       }
     }
 
-    // Telemetry Statistics Fetcher
     async function fetchTelemetryStats() {
       try {
         const response = await fetch(`${WORKER_URL}/stats`, {
@@ -867,50 +848,36 @@ Scores must be integers between 1 and 10. Do not include markdown code block sty
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ masterPassword: masterTeacherPwd })
         });
-        
         if (!response.ok) return;
         const data = await response.json();
         if (!data.configured) return;
 
         document.getElementById('statsBlock').style.display = 'block';
         document.getElementById('stCalls').textContent = data.today?.calls || 0;
-        
         const todayTok = (data.daily?.[data.today]?.inputTokens || 0) + (data.daily?.[data.today]?.outputTokens || 0);
         document.getElementById('stTokens').textContent = todayTok.toLocaleString();
         document.getElementById('stTokenBreakdown').textContent = `in:${(data.daily?.[data.today]?.inputTokens || 0).toLocaleString()} out:${(data.daily?.[data.today]?.outputTokens || 0).toLocaleString()}`;
         
         const cToday = ((data.daily?.[data.today]?.inputTokens || 0) * 0.075 / 1000000) + ((data.daily?.[data.today]?.outputTokens || 0) * 0.30 / 1000000);
         const cTotal = (data.total.inputTokens * 0.075 / 1000000) + (data.total.outputTokens * 0.30 / 1000000);
-        
         document.getElementById('stCostToday').textContent = `$${cToday.toFixed(4)} est.`;
         document.getElementById('stTotalCalls').textContent = data.total.calls.toLocaleString();
         document.getElementById('stTotalCost').textContent = `$${cTotal.toFixed(3)}`;
-
         renderAnalyticsChart(data.daily);
-      } catch (e) {
-        console.error('Telemetry matrix compilation crash:', e);
-      }
+      } catch (e) { console.error(e); }
     }
 
     function renderAnalyticsChart(dailyObj) {
       const container = document.getElementById('chartContainer');
       container.innerHTML = '';
       if (!dailyObj) return;
-
       const days = Object.keys(dailyObj).sort().slice(-14);
-      if (!days.length) {
-        container.innerHTML = `<div style="color:var(--muted);font-size:13px;margin:auto">No dataset logged yet.</div>`;
-        return;
-      }
-
+      if (!days.length) { container.innerHTML = `<div style="margin:auto">No data.</div>`; return; }
       const maxCalls = Math.max(...days.map(d => dailyObj[d].calls || 1));
-      document.getElementById('chartTitle').textContent = `API Traffic — Last ${days.length} Days`;
-
       days.forEach(d => {
         const node = document.createElement('div');
         node.className = 'bar-node';
-        const h = ((dailyObj[d].calls || 0) / maxCalls) * 100;
-        node.style.height = `${Math.max(h, 8)}%`;
+        node.style.height = `${Math.max(((dailyObj[d].calls || 0) / maxCalls) * 100, 8)}%`;
         node.setAttribute('data-tip', `${d}: ${dailyObj[d].calls} calls`);
         container.appendChild(node);
       });
