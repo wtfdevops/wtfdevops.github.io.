@@ -220,7 +220,7 @@ html[data-dark] .ns-title { color: #A78BFA; }
           <span>💬</span>
           <div style="text-align:left">
             <div>Conversation Phase (Isolated)</div>
-            <div style="font-size:12px;color:var(--muted);font-weight:400;margin-top:2px">Choose 1 specific subject area to practice intensely (5 mins).</div>
+            <div style="font-size:12px;color:var(--muted);font-weight:400;margin-top:2px">Choose 1 specific subject area to practice intensely (2.5 mins).</div>
           </div>
         </button>
       </div>
@@ -350,12 +350,12 @@ html[data-dark] .ns-title { color: #A78BFA; }
   </div>
 
   <script>
-    // ⭐️ 網址已完美預設綁定，以後無需再手動修改！
     const WORKER_URL = 'https://b1-trinity.jingplus.workers.dev';
 
     let dailyPassword = '';
     let practiceMode  = ''; // 'full', 'intro', 'topic', 'conversation'
     let history       = [];  
+    let targetTimeLimit = 660; // 預設 11 分鐘 (Full Mock)
     
     let recognition       = null;
     let isRecording       = false;
@@ -447,6 +447,12 @@ html[data-dark] .ns-title { color: #A78BFA; }
       document.getElementById(viewId).classList.add('active');
     }
 
+    // ⭐️ 確保在切換視圖時清除未播完的語音
+    function resetSpeechState() {
+      if (audioSynthesizer) audioSynthesizer.cancel();
+      stopRecordingContext();
+    }
+
     function toggleDarkMode() {
       const isDark = document.documentElement.hasAttribute('data-dark');
       if (isDark) {
@@ -471,15 +477,19 @@ html[data-dark] .ns-title { color: #A78BFA; }
       document.getElementById('setupErr').classList.remove('show');
 
       if (mode === 'full') {
+        targetTimeLimit = 660; // 11分鐘
         introText.innerHTML = `<h3>🏆 Full Mock Exam (完整模擬考試)</h3><p style="margin-top:6px;font-size:13.5px;color:var(--muted)">AI將精準掌控時間比例：<strong>Phase 1 熱身 (1 分鐘)</strong> ➔ <strong>Phase 2 Topic 盤問 (5 分鐘)</strong> ➔ <strong>Phase 3 隨機雙主題即興交流 (5 分鐘)</strong>。請在下方輸入您的題目：</p>`;
         formFields.style.display = 'block';
       } else if (mode === 'intro') {
+        targetTimeLimit = 60; // 1分鐘
         introText.innerHTML = `<h3>👋 Component 1: Introduction</h3><p style="margin-top:6px;font-size:13.5px;color:var(--muted)">The examiner will greet you and ask basic background questions about your life, hobbies, or studies (Target: 1 minute).</p>`;
       } else if (mode === 'topic') {
+        targetTimeLimit = 300; // 5分鐘
         introText.innerHTML = `<h3>📋 Component 2: Topic Phase</h3><p style="margin-top:6px;font-size:13.5px;color:var(--muted)">Please input your pre-prepared Topic Form details. The AI will cross-examine you on these 5 nodes (Target: 5 minutes).</p>`;
         formFields.style.display = 'block';
       } else if (mode === 'conversation') {
-        introText.innerHTML = `<h3>💬 Component 3: Conversation Phase (單獨練習)</h3><p style="margin-top:6px;font-size:13.5px;color:var(--muted)">在此模式下，您可以自選單一主題進行密集的 5 分鐘深入對話練習。</p>`;
+        targetTimeLimit = 150; // ⭐️ 單選主題時間自動減半：2.5 分鐘 (150秒)
+        introText.innerHTML = `<h3>💬 Component 3: Conversation Phase (單選練習)</h3><p style="margin-top:6px;font-size:13.5px;color:var(--muted)">在此模式下，您只需選擇一個主題。考官將針對該主題與您進行密集的 <strong>2.5 分鐘</strong> 深入交流。</p>`;
         convoField.style.display = 'block';
       }
       switchView('viewTopicSetup');
@@ -539,7 +549,7 @@ You must rigorously pace the examination according to these standard guidelines.
 
       } else if (practiceMode === 'intro') {
         document.getElementById('examRoomTitle').textContent = 'Room: Introduction';
-        systemInstruction += `\n\nEngage the candidate in a warm, standard 1-minute greeting and introductory session. Ask basic conversational background questions.`;
+        systemInstruction += `\n\nEngage the candidate in a warm, standard 1-minute greeting and introductory session. Ask basic conversational background questions. Conclude precisely when the interaction feels complete or at 1 minute by stating exactly: "Thank you very much. That is the end of the test."`;
       } else if (practiceMode === 'topic') {
         const title = document.getElementById('topicTitle').value.trim();
         const pts = [
@@ -556,11 +566,16 @@ You must rigorously pace the examination according to these standard guidelines.
           return;
         }
         document.getElementById('examRoomTitle').textContent = `Room: Topic — ${title}`;
-        systemInstruction += `\n\nThe candidate's topic form is titled "${title}". The 5 discussion nodes are:\n${pts.map((p,i) => `- Point ${i+1}: ${p}`).join('\n')}\n\nStart directly by asking the candidate about their topic form. Maintain an intense, focused 5-minute conversation covering these 5 sub-points.`;
+        systemInstruction += `\n\nThe candidate's topic form is titled "${title}". The 5 discussion nodes are:\n${pts.map((p,i) => `- Point ${i+1}: ${p}`).join('\n')}\n\nStart directly by asking the candidate about their topic form. Maintain an intense, focused 5-minute conversation covering these 5 sub-points. Conclude at the 5-minute mark by saying exactly: "Thank you very much. That is the end of the test."`;
       } else if (practiceMode === 'conversation') {
         const subj = document.getElementById('convoSubject').value;
         document.getElementById('examRoomTitle').textContent = `Room: Conversation — ${subj}`;
-        systemInstruction += `\n\nThe single conversation category selected is "${subj}". Engage the candidate in an immersive 5-minute dialogue entirely focused on this particular subject domain.`;
+        
+        // ⭐️ 給 AI 的指令同步調整為 2.5 分鐘 (Strict 2.5 Minutes Protocol)
+        systemInstruction += `\n\n[SESSION TIMING PROTOCOL - ISOLATED CONVERSATION]:
+The single conversation category selected is "${subj}". Engage the candidate in an immersive, deep dialogue entirely focused on this single subject domain. 
+Because this is an isolated single-topic practice session, the time limit is strictly **2.5 minutes**. You should ask around 3 to 4 varied, progressive questions about this topic to challenge their B1 grammar. 
+Once the exchange wraps up or approaches the 2.5-minute mark, finish immediately by saying exactly: "Thank you very much. That is the end of the test."`;
       }
 
       history = [{ role: 'user', parts: [{ text: `SYSTEM_CONFIG: ${systemInstruction}` }] }];
@@ -571,13 +586,17 @@ You must rigorously pace the examination according to these standard guidelines.
       document.getElementById('examTimer').textContent = '00:00';
       document.getElementById('examTimer').classList.remove('warn');
       clearInterval(timerInterval);
+      
       timerInterval = setInterval(() => {
         examTimeSeconds++;
         const m = String(Math.floor(examTimeSeconds / 60)).padStart(2, '0');
         const s = String(examTimeSeconds % 60).padStart(2, '0');
         document.getElementById('examTimer').textContent = `${m}:${s}`;
         
-        if (examTimeSeconds >= 660) document.getElementById('examTimer').classList.add('warn');
+        // 根據不同模式的 targetTimeLimit 動態發出黃金倒數變紅警告
+        if (examTimeSeconds >= targetTimeLimit) {
+          document.getElementById('examTimer').classList.add('warn');
+        }
       }, 1000);
 
       switchView('viewChat');
@@ -669,7 +688,6 @@ You must rigorously pace the examination according to these standard guidelines.
       else { btn.classList.remove('recording'); btn.textContent = '🎙️'; }
     }
 
-    grid = document.getElementById('statusText');
     function updateStatus(txt, isErr = false) {
       const el = document.getElementById('statusText');
       el.textContent = txt;
@@ -719,6 +737,7 @@ You must rigorously pace the examination according to these standard guidelines.
     function confirmFinishExam() {
       if (history.length < 3) {
         clearInterval(timerInterval);
+        resetSpeechState();
         switchView('viewDashboard');
         return;
       }
@@ -729,8 +748,7 @@ You must rigorously pace the examination according to these standard guidelines.
 
     async function executeGradingProtocol() {
       clearInterval(timerInterval);
-      stopRecordingContext();
-      if (audioSynthesizer) audioSynthesizer.cancel();
+      resetSpeechState();
 
       switchView('viewScoring');
       document.getElementById('tryAgainBtn').style.display = 'none';
