@@ -1,417 +1,632 @@
 <!DOCTYPE html>
-<html lang="zh-Hant">
+<html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
-    <title>B1 Listening Exam - Mobile Dark Mode</title>
-    <style>
-        :root {
-            --bg-color: #1a202c;
-            --card-bg: #2d3748;
-            --inner-bg: #1a202c;
-            --primary: #805ad5;
-            --text-main: #e2e8f0;
-            --text-dim: #a0aec0;
-        }
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>B1 Trinity GESE Practice | 英語口語模擬練習</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-        body { 
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft JhengHei", sans-serif; 
-            background-color: var(--bg-color); 
-            color: var(--text-main); 
-            padding: 10px; 
-            margin: 0;
-            -webkit-tap-highlight-color: transparent;
-        }
+    :root {
+      --primary: #2563EB;
+      --primary-dark: #1D4ED8;
+      --primary-light: #EFF6FF;
+      --success: #10B981;
+      --danger: #EF4444;
+      --bg: #F1F5F9;
+      --surface: #FFFFFF;
+      --text: #1E293B;
+      --muted: #64748B;
+      --border: #E2E8F0;
+      --examiner-bubble: #E0F2FE;
+      --shadow: 0 4px 12px rgba(0,0,0,0.08);
+      --radius: 14px;
+    }
 
-        .container { 
-            max-width: 100%; 
-            margin: auto; 
-            background: var(--card-bg); 
-            padding: 20px; 
-            border-radius: 15px; 
-            box-shadow: 0 5px 15px rgba(0,0,0,0.5); 
-        }
-        
-        h1 { font-size: 1.5rem; text-align: center; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
 
-        .settings-section { 
-            background: var(--inner-bg); 
-            padding: 15px; 
-            border-radius: 12px; 
-            margin-bottom: 20px; 
-            border: 1px solid #4a5568;
-        }
+    /* ── Screens ── */
+    .screen { display: none; width: 100%; max-width: 460px; padding: 20px; flex-direction: column; }
+    .screen.active { display: flex; }
+    #examScreen { max-width: 580px; padding: 0; height: 100vh; }
 
-        .setting-item { margin-bottom: 12px; display: flex; flex-direction: column; gap: 8px; }
-        
-        select { 
-            padding: 12px; 
-            border-radius: 8px; 
-            border: 1px solid #4a5568; 
-            background: #2d3748; 
-            color: white;
-            font-size: 1rem;
-            width: 100%;
-            appearance: none; /* 移除行動版預設樣式 */
-        }
+    /* ── Card ── */
+    .card {
+      background: var(--surface);
+      border-radius: var(--radius);
+      padding: 32px;
+      box-shadow: var(--shadow);
+    }
 
-        .btn-start { 
-            padding: 16px; 
-            background: var(--primary); 
-            color: white; 
-            border: none; 
-            border-radius: 10px; 
-            cursor: pointer; 
-            font-weight: bold; 
-            font-size: 1.1rem; 
-            width: 100%; 
-            touch-action: manipulation;
-        }
+    /* ── Logo ── */
+    .logo { text-align: center; margin-bottom: 28px; }
+    .logo .icon { font-size: 52px; display: block; margin-bottom: 10px; }
+    .logo h1 { font-size: 20px; font-weight: 800; color: var(--primary); }
+    .logo p { font-size: 13px; color: var(--muted); margin-top: 4px; }
 
-        /* 導覽網格：在手機上改為彈性排版 */
-        .nav-grid { 
-            display: flex; 
-            flex-wrap: wrap; 
-            gap: 5px; 
-            margin-bottom: 15px; 
-            justify-content: center;
-        }
-        .nav-item { 
-            width: 35px;
-            height: 35px;
-            line-height: 35px;
-            background: var(--inner-bg); 
-            border: 1px solid #4a5568; 
-            border-radius: 5px; 
-            text-align: center; 
-            font-size: 0.75rem; 
-            color: var(--text-dim);
-        }
-        .nav-item.active { border: 2px solid #9f7aea; color: white; background: #44337a; }
-        .nav-item.correct-nav { background: #22543d; border-color: #38a169; color: #c6f6d5; }
-        .nav-item.wrong-nav { background: #742a2a; border-color: #e53e3e; color: #fed7d7; }
+    /* ── Form ── */
+    label { display: block; font-size: 11px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); margin-bottom: 6px; }
+    input[type=text], input[type=password] {
+      width: 100%; padding: 13px 16px;
+      border: 2px solid var(--border); border-radius: 8px;
+      font-size: 16px; outline: none; transition: border .2s;
+      letter-spacing: .1em; color: var(--text);
+    }
+    input:focus { border-color: var(--primary); }
 
-        /* 題目卡片 */
-        .question-card { 
-            background: var(--inner-bg); 
-            border-left: 5px solid var(--primary); 
-            padding: 20px; 
-            border-radius: 12px; 
-            margin-bottom: 15px; 
-            min-height: 100px; 
-        }
-        
-        .question-display { opacity: 0; transition: opacity 0.3s; color: #fff; font-size: 1.2rem; }
-        .question-display.revealed { opacity: 1; }
-        
-        .click-to-reveal { 
-            color: #b794f4; 
-            text-decoration: underline; 
-            margin-bottom: 10px; 
-            display: block;
-            font-size: 0.9rem;
-        }
-        
-        .explanation-box { 
-            display: none; 
-            margin-top: 15px; 
-            padding: 12px; 
-            background: #2a4365; 
-            border-radius: 8px; 
-            font-size: 0.9rem; 
-            color: #bee3f8; 
-            border: 1px dashed #63b3ed;
-        }
-        
-        /* 選項按鈕加大 */
-        .options-grid { display: grid; grid-template-columns: 1fr; gap: 8px; }
-        .option { 
-            padding: 18px; 
-            border: 2px solid #4a5568; 
-            border-radius: 12px; 
-            background: #2d3748; 
-            color: #e2e8f0;
-            text-align: left; 
-            font-size: 1rem;
-        }
-        
-        .correct { background-color: #22543d !important; border-color: #38a169 !important; color: #c6f6d5 !important; }
-        .wrong { background-color: #742a2a !important; border-color: #e53e3e !important; color: #fed7d7 !important; }
-        
-        .replay-btn { 
-            background: var(--primary); 
-            color: white; 
-            border: none; 
-            border-radius: 50%; 
-            width: 50px; 
-            height: 50px; 
-            float: right; 
-            font-size: 1.4rem;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        
-        .timer-container { width: 100%; background: #4a5568; height: 8px; border-radius: 4px; margin-bottom: 15px; }
-        #timer-bar { width: 100%; height: 100%; background: #f687b3; transition: width 1s linear; }
+    /* ── Buttons ── */
+    .btn { width: 100%; padding: 13px; border: none; border-radius: 9px; font-size: 15px; font-weight: 700; cursor: pointer; transition: all .2s; margin-top: 12px; }
+    .btn-primary { background: var(--primary); color: #fff; }
+    .btn-primary:hover { background: var(--primary-dark); }
+    .btn-primary:disabled { opacity: .45; cursor: not-allowed; }
+    .btn-secondary { background: var(--border); color: var(--text); }
+    .btn-secondary:hover { background: #cbd5e1; }
+    .btn-danger { background: var(--danger); color: #fff; }
 
-        #quiz-area, #results-area { display: none; }
-        .test-btn { background: #4a5568; color: white; border: none; padding: 12px; border-radius: 8px; margin-top: 5px; }
-    </style>
+    /* ── Error ── */
+    .err { font-size: 13px; color: var(--danger); margin-top: 7px; display: none; }
+    .err.show { display: block; }
+
+    /* ── Teacher link ── */
+    .teacher-link { text-align: center; margin-top: 18px; }
+    .teacher-link span { font-size: 12px; color: #CBD5E1; cursor: pointer; user-select: none; }
+    .teacher-link span:hover { color: var(--muted); }
+
+    /* ── Topic grid ── */
+    .screen-title { font-size: 19px; font-weight: 800; margin-bottom: 3px; }
+    .screen-sub { font-size: 13px; color: var(--muted); margin-bottom: 16px; }
+
+    .topic-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 14px; }
+    .topic-card {
+      border: 2px solid var(--border); border-radius: 10px;
+      padding: 14px 10px; text-align: center; cursor: pointer;
+      transition: all .2s; background: var(--surface);
+    }
+    .topic-card:hover { border-color: var(--primary); background: var(--primary-light); }
+    .topic-card.selected { border-color: var(--primary); background: var(--primary-light); box-shadow: 0 0 0 3px rgba(37,99,235,.15); }
+    .topic-card .em { font-size: 30px; margin-bottom: 5px; }
+    .topic-card .en { font-size: 13px; font-weight: 700; }
+    .topic-card .zh { font-size: 11px; color: var(--muted); margin-top: 2px; }
+
+    /* ── Exam screen ── */
+    #examScreen { display: none; flex-direction: column; }
+    #examScreen.active { display: flex; }
+
+    .exam-header {
+      background: var(--primary);
+      color: #fff;
+      padding: 14px 20px;
+      display: flex; align-items: center; justify-content: space-between;
+      flex-shrink: 0;
+    }
+    .exam-header .htitle { font-weight: 800; font-size: 15px; }
+    .exam-header .htopic { font-size: 12px; opacity: .75; margin-top: 2px; }
+    .exam-counter {
+      background: rgba(255,255,255,.2);
+      padding: 4px 10px; border-radius: 20px;
+      font-size: 12px; font-weight: 700; white-space: nowrap;
+    }
+
+    .chat-area {
+      flex: 1; overflow-y: auto; padding: 20px;
+      display: flex; flex-direction: column; gap: 14px;
+      background: var(--bg);
+    }
+
+    .msg { max-width: 78%; animation: fadeUp .3s ease; }
+    .msg.examiner { align-self: flex-start; }
+    .msg.student { align-self: flex-end; }
+    .msg-label { font-size: 11px; color: var(--muted); margin-bottom: 4px; }
+    .msg.student .msg-label { text-align: right; }
+    .bubble {
+      padding: 11px 15px; border-radius: 16px; font-size: 15px; line-height: 1.55;
+    }
+    .msg.examiner .bubble { background: var(--examiner-bubble); border-bottom-left-radius: 3px; }
+    .msg.student .bubble { background: var(--primary); color: #fff; border-bottom-right-radius: 3px; }
+
+    /* Typing dots */
+    .typing { align-self: flex-start; display: none; }
+    .typing.show { display: flex; }
+    .typing-dots { background: var(--examiner-bubble); padding: 13px 16px; border-radius: 16px; border-bottom-left-radius: 3px; display: flex; gap: 5px; }
+    .dot { width: 8px; height: 8px; background: #94a3b8; border-radius: 50%; animation: bounce 1.3s infinite; }
+    .dot:nth-child(2) { animation-delay: .2s; }
+    .dot:nth-child(3) { animation-delay: .4s; }
+
+    @keyframes bounce { 0%,60%,100%{transform:translateY(0)} 30%{transform:translateY(-7px)} }
+    @keyframes fadeUp { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
+
+    /* ── Input area ── */
+    .input-area {
+      padding: 14px 18px 18px;
+      background: var(--surface);
+      border-top: 1px solid var(--border);
+      flex-shrink: 0;
+    }
+    .mode-toggle { display: flex; gap: 8px; margin-bottom: 10px; }
+    .mode-btn {
+      padding: 5px 14px; border: 2px solid var(--border); border-radius: 20px;
+      background: none; cursor: pointer; font-size: 13px; font-weight: 600; transition: all .2s;
+    }
+    .mode-btn.active { border-color: var(--primary); background: var(--primary); color: #fff; }
+
+    .text-row { display: flex; gap: 8px; }
+    .text-row input {
+      flex: 1; padding: 12px 15px; border: 2px solid var(--border); border-radius: 9px;
+      font-size: 15px; outline: none; letter-spacing: 0; margin-top: 0;
+    }
+    .text-row input:focus { border-color: var(--primary); }
+    .send-btn {
+      padding: 12px 18px; background: var(--primary); color: #fff;
+      border: none; border-radius: 9px; cursor: pointer; font-size: 18px;
+      transition: background .2s;
+    }
+    .send-btn:hover { background: var(--primary-dark); }
+    .send-btn:disabled { opacity: .4; cursor: not-allowed; }
+
+    .voice-area { text-align: center; padding: 8px 0; }
+    .mic-btn {
+      width: 62px; height: 62px; border-radius: 50%; border: none;
+      background: var(--primary); color: #fff; font-size: 26px;
+      cursor: pointer; transition: all .2s; box-shadow: var(--shadow);
+    }
+    .mic-btn.recording { background: var(--danger); animation: pulse 1s infinite; }
+    .mic-btn:disabled { opacity: .4; cursor: not-allowed; }
+    .voice-hint { font-size: 12px; color: var(--muted); margin-top: 7px; }
+    @keyframes pulse { 0%,100%{box-shadow:0 0 0 0 rgba(239,68,68,.4)} 50%{box-shadow:0 0 0 12px rgba(239,68,68,0)} }
+
+    /* ── Feedback ── */
+    .feedback-box {
+      background: #f8fafc; border-radius: 10px; padding: 18px;
+      font-size: 14px; line-height: 1.75; white-space: pre-wrap;
+      border-left: 4px solid var(--success); margin: 16px 0;
+    }
+
+    /* ── Teacher dashboard ── */
+    .pwd-display {
+      text-align: center; padding: 24px; margin: 20px 0;
+      background: var(--primary-light); border-radius: 12px;
+      border: 2px dashed var(--primary);
+    }
+    .pwd-display .pwd-label { font-size: 12px; color: var(--muted); margin-bottom: 8px; }
+    .pwd-display .pwd-value { font-size: 38px; font-weight: 900; letter-spacing: .25em; color: var(--primary); }
+    .pwd-display .pwd-date { font-size: 12px; color: var(--muted); margin-top: 8px; }
+
+    .hidden { display: none !important; }
+  </style>
 </head>
 <body>
 
-<div class="container">
-    <div id="setup-area">
-        <h1>B1 聽力解析挑戰</h1>
-        <div class="settings-section">
-            <div class="setting-item">
-                <label>1. 選擇口音</label>
-                <select id="voice-select"><option>正在載入語音...</option></select>
-                <button class="test-btn" onclick="testVoice()">🔊 點此試聽聲</button>
-            </div>
-            <div class="setting-item">
-                <label>2. 語速</label>
-                <select id="audio-speed">
-                    <option value="0.7">慢速</option>
-                    <option value="0.85" selected>正常</option>
-                    <option value="1.0">快速</option>
-                </select>
-            </div>
-            <div class="setting-item">
-                <label>3. 限時</label>
-                <select id="timer-setting">
-                    <option value="10">10 秒</option>
-                    <option value="15" selected>15 秒</option>
-                    <option value="30">30 秒</option>
-                </select>
-            </div>
-        </div>
-        <button class="btn-start" onclick="startQuiz()">開始挑戰</button>
+<!-- ══════════════════════════════════════
+     Screen 1 · Student Password
+══════════════════════════════════════ -->
+<div class="screen active" id="s-password">
+  <div class="card">
+    <div class="logo">
+      <span class="icon">🎓</span>
+      <h1>Trinity GESE B1 Practice</h1>
+      <p>英國B1英語口語模擬練習</p>
     </div>
-
-    <div id="quiz-area">
-        <div class="timer-container"><div id="timer-bar"></div></div>
-        <div style="display:flex; justify-content:space-between; margin-bottom:10px; font-size:0.9rem;">
-            <span>正確率：<span id="accuracy">0</span>%</span>
-            <span id="topic-label" style="color:#d6bcfa; font-weight:bold;"></span>
-        </div>
-        <div class="nav-grid" id="nav-grid"></div>
-        
-        <div class="question-card">
-            <button class="replay-btn" onclick="replayAudio()">🔊</button>
-            <div id="reveal-prompt" class="click-to-reveal" onclick="revealText()">👁️ 點擊顯示問題與解析</div>
-            <div style="min-height: 1.5em;"><span id="question-text" class="question-display"></span></div>
-            <div id="explanation-text" class="explanation-box"></div>
-        </div>
-
-        <div class="options-grid" id="options-container"></div>
-        <button id="next-btn" class="btn-start" style="margin-top:20px; display:none;" onclick="moveNext()">下一題 ➔</button>
-    </div>
-
-    <div id="results-area">
-        <h1 style="text-align:center;">測驗完成</h1>
-        <div style="font-size: 4rem; color: #9f7aea; text-align:center; font-weight: bold; margin: 20px 0;"><span id="final-percent">0</span>%</div>
-        <button class="btn-start" onclick="location.reload()">重新開始</button>
-    </div>
+    <label>Today's Password / 今日密碼</label>
+    <input type="password" id="pwdInput" placeholder="Ask your teacher for today's password"
+           maxlength="8" style="text-transform:uppercase"
+           onkeyup="if(event.key==='Enter') checkPassword()" />
+    <div class="err" id="pwdErr">❌ Wrong password — 密碼錯誤，請向老師查詢</div>
+    <button class="btn btn-primary" onclick="checkPassword()">Enter / 進入 →</button>
+  </div>
+  <div class="teacher-link"><span onclick="goTeacherLogin()">教師入口</span></div>
 </div>
 
+<!-- ══════════════════════════════════════
+     Screen 2 · Topic Selection
+══════════════════════════════════════ -->
+<div class="screen" id="s-topic">
+  <div class="screen-title">Choose Your Topic</div>
+  <div class="screen-sub">選擇考試話題，然後開始模擬練習</div>
+  <div class="topic-grid" id="topicGrid"></div>
+  <button class="btn btn-primary" id="startBtn" onclick="startExam()" disabled
+          style="margin-top:4px">Start Exam / 開始考試 →</button>
+  <button class="btn btn-secondary" onclick="showScreen('s-password')">← Back / 返回</button>
+</div>
+
+<!-- ══════════════════════════════════════
+     Screen 3 · Exam
+══════════════════════════════════════ -->
+<div class="screen" id="examScreen">
+  <div class="exam-header">
+    <div>
+      <div class="htitle">🎓 Trinity GESE B1 Examiner</div>
+      <div class="htopic" id="examTopicLabel"></div>
+    </div>
+    <div class="exam-counter" id="exchCount">0 / 12</div>
+  </div>
+
+  <div class="chat-area" id="chatArea">
+    <div class="typing" id="typing">
+      <div class="typing-dots">
+        <div class="dot"></div><div class="dot"></div><div class="dot"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="input-area">
+    <div class="mode-toggle">
+      <button class="mode-btn active" id="btnText" onclick="setMode('text')">⌨️ Text</button>
+      <button class="mode-btn" id="btnVoice" onclick="setMode('voice')">🎤 Voice</button>
+    </div>
+    <div id="textArea" class="text-row">
+      <input type="text" id="txtIn" placeholder="Type your answer here…"
+             onkeyup="if(event.key==='Enter') sendMsg()" />
+      <button class="send-btn" id="sendBtn" onclick="sendMsg()">➤</button>
+    </div>
+    <div id="voiceArea" class="voice-area hidden">
+      <button class="mic-btn" id="micBtn" onclick="toggleMic()">🎤</button>
+      <div class="voice-hint" id="micHint">Tap to speak / 點擊說話</div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     Screen 4 · Feedback
+══════════════════════════════════════ -->
+<div class="screen" id="s-feedback">
+  <div class="card">
+    <div class="logo">
+      <span class="icon">✅</span>
+      <h1>Practice Complete!</h1>
+      <p>模擬考試完成 · 考官反饋</p>
+    </div>
+    <div class="feedback-box" id="feedbackBox"></div>
+    <button class="btn btn-primary" onclick="practiceAgain()">Practice Again / 再練一次</button>
+    <button class="btn btn-secondary" onclick="showScreen('s-topic')">Change Topic / 換話題</button>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     Screen 5 · Teacher Login
+══════════════════════════════════════ -->
+<div class="screen" id="s-teacher-login">
+  <div class="card">
+    <div class="logo">
+      <span class="icon">👩‍🏫</span>
+      <h1>Teacher Portal</h1>
+      <p>教師入口</p>
+    </div>
+    <label>Master Password / 主密碼</label>
+    <input type="password" id="masterPwdInput" placeholder="Enter master password"
+           onkeyup="if(event.key==='Enter') checkMasterPwd()" />
+    <div class="err" id="masterErr">❌ Invalid password / 密碼錯誤</div>
+    <button class="btn btn-primary" onclick="checkMasterPwd()">Login / 登入</button>
+    <button class="btn btn-secondary" onclick="showScreen('s-password')">← Back / 返回</button>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     Screen 6 · Teacher Dashboard
+══════════════════════════════════════ -->
+<div class="screen" id="s-teacher">
+  <div class="card">
+    <div class="logo">
+      <span class="icon">📋</span>
+      <h1>Teacher Dashboard</h1>
+      <p>教師控制台</p>
+    </div>
+    <div class="pwd-display">
+      <div class="pwd-label">Today's Student Password / 今日學生密碼</div>
+      <div class="pwd-value" id="todayPwd">------</div>
+      <div class="pwd-date" id="todayDate"></div>
+    </div>
+    <p style="font-size:13px;color:var(--muted);text-align:center;margin-bottom:4px">
+      Share this with students each morning<br>每天早上告訴學生此密碼
+    </p>
+    <button class="btn btn-secondary" onclick="showScreen('s-password')" style="margin-top:16px">← Back / 返回</button>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     JavaScript
+══════════════════════════════════════ -->
 <script>
-// 題目數據（同前，包含解析）
-const grammarPoints = ["Past Simple Tense", "Future Tense", "Expressing Preferences", "Giving Reasons", "Quantifying / Duration", "Present Perfect", "Present Tense"];
-let questions = [
-    {q: "What did you eat for dinner last night?", a: "Past Simple Tense", t: "Experiences", e: "解析：句中使用了 'did' 和 'last night'，這是過去簡單式的典型時間標誌。"},
-    {q: "Where will you go for your next summer holiday?", a: "Future Tense", t: "Plans", e: "解析：句中使用了 'will' 和 'next summer'，表示對未來的計劃或預測。"},
-    {q: "Do you prefer tea or coffee in the morning?", a: "Expressing Preferences", t: "Daily Life", e: "解析：句中使用了 'prefer A or B'，這是在詢問對象的喜好偏好。"},
-    {q: "Why do you like living in your city?", a: "Giving Reasons", t: "Opinion", e: "解析：以 'Why' 開頭的問句通常要求回答原因 (Giving Reasons)。"},
-    {q: "How many hours a day do you spend on your phone?", a: "Quantifying / Duration", t: "Habits", e: "解析：'How many hours' 用於詢問時間的長短或數量 (Duration)。"},
-    {q: "Have you ever seen a famous singer live?", a: "Present Perfect", t: "Experiences", e: "解析：'Have you ever + 過去分詞' 是現在完成式，用於詢問過往的人生經歷。"},
-    {q: "How often do you visit your grandparents?", a: "Present Tense", t: "Family", e: "解析：'How often' 詢問頻率，配合 'do you visit' 表示目前的一般習慣。"},
-    {q: "When did you buy your first car?", a: "Past Simple Tense", t: "Transport", e: "解析：'did you buy' 指向過去的一個特定時間點。"},
-    {q: "Are you going to celebrate your birthday next month?", a: "Future Tense", t: "Special Occasions", e: "解析：'be going to' 用於表示已經決定好的未來打算。"},
-    {q: "Would you rather travel by plane or by boat?", a: "Expressing Preferences", t: "Transport", e: "解析：'Would you rather' 是表達偏好的常用語法。"},
-    {q: "Why is it important to learn a musical instrument?", a: "Giving Reasons", t: "Music", e: "解析：詢問重要性及原因，屬於 Giving Reasons。"},
-    {q: "How long have you lived in your current house?", a: "Quantifying / Duration", t: "Personal", e: "解析：'How long' 詢問持續時間的長度。"},
-    {q: "Has your family ever visited a traditional festival abroad?", a: "Present Perfect", t: "Festivals", e: "解析：使用 'Has... ever' 詢問截至目前為止的經驗。"},
-    {q: "What time do you usually wake up on Saturdays?", a: "Present Tense", t: "Routine", e: "解析：'usually' 加上現在式動詞，描述日常規律或習慣。"},
-    {q: "Who was your favorite teacher when you were at school?", a: "Past Simple Tense", t: "Education", e: "解析：'was' 和 'were' 顯示這是在談論過去的事實。"},
-    {q: "Will you take the bus to work tomorrow morning?", a: "Future Tense", t: "Transport", e: "解析：'Will' 和 'tomorrow' 明顯指向未來。"},
-    {q: "Do you like pop music more than rock music?", a: "Expressing Preferences", t: "Music", e: "解析：比較兩者並詢問喜好。"},
-    {q: "Why do people enjoy watching fireworks at New Year?", a: "Giving Reasons", t: "Festivals", e: "解析：'Why' 詢問行為背後的動機或原因。"},
-    {q: "How many kilometers is your commute to the office?", a: "Quantifying / Duration", t: "Transport", e: "解析：詢問具體的數量/距離。"},
-    {q: "Have you ever won a prize at a wedding game?", a: "Present Perfect", t: "Special Occasions", e: "解析：詢問過往是否有過某種特定的經驗。"},
-    {q: "Which radio station do you listen to in the car?", a: "Present Tense", t: "Media", e: "解析：詢問目前的習慣性行為。"},
-    {q: "Did you receive many gifts on your last birthday?", a: "Past Simple Tense", t: "Special Occasions", e: "解析：'Did' 搭配 'last birthday' 指向過去事件。"},
-    {q: "What are you going to wear to the wedding on Sunday?", a: "Future Tense", t: "Special Occasions", e: "解析：'are you going to' 表示未來的安排。"},
-    {q: "Do you prefer watching horror movies or comedies?", a: "Expressing Preferences", t: "Entertainment", e: "解析：詢問在兩種電影類型之間的選擇。"},
-    {q: "Why is public transport better than driving a car?", a: "Giving Reasons", t: "Transport", e: "解析：詢問支持某種觀點的原因。"},
-    {q: "How many days did you spend at the local festival?", a: "Quantifying / Duration", t: "Festivals", e: "解析：'How many days' 用於量化一段時間。"},
-    {q: "Have you ever traveled on a high-speed train?", a: "Present Perfect", t: "Transport", e: "解析：詢問關於交通工具的搭乘經驗。"},
-    {q: "How do you usually spend your Sunday afternoons?", a: "Present Tense", t: "Routine", e: "解析：詢問例行公事。"},
-    {q: "What was the most memorable trip you took as a child?", a: "Past Simple Tense", t: "Travel", e: "解析：'was' 顯示這是在談論兒時的過去回憶。"},
-    {q: "Are you going to stay at home or go out tonight?", a: "Future Tense", t: "Plans", e: "解析：詢問今晚即將發生的計劃。"},
-    {q: "Would you prefer to learn the violin or the drums?", a: "Expressing Preferences", t: "Hobbies", e: "解析：'Would prefer' 用於詢問假設性或具體的選擇。"},
-    {q: "Why do you think music is important for celebrations?", a: "Giving Reasons", t: "Culture", e: "解析：要求解釋對音樂重要性的看法原因。"},
-    {q: "How many guests are you inviting to the party?", a: "Quantifying / Duration", t: "Party", e: "解析：詢問賓客的數量。"},
-    {q: "Have you ever been to a film festival in another city?", a: "Present Perfect", t: "Festivals", e: "解析：詢問是否有到過某處的經驗。"},
-    {q: "Do you use the subway every day to get to school?", a: "Present Tense", t: "Transport", e: "解析：'every day' 是現在式常用的頻率副詞。"},
-    {q: "What did you do during the last national holiday?", a: "Past Simple Tense", t: "Holiday", e: "解析：'did you do' 指向前一次假期的活動。"},
-    {q: "Will you learn a new language next year?", a: "Future Tense", t: "Learning", e: "解析：'next year' 與 'Will' 搭配表示未來意圖。"},
-    {q: "Do you prefer traditional food or modern snacks?", a: "Expressing Preferences", t: "Food", e: "解析：在食物種類間進行喜好選擇。"},
-    {q: "Why is it necessary to have a car in the countryside?", a: "Giving Reasons", t: "Living", e: "解析：尋求對鄉村生活必需品的原因解釋。"},
-    {q: "How many hours was the flight to your last destination?", a: "Quantifying / Duration", t: "Travel", e: "解析：量化過去某次飛行的時間。"},
-    {q: "Have you ever met a famous actor at the cinema?", a: "Present Perfect", t: "Media", e: "解析：詢問過往奇特的個人經歷。"},
-    {q: "Does your city have many music venues?", a: "Present Tense", t: "City Life", e: "解析：詢問關於現狀的事實。"},
-    {q: "How did you celebrate your graduation from university?", a: "Past Simple Tense", t: "Education", e: "解析：詢問過去特定事件（畢業）的慶祝方式。"},
-    {q: "What will the weather be like for the outdoor concert?", a: "Future Tense", t: "Weather", e: "解析：'will... be' 用於預測未來天氣。"},
-    {q: "Do you prefer attending big concerts or small gigs?", a: "Expressing Preferences", t: "Music", e: "解析：詢問對演唱會規模的偏好。"},
-    {q: "Why is it fun to exchange gifts during festivals?", a: "Giving Reasons", t: "Tradition", e: "解析：探討節日行為背後的理由。"},
-    {q: "How many months did it take you to learn that song?", a: "Quantifying / Duration", t: "Music", e: "解析：詢問完成某事所需的累積時間。"},
-    {q: "Have you ever forgotten a close friend's birthday?", a: "Present Perfect", t: "Social", e: "解析：詢問是否有過某種失誤的經歷。"},
-    {q: "What kind of TV shows do you watch after dinner?", a: "Present Tense", t: "Media", e: "解析：詢問晚上的日常習慣。"},
-    {q: "Where did you go on your very first plane trip?", a: "Past Simple Tense", t: "Travel", e: "解析：詢問人生的第一次經驗，發生在過去。"}
+// ─── CONFIG ─────────────────────────────────────────────────
+// After deploying your Cloudflare Worker, replace the URL below
+const WORKER_URL = 'https://dry-bush-add7.jingplus.workers.dev';
+
+// ─── STATE ──────────────────────────────────────────────────
+let dailyPassword = null;
+let selectedTopic  = null;
+let history        = [];   // Gemini conversation history
+let exchanges      = 0;
+const MAX_EXCH     = 12;
+let inputMode      = 'text';
+let recognition    = null;
+let micActive      = false;
+let examDone       = false;
+
+// ─── TOPICS ─────────────────────────────────────────────────
+const TOPICS = [
+  { e:'👨‍👩‍👧', en:'My Family',      zh:'我的家人'   },
+  { e:'🎮',      en:'My Hobbies',     zh:'我的嗜好'   },
+  { e:'🏫',      en:'My School',      zh:'我的學校'   },
+  { e:'🍜',      en:'Food & Eating',  zh:'飲食文化'   },
+  { e:'✈️',      en:'Travel',         zh:'旅行'       },
+  { e:'🏠',      en:'My Home',        zh:'我的家'     },
+  { e:'📱',      en:'Technology',     zh:'科技'       },
+  { e:'⚽',      en:'Sports',         zh:'運動'       },
+  { e:'🎵',      en:'Music',          zh:'音樂'       },
+  { e:'🌟',      en:'Future Plans',   zh:'未來計劃'   },
+  { e:'🎉',      en:'Festivals',      zh:'節日慶典'   },
+  { e:'🐾',      en:'Pets & Animals', zh:'寵物動物'   },
 ];
 
-let voices = [];
-let currentIndex = 0;
-let userAnswers = [];
-let timerInterval;
+// ─── INIT ────────────────────────────────────────────────────
+(function init() {
+  renderTopics();
+  setupSpeech();
+})();
 
-// 手機語音引擎載入
-function initVoices() {
-    voices = window.speechSynthesis.getVoices().filter(v => v.lang.startsWith('en'));
-    const select = document.getElementById('voice-select');
-    if (voices.length > 0) {
-        select.innerHTML = voices.map((v, i) => `<option value="${i}">${v.name}</option>`).join('');
-    }
-}
-if (speechSynthesis.onvoiceschanged !== undefined) {
-    speechSynthesis.onvoiceschanged = initVoices;
-}
-initVoices();
-
-function testVoice() { speak("Hello! This is a test for my accent."); }
-
-function speak(text) {
-    window.speechSynthesis.cancel();
-    const msg = new SpeechSynthesisUtterance(text);
-    const vIdx = document.getElementById('voice-select').value;
-    if (voices[vIdx]) msg.voice = voices[vIdx];
-    msg.rate = parseFloat(document.getElementById('audio-speed').value);
-    window.speechSynthesis.speak(msg);
+function renderTopics() {
+  document.getElementById('topicGrid').innerHTML = TOPICS.map((t, i) => `
+    <div class="topic-card" id="tc-${i}" onclick="pickTopic(${i})">
+      <div class="em">${t.e}</div>
+      <div class="en">${t.en}</div>
+      <div class="zh">${t.zh}</div>
+    </div>`).join('');
 }
 
-function startQuiz() {
-    // 隨機打亂
-    for (let i = questions.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [questions[i], questions[j]] = [questions[j], questions[i]];
-    }
-    userAnswers = Array(questions.length).fill(null);
-    document.getElementById('setup-area').style.display = 'none';
-    document.getElementById('quiz-area').style.display = 'block';
-    renderNav();
-    loadQuestion(0);
+function pickTopic(i) {
+  document.querySelectorAll('.topic-card').forEach(c => c.classList.remove('selected'));
+  document.getElementById(`tc-${i}`).classList.add('selected');
+  selectedTopic = TOPICS[i];
+  document.getElementById('startBtn').disabled = false;
 }
 
-function renderNav() {
-    const nav = document.getElementById('nav-grid');
-    nav.innerHTML = questions.map((_, i) => {
-        let cls = 'nav-item' + (i === currentIndex ? ' active' : '') + (userAnswers[i] === true ? ' correct-nav' : userAnswers[i] === false ? ' wrong-nav' : '');
-        return `<div class="${cls}">${i+1}</div>`;
-    }).join('');
-}
-
-function loadQuestion(index) {
-    clearInterval(timerInterval);
-    currentIndex = index;
-    renderNav();
-    const q = questions[index];
-    
-    document.getElementById('topic-label').innerText = q.t;
-    document.getElementById('next-btn').style.display = 'none';
-    document.getElementById('question-text').innerText = "";
-    document.getElementById('question-text').classList.remove('revealed');
-    document.getElementById('explanation-text').style.display = 'none';
-    document.getElementById('reveal-prompt').style.display = 'block';
-
-    const container = document.getElementById('options-container');
-    container.innerHTML = grammarPoints.map(pt => {
-        let cls = 'option';
-        if (userAnswers[index] !== null) {
-            if (pt === q.a) cls += ' correct';
-            else if (userAnswers[index] === false) cls += ' wrong';
-        }
-        return `<div class="${cls}" onclick="handleChoice(this, '${pt}', '${q.a}')">${pt}</div>`;
-    }).join('');
-
-    if (userAnswers[index] === null) startTimer();
-    else revealText();
-    
-    // 手機延遲播放確保穩定
-    setTimeout(() => speak(q.q), 100);
-}
-
-function revealText() {
-    const q = questions[currentIndex];
-    const qEl = document.getElementById('question-text');
-    qEl.innerText = q.q;
-    qEl.classList.add('revealed');
-    document.getElementById('explanation-text').innerText = q.e;
-    document.getElementById('explanation-text').style.display = 'block';
-    document.getElementById('reveal-prompt').style.display = 'none';
-}
-
-function replayAudio() { speak(questions[currentIndex].q); }
-
-function startTimer() {
-    const max = parseInt(document.getElementById('timer-setting').value);
-    let left = max;
-    const bar = document.getElementById('timer-bar');
-    bar.style.transition = 'none'; 
-    bar.style.width = '100%';
-    
-    timerInterval = setInterval(() => {
-        left--;
-        bar.style.transition = 'width 1s linear';
-        bar.style.width = (left / max * 100) + '%';
-        if (left <= 0) { 
-            clearInterval(timerInterval); 
-            handleChoice(null, "TIMEOUT", questions[currentIndex].a); 
-        }
-    }, 1000);
-}
-
-function handleChoice(el, selected, correct) {
-    if (userAnswers[currentIndex] !== null) return;
-    clearInterval(timerInterval);
-    userAnswers[currentIndex] = (selected === correct);
-    revealText();
-    renderNav();
-    updateStats();
-    
-    document.querySelectorAll('.option').forEach(opt => {
-        if(opt.innerText === correct) opt.classList.add('correct');
-        if(opt.innerText === selected && selected !== correct) opt.classList.add('wrong');
+// ─── PASSWORD CHECK ──────────────────────────────────────────
+async function checkPassword() {
+  const val = document.getElementById('pwdInput').value.toUpperCase().trim();
+  if (!val) return;
+  try {
+    const r = await fetch(`${WORKER_URL}/chat`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ dailyPassword: val, checkOnly: true }),
     });
-    
-    document.getElementById('next-btn').style.display = 'block';
-    speak(selected === correct ? "Correct" : "Correct answer is " + correct);
+    if (r.status === 401) { showErr('pwdErr'); return; }
+    if (!r.ok) throw new Error('Server error');
+    dailyPassword = val;
+    showScreen('s-topic');
+  } catch {
+    document.getElementById('pwdErr').textContent = '⚠️ Cannot connect to server. Check setup.';
+    showErr('pwdErr');
+  }
 }
 
-function updateStats() {
-    const ans = userAnswers.filter(a => a !== null).length;
-    const cor = userAnswers.filter(a => a === true).length;
-    document.getElementById('accuracy').innerText = ans === 0 ? 0 : Math.round((cor/ans)*100);
+// ─── EXAM ────────────────────────────────────────────────────
+function startExam() {
+  if (!selectedTopic) return;
+  history   = [];
+  exchanges = 0;
+  examDone  = false;
+  document.getElementById('examTopicLabel').textContent =
+    `${selectedTopic.e} ${selectedTopic.en} / ${selectedTopic.zh}`;
+  document.getElementById('exchCount').textContent = `0 / ${MAX_EXCH}`;
+  document.getElementById('chatArea').innerHTML = `
+    <div class="typing show" id="typing">
+      <div class="typing-dots">
+        <div class="dot"></div><div class="dot"></div><div class="dot"></div>
+      </div>
+    </div>`;
+  document.getElementById('txtIn').value = '';
+  showScreen('examScreen');
+  openExam();
 }
 
-function moveNext() {
-    if (currentIndex < questions.length - 1) loadQuestion(currentIndex + 1);
-    else {
-        document.getElementById('quiz-area').style.display = 'none';
-        document.getElementById('results-area').style.display = 'block';
-        document.getElementById('final-percent').innerText = document.getElementById('accuracy').innerText;
-    }
+async function openExam() {
+  const sys = buildSystemPrompt();
+  const seed = [{ role: 'user', parts: [{ text: 'Please begin.' }] }];
+  const reply = await callGemini(sys, seed);
+  hideTyping();
+  if (reply) {
+    history = [...seed, { role: 'model', parts: [{ text: reply }] }];
+    addBubble('examiner', reply);
+  }
+}
+
+async function sendMsg() {
+  const inp = document.getElementById('txtIn');
+  const txt = inp.value.trim();
+  if (!txt || examDone) return;
+  inp.value = '';
+  await handleStudent(txt);
+}
+
+async function handleStudent(txt) {
+  if (!txt || examDone) return;
+  addBubble('student', txt);
+  history.push({ role: 'user', parts: [{ text: txt }] });
+  exchanges++;
+  document.getElementById('exchCount').textContent = `${exchanges} / ${MAX_EXCH}`;
+  showTyping();
+
+  const sys = buildSystemPrompt();
+  const reply = await callGemini(sys, history);
+  hideTyping();
+  if (!reply) return;
+
+  history.push({ role: 'model', parts: [{ text: reply }] });
+
+  if (reply.includes('EXAM COMPLETE') || exchanges >= MAX_EXCH) {
+    examDone = true;
+    const [before, after] = reply.split('EXAM COMPLETE');
+    if (before && before.trim()) addBubble('examiner', before.trim());
+    setTimeout(() => showFeedback(after ? after.trim() : reply), 600);
+  } else {
+    addBubble('examiner', reply);
+  }
+}
+
+function buildSystemPrompt() {
+  const isLast = exchanges >= MAX_EXCH - 1;
+  return `You are a Trinity College London GESE Grade 5 (B1) English examiner conducting a speaking exam practice.
+
+Topic: "${selectedTopic.en}"
+Exchange: ${exchanges + 1} of ${MAX_EXCH}
+
+Rules:
+- Keep your replies SHORT — 1 or 2 sentences maximum. You ask questions; the student answers.
+- Ask natural follow-up questions appropriate for B1 level.
+- Be warm, professional, and encouraging.
+- Do NOT correct grammar errors mid-conversation.
+- Respond in English only.
+${isLast
+  ? `- This is the FINAL exchange. After a brief acknowledgement, write exactly "EXAM COMPLETE" on a new line, then give short feedback covering: Fluency, Vocabulary, Grammar, and Communication. Keep it positive and practical.`
+  : ''}`;
+}
+
+async function callGemini(systemInstruction, contents) {
+  try {
+    const payload = {
+      systemInstruction: { parts: [{ text: systemInstruction }] },
+      contents,
+      generationConfig: { temperature: 0.75, maxOutputTokens: 280 },
+    };
+    const r = await fetch(`${WORKER_URL}/chat`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ dailyPassword, payload }),
+    });
+    const data = await r.json();
+    return data?.candidates?.[0]?.content?.parts?.[0]?.text ?? null;
+  } catch {
+    return 'Sorry, there was a connection error. Please try again.';
+  }
+}
+
+// ─── FEEDBACK ────────────────────────────────────────────────
+function showFeedback(text) {
+  document.getElementById('feedbackBox').textContent = text || 'Great practice! Keep it up!';
+  showScreen('s-feedback');
+}
+
+function practiceAgain() {
+  history   = [];
+  exchanges = 0;
+  examDone  = false;
+  startExam();
+}
+
+// ─── UI HELPERS ──────────────────────────────────────────────
+function addBubble(role, text) {
+  const area = document.getElementById('chatArea');
+  const typing = document.getElementById('typing');
+  const d = document.createElement('div');
+  d.className = `msg ${role}`;
+  d.innerHTML = `
+    <div class="msg-label">${role === 'examiner' ? '🎓 Examiner' : '👤 You'}</div>
+    <div class="bubble">${text.replace(/\n/g, '<br>')}</div>`;
+  area.insertBefore(d, typing);
+  area.scrollTop = area.scrollHeight;
+}
+
+function showTyping() {
+  const t = document.getElementById('typing');
+  if (t) { t.className = 'typing show'; document.getElementById('chatArea').scrollTop = 9999; }
+}
+function hideTyping() {
+  const t = document.getElementById('typing');
+  if (t) t.className = 'typing';
+}
+
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+
+function showErr(id) {
+  const el = document.getElementById(id);
+  el.classList.add('show');
+  setTimeout(() => el.classList.remove('show'), 3500);
+}
+
+// ─── INPUT MODE ──────────────────────────────────────────────
+function setMode(mode) {
+  inputMode = mode;
+  document.getElementById('btnText').className  = `mode-btn${mode==='text'  ? ' active' : ''}`;
+  document.getElementById('btnVoice').className = `mode-btn${mode==='voice' ? ' active' : ''}`;
+  document.getElementById('textArea').className  = mode === 'text'  ? 'text-row'   : 'text-row hidden';
+  document.getElementById('voiceArea').className = mode === 'voice' ? 'voice-area' : 'voice-area hidden';
+}
+
+// ─── SPEECH RECOGNITION ─────────────────────────────────────
+function setupSpeech() {
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!SR) { document.getElementById('btnVoice').disabled = true; return; }
+  recognition = new SR();
+  recognition.continuous = false;
+  recognition.interimResults = false;
+  recognition.lang = 'en-GB';
+
+  recognition.onresult = e => {
+    const t = e.results[0][0].transcript;
+    document.getElementById('micHint').textContent = `"${t}"`;
+    stopMic();
+    handleStudent(t);
+  };
+  recognition.onerror = () => {
+    stopMic();
+    document.getElementById('micHint').textContent = 'Error — tap to try again';
+  };
+  recognition.onend = () => { if (micActive) stopMic(); };
+}
+
+function toggleMic() {
+  if (!recognition) return;
+  micActive ? stopMic() : startMic();
+}
+function startMic() {
+  recognition.start();
+  micActive = true;
+  document.getElementById('micBtn').className = 'mic-btn recording';
+  document.getElementById('micHint').textContent = 'Listening… / 聆聽中…';
+}
+function stopMic() {
+  try { recognition.stop(); } catch {}
+  micActive = false;
+  document.getElementById('micBtn').className = 'mic-btn';
+  document.getElementById('micHint').textContent = 'Tap to speak / 點擊說話';
+}
+
+// ─── TEACHER ────────────────────────────────────────────────
+function goTeacherLogin() {
+  document.getElementById('masterPwdInput').value = '';
+  document.getElementById('masterErr').classList.remove('show');
+  showScreen('s-teacher-login');
+}
+
+async function checkMasterPwd() {
+  const pwd = document.getElementById('masterPwdInput').value.trim();
+  if (!pwd) return;
+  try {
+    const r = await fetch(`${WORKER_URL}/teacher`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ masterPassword: pwd }),
+    });
+    if (r.status === 401) { showErr('masterErr'); return; }
+    const data = await r.json();
+    document.getElementById('todayPwd').textContent  = data.password;
+    document.getElementById('todayDate').textContent = `Date: ${data.date} (HKT)`;
+    showScreen('s-teacher');
+  } catch {
+    document.getElementById('masterErr').textContent = '⚠️ Connection error';
+    showErr('masterErr');
+  }
 }
 </script>
 </body>
