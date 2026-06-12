@@ -89,11 +89,9 @@ html[data-dark] .dash-card { border-left-color: #3B82F6; }
 .exam-title { font-size: 14px; font-weight: 600; color: var(--muted); }
 .timer { font-size: 14px; font-weight: 700; color: var(--text); background: var(--surface2); padding: 4px 10px; border-radius: 20px; border: 1px solid var(--border); font-family: monospace; }
 .timer.warn { color: var(--danger); background: #FEF2F2; border-color: #FCA5A5; animation: pulse 1s infinite; }
-@keyframes pulse { 0%, 100% { opacity:1; } 50% { opacity:0.6; } }
 
 .chat-box { flex-grow: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 12px; padding: 4px; margin-bottom: 16px; max-height: 340px; border-bottom: 1px solid var(--border); padding-bottom: 14px; scroll-behavior: smooth; }
 .chat-box::-webkit-scrollbar { width: 5px; }
-.chat-box::-webkit-scrollbar-track { background: transparent; }
 .chat-box::-webkit-scrollbar-thumb { background: var(--border); border-radius: 10px; }
 
 .msg { max-width: 85%; padding: 12px 14px; border-radius: 14px; font-size: 14.5px; line-height: 1.45; animation: bubbleUp 0.2s ease-out; word-wrap: break-word; position: relative; }
@@ -115,8 +113,6 @@ html[data-dark] .dash-card { border-left-color: #3B82F6; }
 .score-icon { font-size: 44px; margin-bottom: 6px; }
 .score-title { font-size: 18px; font-weight: 700; }
 .scoring-scroll { flex-grow: 1; overflow-y: auto; max-height: 420px; padding-right: 4px; margin-bottom: 16px; }
-.scoring-scroll::-webkit-scrollbar { width: 5px; }
-.scoring-scroll::-webkit-scrollbar-thumb { background: var(--border); border-radius: 10px; }
 
 .overall-wrap { display: flex; flex-direction: column; align-items: center; margin-bottom: 24px; background: var(--surface2); padding: 16px; border-radius: var(--radius); border: 1px solid var(--border); }
 .overall-circle { width: 90px; height: 90px; border-radius: 50%; border: 6px solid var(--primary); display: flex; align-items: center; justify-content: center; flex-direction: row; margin-bottom: 8px; background: var(--surface); }
@@ -130,15 +126,16 @@ html[data-dark] .dash-card { border-left-color: #3B82F6; }
 .crit-score { font-family: monospace; font-size: 15px; }
 .bar-wrap { width: 100%; height: 6px; background: var(--border); border-radius: 3px; overflow: hidden; margin-bottom: 10px; }
 .bar-fill { height: 100%; width: 0; transition: width 0.6s cubic-bezier(0.1, 0.8, 0.2, 1); }
-.crit-text { font-size: 13.5px; line-height: 1.45; color: var(--text); }
-.crit-tip { font-size: 12.5px; background: var(--surface); border: 1px solid var(--border); padding: 8px; border-radius: 6px; margin-top: 8px; color: var(--muted); }
+.crit-text { font-size: 13.5px; line-height: 1.5; color: var(--text); }
+.crit-zh { font-size: 13px; color: var(--muted); margin-top: 4px; border-top: 1px dashed var(--border); padding-top: 4px; } /* 繁中翻譯樣式 */
+.crit-tip { font-size: 12.5px; background: var(--surface); border: 1px solid var(--border); padding: 8px; border-radius: 6px; margin-top: 8px; color: var(--text); }
 
 .next-steps { background: var(--ph2-lt); border: 1px solid #DDD6FE; border-radius: 10px; padding: 14px; margin-bottom: 12px; }
 html[data-dark] .next-steps { background: #2E1065; border-color: #4C1D95; }
 .ns-title { font-size: 14px; font-weight: 700; color: #6D28D9; margin-bottom: 8px; }
 html[data-dark] .ns-title { color: #A78BFA; }
 .ns-list { padding-left: 20px; font-size: 13.5px; line-height: 1.5; }
-.ns-list li { margin-bottom: 6px; }
+.ns-list li { margin-bottom: 8px; }
 
 .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 16px; }
 .stat-card { background: var(--surface2); border: 1px solid var(--border); padding: 12px; border-radius: 9px; text-align: center; }
@@ -148,7 +145,6 @@ html[data-dark] .ns-title { color: #A78BFA; }
 .chart-title { font-size: 13px; font-weight: 600; color: var(--muted); margin: 14px 0 8px 0; text-transform: uppercase; }
 .bar-node { flex-grow: 1; background: var(--primary); border-radius: 3px 3px 0 0; min-width: 6px; position: relative; cursor: pointer; }
 .bar-node:hover { background: var(--primary-dk); }
-.bar-node:hover::after { content: attr(data-tip); position: absolute; bottom: 100%; left: 50%; transform: translateX(-50%); background: #000; color: #fff; padding: 4px 6px; font-size: 10px; border-radius: 4px; white-space: nowrap; z-index: 10; pointer-events: none; }
 
 .footer-note { text-align: center; color: var(--muted); font-size: 11px; margin-top: 16px; border-top: 1px solid var(--border); padding-top: 12px; }
   </style>
@@ -219,10 +215,13 @@ html[data-dark] .ns-title { color: #A78BFA; }
       
       <div class="input-group">
         <label class="label" for="examinerGender">Select Examiner Voice (選擇考官聲音)</label>
-        <select id="examinerGender">
-          <option value="male">🧔 Mr. Smith (Male UK Voice)</option>
-          <option value="female" selected>👩 Ms. Davis (Female UK Voice)</option>
-        </select>
+        <div style="display: flex; gap: 8px;">
+          <select id="examinerGender" onchange="resetSpeechState()">
+            <option value="male">🧔 Mr. Smith (Male UK Voice)</option>
+            <option value="female" selected>👩 Ms. Davis (Female UK Voice)</option>
+          </select>
+          <button class="btn" id="testVoiceBtn" onclick="testCurrentVoice()" style="width: auto; padding: 0 16px; white-space: nowrap; background: var(--surface2); color: var(--text); border: 1px solid var(--border);">🎵 Test Voice</button>
+        </div>
       </div>
 
       <div id="topicFormFields" style="display:none">
@@ -352,8 +351,8 @@ html[data-dark] .ns-title { color: #A78BFA; }
     let history       = [];  
     let targetTimeLimit = 660; 
     let systemInstructionGlobal = ''; 
-    let chosenGender  = 'female'; // ⭐️ 預設性別為女聲
-    let examinerName  = 'Ms. Davis'; // ⭐️ 預設名字
+    let chosenGender  = 'female'; 
+    let examinerName  = 'Ms. Davis'; 
     
     let recognition       = null;
     let isRecording       = false;
@@ -405,7 +404,6 @@ html[data-dark] .ns-title { color: #A78BFA; }
         updateStatus('Critical Error: Web Speech API unsupported in this browser.', true);
       }
 
-      // 預熱載入系統聲音庫
       if (audioSynthesizer) {
         audioSynthesizer.getVoices();
         if (speechSynthesis.onvoiceschanged !== undefined) {
@@ -450,7 +448,22 @@ html[data-dark] .ns-title { color: #A78BFA; }
       document.getElementById('dailyPasswordInput').value = '';
       switchView('viewPassword');
     }
-
+    
+// 🎵 測試目前選擇的考官聲音功能
+    function testCurrentVoice() {
+      // 先暫停所有正在播放的聲音
+      if (audioSynthesizer) audioSynthesizer.cancel();
+      
+      // 讀取當前選單點選的性別
+      chosenGender = document.getElementById('examinerGender').value;
+      const exName = (chosenGender === 'male') ? 'Mr. Smith' : 'Ms. Davis';
+      
+      // 臨時觸發一次語音朗讀，測試抓取到的聲音
+      speakOutputText(`Hello, I am ${exName}. Nice to meet you.`, () => {
+        console.log(`Voice test completed for ${exName}`);
+      });
+    }
+    
     function switchView(viewId) {
       document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
       document.getElementById(viewId).classList.add('active');
@@ -507,7 +520,6 @@ html[data-dark] .ns-title { color: #A78BFA; }
       const errEl = document.getElementById('setupErr');
       errEl.classList.remove('show');
 
-      // ⭐️ 抓取選定的考官聲音性別與名稱
       chosenGender = document.getElementById('examinerGender').value;
       examinerName = (chosenGender === 'male') ? 'Mr. Smith' : 'Ms. Davis';
       const genderEmoji = (chosenGender === 'male') ? '🧔' : '👩';
@@ -607,82 +619,99 @@ Rules:
       executeExaminerTurn();
     }
 
-async function executeExaminerTurn() {
-  updateStatus('Examiner is thinking...');
-  document.getElementById('micBtn').disabled = true;
+    async function executeExaminerTurn() {
+      updateStatus('Examiner is thinking...');
+      document.getElementById('micBtn').disabled = true;
 
-  // ⚡️ 加速關鍵：嚴格限制帶過去的歷史紀錄數量！
-  // 只保留最新的 6 句對話（約 3 回合），既能維持上下文記憶，又能大幅提升反應速度！
-  if (history.length > 7) { 
-    const latestExchanges = history.slice(-6); 
-    history = [
-      { role: 'user', parts: [{ text: `SYSTEM_CONFIG: ${systemInstructionGlobal} (Context active)` }] },
-      ...latestExchanges
-    ];
-  }
+      // ⚡️ 保持輕量化的 6 句歷史對話限制，防止 Gemini 卡頓
+      if (history.length > 7) { 
+        const latestExchanges = history.slice(-6); 
+        history = [
+          { role: 'user', parts: [{ text: `SYSTEM_CONFIG: ${systemInstructionGlobal} (Context active)` }] },
+          ...latestExchanges
+        ];
+      }
 
-  try {
-    const payload = { contents: history };
-    const data = await apiRequest('/chat', { dailyPassword, payload });
-    
-    const responseText = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
-    if (!responseText) throw new Error('Empty response');
+      try {
+        const payload = { contents: history };
+        const data = await apiRequest('/chat', { dailyPassword, payload });
+        
+        const responseText = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
+        if (!responseText) throw new Error('Empty response');
 
-    history.push({ role: 'model', parts: [{ text: responseText }] });
-    appendMessage('examiner', responseText);
-    updateStatus('Examiner speaking...');
-    
-    speakOutputText(responseText, () => {
-      updateStatus('Your turn. Click the mic button 🎙️ to start speaking.');
-      document.getElementById('micBtn').disabled = false;
-    });
+        history.push({ role: 'model', parts: [{ text: responseText }] });
+        appendMessage('examiner', responseText);
+        updateStatus('Examiner speaking...');
+        
+        speakOutputText(responseText, () => {
+          updateStatus('Your turn. Click the mic button 🎙️ to start speaking.');
+          document.getElementById('micBtn').disabled = false;
+        });
 
-  } catch (err) {
-    console.error(err);
-    updateStatus('Session disruption. Failed to contact Examiner.', true);
-  }
-}
+      } catch (err) {
+        console.error(err);
+        updateStatus('Session disruption. Failed to contact Examiner.', true);
+      }
+    }
 
-    // ⭐️ 核心語音調整：根據下拉選單的性別，動態指派男聲/女聲
-    function speakOutputText(text, callback) {
+function speakOutputText(text, callback) {
       if (!audioSynthesizer) return callback();
       audioSynthesizer.cancel();
 
       const cleanText = text.replace(/SYSTEM_CONFIG:.*$/gi, '').trim();
       currentUtterance = new SpeechSynthesisUtterance(cleanText);
-      currentUtterance.lang = 'en-GB';
-
+      
+      // 取得系統所有支援的聲音
       const voices = audioSynthesizer.getVoices();
       
-      // 篩選所有英國英語語音檔
-      const ukVoices = voices.filter(v => v.lang.startsWith('en-GB') || v.lang.startsWith('en_GB'));
+      // 1. 先抓出所有英文聲音 (en-)
+      const enVoices = voices.filter(v => v.lang.toLowerCase().startsWith('en'));
+      // 2. 再細分出英國英文聲音 (en-GB)
+      const ukVoices = enVoices.filter(v => v.lang.toLowerCase().replace('_', '-').startsWith('en-gb'));
       
       let matchedVoice = null;
 
       if (chosenGender === 'male') {
-        // 男聲優先權：尋找包含 male, david, george, james, sam 等關鍵字的英國語音
-        matchedVoice = ukVoices.find(v => v.name.toLowerCase().includes('male') || 
-                                          v.name.toLowerCase().includes('david') || 
-                                          v.name.toLowerCase().includes('george') || 
-                                          v.name.toLowerCase().includes('james')) || 
-                       ukVoices.find(v => v.name.includes('Google') && !v.name.includes('Female'));
+        // 🧔 尋找男聲優先順序：
+        // 優先級 A：英國地區的知名男聲
+        matchedVoice = ukVoices.find(v => {
+          const name = v.name.toLowerCase();
+          return name.includes('male') || name.includes('david') || name.includes('george') || name.includes('james') || name.includes('oliver');
+        });
+
+        // 優先級 B：如果英國沒男聲，擴大到全英文地區(如美國、澳洲)的男聲 (例如 Microsoft David, Google US English Male)
+        if (!matchedVoice) {
+          matchedVoice = enVoices.find(v => {
+            const name = v.name.toLowerCase();
+            return name.includes('male') || name.includes('david') || name.includes('george') || name.includes('guy') || name.includes('andrew') || name.includes('brian');
+          });
+        }
+
+        // 優先級 C：如果還是沒有，找任何名字不包含 female/zira/hazel/susan 的英國聲音
+        if (!matchedVoice && ukVoices.length > 0) {
+          matchedVoice = ukVoices.find(v => {
+            const name = v.name.toLowerCase();
+            return !name.includes('female') && !name.includes('zira') && !name.includes('hazel') && !name.includes('susan');
+          });
+        }
       } else {
-        // 女聲優先權：尋找包含 female, hazel, zira, susan, hazel 等關鍵字的英國語音
-        matchedVoice = ukVoices.find(v => v.name.toLowerCase().includes('female') || 
-                                          v.name.toLowerCase().includes('hazel') || 
-                                          v.name.toLowerCase().includes('zira') || 
-                                          v.name.toLowerCase().includes('susan')) || 
-                       ukVoices.find(v => v.name.includes('Google') && v.name.includes('Female'));
+        // 👩 尋找女聲優先順序：
+        matchedVoice = ukVoices.find(v => {
+          const name = v.name.toLowerCase();
+          return name.includes('female') || name.includes('hazel') || name.includes('zira') || name.includes('susan') || name.includes('alice');
+        }) || ukVoices[0];
       }
 
-      // 如果完全找不到對應的性別，則使用隨機英國英語保底
-      if (!matchedVoice && ukVoices.length > 0) {
-        matchedVoice = ukVoices[0];
-      }
-
+      // 如果精準匹配成功，就使用該聲音，否則不指定（交由系統預設，但設定語言為 en-GB）
       if (matchedVoice) {
         currentUtterance.voice = matchedVoice;
+        currentUtterance.lang = matchedVoice.lang; // 同步語系
+      } else {
+        currentUtterance.lang = 'en-GB';
       }
+
+      // 調節一下語速，讓英國腔聽起來更優雅自然（1.0 是原速，0.95 稍微沉穩一點）
+      currentUtterance.rate = 0.95; 
 
       currentUtterance.onend = () => callback();
       currentUtterance.onerror = (e) => { console.error(e); callback(); };
@@ -747,7 +776,6 @@ async function executeExaminerTurn() {
       const box = document.getElementById('chatBox');
       const el = document.createElement('div');
       el.className = `msg ${role}`;
-      // 讓泡泡左側動態加上考官名字
       el.textContent = (role === 'examiner') ? `[${examinerName}]: ${text}` : text;
       box.appendChild(el);
       box.scrollTop = box.scrollHeight;
@@ -803,23 +831,32 @@ async function executeExaminerTurn() {
       switchView('viewScoring');
       document.getElementById('tryAgainBtn').style.display = 'none';
       document.getElementById('changeTopicBtn').style.display = 'none';
-      displayScoring(null, '🔄 Analyzing transcript telemetry and assessing linguistic benchmarks...');
+      displayScoring(null, '連結評分引擎中，正在深度分析您的口說盲點並生成繁中翻譯報告...');
 
       const exchangeLogs = history.filter(h => !h.parts[0].text.startsWith('SYSTEM_CONFIG:'));
 
+      // ⚡️ 核心提示詞優化：強制 AI 回傳中英雙語對照的 JSON 資料
       const gradingPrompt = `You are the lead linguistic grading engine for Trinity College London assessments. Evaluate the following dialogue transcript against CEFR B1 / Grade 5 speaking criteria.
 
 Dialogue Context:
 ${exchangeLogs.map(m => `${m.role.toUpperCase()}: ${m.parts[0].text}`).join('\n')}
 
-You MUST respond with a single, valid JSON object matching this exact schema:
+You MUST respond with a single, valid JSON object matching this exact schema. 
+CRITICAL REQUIREMENT FOR TEXT AND TIP FIELDS: You must write the English feedback first, followed IMMEDIATELY by its Traditional Chinese (繁體中文) translation in parentheses.
+Example format for text/tip fields: "Your grammar was mostly correct. (您的語法基本正確。)"
+
+Schema:
 {
   "overall": 7,
-  "fluency": { "score": 8, "text": "...", "tip": "..." },
-  "vocabulary": { "score": 6, "text": "...", "tip": "..." },
-  "grammar": { "score": 7, "text": "...", "tip": "..." },
-  "communication": { "score": 7, "text": "...", "tip": "..." },
-  "nextSteps": ["...", "..."]
+  "overall_zh": "良好 (Merit)",
+  "fluency": { "score": 8, "text": "English text (繁中翻譯)", "tip": "English tip (繁中建議)" },
+  "vocabulary": { "score": 6, "text": "English text (繁中翻譯)", "tip": "English tip (繁中建議)" },
+  "grammar": { "score": 7, "text": "English text (繁中翻譯)", "tip": "English tip (繁中建議)" },
+  "communication": { "score": 7, "text": "English text (繁中翻譯)", "tip": "English tip (繁中建議)" },
+  "nextSteps": [
+    "First action item in English (第一個繁中行動建議)",
+    "Second action item in English (第二個繁中行動建議)"
+  ]
 }
 Scores must be integers between 1 and 10. Respond only with the raw object without markdown blocks.`;
 
@@ -832,8 +869,18 @@ Scores must be integers between 1 and 10. Respond only with the raw object witho
         displayScoring(scoreObj, null);
       } catch (err) {
         console.error(err);
-        displayScoring(null, '❌ Failed to parse response from evaluation server.');
+        displayScoring(null, '❌ 評分解析失敗。請確認網路連線或嘗試重新評分。');
       }
+    }
+
+    // ⚡️ 前端排版拆解：自動將括號內的繁體中文抽出來獨立換行顯示，版面更整齊
+    function splitEnZh(rawString) {
+      if (!rawString) return '';
+      const match = rawString.match(/^([\s\S]*?)\(([\s\S]*?)\)\s*$/);
+      if (match) {
+        return `<div class="crit-en">${match[1].trim()}</div><div class="crit-zh">➔ ${match[2].trim()}</div>`;
+      }
+      return `<div class="crit-en">${rawString}</div>`;
     }
 
     function crit(label, emoji, data){
@@ -847,8 +894,8 @@ Scores must be integers between 1 and 10. Respond only with the raw object witho
           <span class="crit-score" style="color:${c}">${data.score}/10</span>
         </div>
         <div class="bar-wrap"><div class="bar-fill" style="width:${data.score*10}%;background:${c}"></div></div>
-        <p class="crit-text">${data.text}</p>
-        ${data.tip ? `<div class="crit-tip">💡 ${data.tip}</div>` : ''}
+        <div class="crit-text">${splitEnZh(data.text)}</div>
+        ${data.tip ? `<div class="crit-tip">💡 ${splitEnZh(data.tip)}</div>` : ''}
       </div>`;
     }
 
@@ -860,19 +907,26 @@ Scores must be integers between 1 and 10. Respond only with the raw object witho
         return;
       }
       const oc = scoreColor(s.overall);
+      
+      // 動態對照總分評級
+      let displayLabel = overallLabel(s.overall);
+      if (s.overall_zh) {
+        displayLabel = `${displayLabel.split('(')[0]} (${s.overall_zh})`;
+      }
+
       document.getElementById('scoringContent').innerHTML = `
         <div class="overall-wrap">
           <div class="overall-circle" style="border-color:${oc}">
             <div class="overall-num" style="color:${oc}">${s.overall}</div>
             <div class="overall-den">/10</div>
           </div>
-          <div class="overall-label">${overallLabel(s.overall)}</div>
+          <div class="overall-label">${displayLabel}</div>
         </div>
-        ${crit('Fluency', '🗣️', s.fluency)}
-        ${crit('Vocabulary', '📚', s.vocabulary)}
-        ${crit('Grammar', '✏️', s.grammar)}
-        ${crit('Communication', '💬', s.communication)}
-        ${s.nextSteps ? `<div class="next-steps"><div class="ns-title">📋 Next Steps / 改善建議</div><ul class="ns-list">${s.nextSteps.map(t=>`<li>${t}</li>`).join('')}</ul></div>`:''}`;
+        ${crit('Fluency & Spontaneity (流暢度)', '🗣️', s.fluency)}
+        ${crit('Vocabulary (詞彙豐富度)', '📚', s.vocabulary)}
+        ${crit('Grammar (文法準確度)', '✏️', s.grammar)}
+        ${crit('Communication (溝通成效)', '💬', s.communication)}
+        ${s.nextSteps ? `<div class="next-steps"><div class="ns-title">📋 Next Steps / 衝刺改善建議</div><ul class="ns-list">${s.nextSteps.map(t=>`<li>${splitEnZh(t)}</li>`).join('')}</ul></div>`:''}`;
 
       document.getElementById('scoringIcon').textContent = s.overall >= 7 ? '🏆' : '📊';
       document.getElementById('tryAgainBtn').style.display  = 'block';
@@ -880,7 +934,7 @@ Scores must be integers between 1 and 10. Respond only with the raw object witho
     }
 
     function scoreColor(v) { return v >= 8 ? 'var(--success)' : (v >= 5 ? 'var(--warn)' : 'var(--danger)'); }
-    function overallLabel(v) { return v >= 8.5 ? 'Distinction (🏆 A)' : (v >= 7.0 ? 'Merit (🌟 B)' : (v >= 5.0 ? 'Pass (✅ C)' : 'Fail (❌ Insufficient)')); }
+    function overallLabel(v) { return v >= 8.5 ? 'Distinction' : (v >= 7.0 ? 'Merit' : (v >= 5.0 ? 'Pass' : 'Fail')); }
 
     async function authenticateTeacher() {
       const pwd = document.getElementById('masterPasswordInput').value;
@@ -900,7 +954,7 @@ Scores must be integers between 1 and 10. Respond only with the raw object witho
         masterTeacherPwd = pwd;
         
         document.getElementById('tTodayPassword').textContent = data.password;
-        document.getElementById('tTodayDate').textContent = `Date: ${data.date} (HKT Midnight Clock)`;
+        document.getElementById('tTodayDate').textContent = `Date: ${data.date}`;
         switchView('viewTeacherDash');
         fetchTelemetryStats();
       } catch (err) {
