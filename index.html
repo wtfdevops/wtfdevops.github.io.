@@ -353,15 +353,16 @@ html[data-dark] .ns-title { color: #A78BFA; }
     const WORKER_URL = 'https://b1-trinity.jingplus.workers.dev';
 
     let dailyPassword = '';
-    let practiceMode  = ''; // 'full', 'intro', 'topic', 'conversation'
+    let practiceMode  = ''; 
     let history       = [];  
-    let targetTimeLimit = 660; // 預設 11 分鐘 (Full Mock)
+    let targetTimeLimit = 660; 
     
     let recognition       = null;
     let isRecording       = false;
     let currentUtterance  = null;
     let audioSynthesizer  = window.speechSynthesis;
     let speechTokenBox    = []; 
+    let currentLiveText   = ''; // ⭐️ 新增：追蹤目前畫面上看到的所有最新文字
 
     let examTimeSeconds   = 0;
     let timerInterval     = null;
@@ -389,7 +390,10 @@ html[data-dark] .ns-title { color: #A78BFA; }
             else interimText += e.results[i][0].transcript;
           }
           if (finalizedText) speechTokenBox.push(finalizedText);
-          renderLiveTranscription(speechTokenBox.join(' ') + ' ' + interimText);
+          
+          // ⭐️ 彙整當下所有文字，包含剛說完的跟臨時的
+          currentLiveText = (speechTokenBox.join(' ') + ' ' + interimText).trim();
+          renderLiveTranscription(currentLiveText);
         };
 
         recognition.onerror = (e) => {
@@ -447,7 +451,6 @@ html[data-dark] .ns-title { color: #A78BFA; }
       document.getElementById(viewId).classList.add('active');
     }
 
-    // ⭐️ 確保在切換視圖時清除未播完的語音
     function resetSpeechState() {
       if (audioSynthesizer) audioSynthesizer.cancel();
       stopRecordingContext();
@@ -477,18 +480,18 @@ html[data-dark] .ns-title { color: #A78BFA; }
       document.getElementById('setupErr').classList.remove('show');
 
       if (mode === 'full') {
-        targetTimeLimit = 660; // 11分鐘
+        targetTimeLimit = 660; 
         introText.innerHTML = `<h3>🏆 Full Mock Exam (完整模擬考試)</h3><p style="margin-top:6px;font-size:13.5px;color:var(--muted)">AI將精準掌控時間比例：<strong>Phase 1 熱身 (1 分鐘)</strong> ➔ <strong>Phase 2 Topic 盤問 (5 分鐘)</strong> ➔ <strong>Phase 3 隨機雙主題即興交流 (5 分鐘)</strong>。請在下方輸入您的題目：</p>`;
         formFields.style.display = 'block';
       } else if (mode === 'intro') {
-        targetTimeLimit = 60; // 1分鐘
+        targetTimeLimit = 60; 
         introText.innerHTML = `<h3>👋 Component 1: Introduction</h3><p style="margin-top:6px;font-size:13.5px;color:var(--muted)">The examiner will greet you and ask basic background questions about your life, hobbies, or studies (Target: 1 minute).</p>`;
       } else if (mode === 'topic') {
-        targetTimeLimit = 300; // 5分鐘
+        targetTimeLimit = 300; 
         introText.innerHTML = `<h3>📋 Component 2: Topic Phase</h3><p style="margin-top:6px;font-size:13.5px;color:var(--muted)">Please input your pre-prepared Topic Form details. The AI will cross-examine you on these 5 nodes (Target: 5 minutes).</p>`;
         formFields.style.display = 'block';
       } else if (mode === 'conversation') {
-        targetTimeLimit = 150; // ⭐️ 單選主題時間自動減半：2.5 分鐘 (150秒)
+        targetTimeLimit = 150; 
         introText.innerHTML = `<h3>💬 Component 3: Conversation Phase (單選練習)</h3><p style="margin-top:6px;font-size:13.5px;color:var(--muted)">在此模式下，您只需選擇一個主題。考官將針對該主題與您進行密集的 <strong>2.5 分鐘</strong> 深入交流。</p>`;
         convoField.style.display = 'block';
       }
@@ -571,7 +574,6 @@ You must rigorously pace the examination according to these standard guidelines.
         const subj = document.getElementById('convoSubject').value;
         document.getElementById('examRoomTitle').textContent = `Room: Conversation — ${subj}`;
         
-        // ⭐️ 給 AI 的指令同步調整為 2.5 分鐘 (Strict 2.5 Minutes Protocol)
         systemInstruction += `\n\n[SESSION TIMING PROTOCOL - ISOLATED CONVERSATION]:
 The single conversation category selected is "${subj}". Engage the candidate in an immersive, deep dialogue entirely focused on this single subject domain. 
 Because this is an isolated single-topic practice session, the time limit is strictly **2.5 minutes**. You should ask around 3 to 4 varied, progressive questions about this topic to challenge their B1 grammar. 
@@ -593,7 +595,6 @@ Once the exchange wraps up or approaches the 2.5-minute mark, finish immediately
         const s = String(examTimeSeconds % 60).padStart(2, '0');
         document.getElementById('examTimer').textContent = `${m}:${s}`;
         
-        // 根據不同模式的 targetTimeLimit 動態發出黃金倒數變紅警告
         if (examTimeSeconds >= targetTimeLimit) {
           document.getElementById('examTimer').classList.add('warn');
         }
@@ -656,6 +657,7 @@ Once the exchange wraps up or approaches the 2.5-minute mark, finish immediately
       if (!recognition || isRecording) return;
       if (audioSynthesizer && audioSynthesizer.speaking) audioSynthesizer.cancel();
       speechTokenBox = [];
+      currentLiveText = ''; // ⭐️ 重置暫存字串
       try { recognition.start(); } catch (e) {}
     }
 
@@ -670,7 +672,12 @@ Once the exchange wraps up or approaches the 2.5-minute mark, finish immediately
       stopRecordingContext();
       clearLiveTranscriptionBubble();
 
-      const finalPhrase = speechTokenBox.join(' ').trim();
+      // ⭐️ 核心修正：如果 token 陣列沒合成功，改抓即時畫面上看得到的 currentLiveText 兜底
+      let finalPhrase = speechTokenBox.join(' ').trim();
+      if (!finalPhrase && currentLiveText) {
+        finalPhrase = currentLiveText;
+      }
+
       if (!finalPhrase) {
         updateStatus('No speech captured. Click mic to try again.');
         document.getElementById('micBtn').disabled = false;
@@ -679,6 +686,9 @@ Once the exchange wraps up or approaches the 2.5-minute mark, finish immediately
 
       appendMessage('user', finalPhrase);
       history.push({ role: 'user', parts: [{ text: finalPhrase }] });
+      
+      // ⭐️ 清空，為下一輪做準備
+      currentLiveText = ''; 
       executeExaminerTurn();
     }
 
