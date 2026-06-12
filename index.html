@@ -670,32 +670,42 @@ Rules:
       }
     }
 
-function speakOutputText(text, callback) {
+// 🎵 強力捕捉與測試聲音的核心函數（方案二：Chrome 男聲強制保底版）
+    function speakOutputText(text, callback) {
       if (!audioSynthesizer) return callback();
       audioSynthesizer.cancel();
 
       const cleanText = text.replace(/SYSTEM_CONFIG:.*$/gi, '').trim();
       currentUtterance = new SpeechSynthesisUtterance(cleanText);
       
-      // 取得系統所有支援的聲音
+      // 取得目前瀏覽器支援的所有聲音
       const voices = audioSynthesizer.getVoices();
       
-      // 1. 先抓出所有英文聲音 (en-)
+      // 1. 抓出所有英文聲音 (en)
       const enVoices = voices.filter(v => v.lang.toLowerCase().startsWith('en'));
-      // 2. 再細分出英國英文聲音 (en-GB)
+      // 2. 細分出英國英文聲音 (en-GB)
       const ukVoices = enVoices.filter(v => v.lang.toLowerCase().replace('_', '-').startsWith('en-gb'));
       
       let matchedVoice = null;
 
       if (chosenGender === 'male') {
-        // 🧔 尋找男聲優先順序：
-        // 優先級 A：英國地區的知名男聲
+        // 🧔 男聲強力捕捉四道防線：
+        
+        // 防線 1：優先找 Mac 系統或 Chrome 內建的「英國英文男聲」
         matchedVoice = ukVoices.find(v => {
           const name = v.name.toLowerCase();
           return name.includes('male') || name.includes('david') || name.includes('george') || name.includes('james') || name.includes('oliver');
         });
 
-        // 優先級 B：如果英國沒男聲，擴大到全英文地區(如美國、澳洲)的男聲 (例如 Microsoft David, Google US English Male)
+        // 防線 2：如果沒有英國男聲，立刻抓 Chrome 內建最經典的萬用美國男聲 (Google US English Male) 或其他地區英文男聲
+        if (!matchedVoice) {
+          matchedVoice = enVoices.find(v => {
+            const name = v.name.toLowerCase();
+            return name.includes('google') && name.includes('male');
+          });
+        }
+
+        // 防線 3：如果還是沒有 Google 男聲，擴大搜尋名字裡包含男聲關鍵字（如 david, guy, brian）的任何英文聲音
         if (!matchedVoice) {
           matchedVoice = enVoices.find(v => {
             const name = v.name.toLowerCase();
@@ -703,37 +713,38 @@ function speakOutputText(text, callback) {
           });
         }
 
-        // 優先級 C：如果還是沒有，找任何名字不包含 female/zira/hazel/susan 的英國聲音
+        // 防線 4：如果驚悚到連任何男聲關鍵字都找不到，強行過濾掉常見女聲名字，盲選一個可能為男聲的英國聲音
         if (!matchedVoice && ukVoices.length > 0) {
           matchedVoice = ukVoices.find(v => {
             const name = v.name.toLowerCase();
-            return !name.includes('female') && !name.includes('zira') && !name.includes('hazel') && !name.includes('susan');
+            return !name.includes('female') && !name.includes('zira') && !name.includes('hazel') && !name.includes('susan') && !name.includes('alice') && !name.includes('siri');
           });
         }
       } else {
-        // 👩 尋找女聲優先順序：
+        // 👩 女聲雙防線：
         matchedVoice = ukVoices.find(v => {
           const name = v.name.toLowerCase();
           return name.includes('female') || name.includes('hazel') || name.includes('zira') || name.includes('susan') || name.includes('alice');
         }) || ukVoices[0];
       }
 
-      // 如果精準匹配成功，就使用該聲音，否則不指定（交由系統預設，但設定語言為 en-GB）
+      // 應用捕捉到的聲音
       if (matchedVoice) {
         currentUtterance.voice = matchedVoice;
-        currentUtterance.lang = matchedVoice.lang; // 同步語系
+        currentUtterance.lang = matchedVoice.lang; // 同步聲音語系（例如切換到 en-US）
+        console.log("Successfully captured voice:", matchedVoice.name, matchedVoice.lang);
       } else {
-        currentUtterance.lang = 'en-GB';
+        // 萬一完全空無一物，保底強制設為英文語系
+        currentUtterance.lang = (chosenGender === 'male') ? 'en-US' : 'en-GB';
       }
 
-      // 調節一下語速，讓英國腔聽起來更優雅自然（1.0 是原速，0.95 稍微沉穩一點）
+      // 微調語速，讓聲音聽起來更沉穩自然
       currentUtterance.rate = 0.95; 
 
       currentUtterance.onend = () => callback();
       currentUtterance.onerror = (e) => { console.error(e); callback(); };
       audioSynthesizer.speak(currentUtterance);
     }
-
     function handleMicClick() {
       if (isRecording) commitUserSpeech();
       else startRecordingContext();
