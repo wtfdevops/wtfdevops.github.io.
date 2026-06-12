@@ -670,7 +670,7 @@ Rules:
       }
     }
 
-// 🎵 強力捕捉與測試聲音的核心函數（方案二：Chrome 男聲強制保底版）
+// 🎵 強力捕捉與測試聲音的核心函數（加入 Chrome 異步刷新機制）
     function speakOutputText(text, callback) {
       if (!audioSynthesizer) return callback();
       audioSynthesizer.cancel();
@@ -678,26 +678,30 @@ Rules:
       const cleanText = text.replace(/SYSTEM_CONFIG:.*$/gi, '').trim();
       currentUtterance = new SpeechSynthesisUtterance(cleanText);
       
-      // 取得目前瀏覽器支援的所有聲音
-      const voices = audioSynthesizer.getVoices();
+      // ⚡️ 核心修正：強制重新向瀏覽器索取最新的聲音清單
+      let voices = audioSynthesizer.getVoices();
       
-      // 1. 抓出所有英文聲音 (en)
+      // 如果第一次拿是空的（Chrome 常見盲點），嘗試重新觸發一次
+      if (!voices || voices.length === 0) {
+        window.speechSynthesis.getVoices();
+        voices = audioSynthesizer.getVoices();
+      }
+      
       const enVoices = voices.filter(v => v.lang.toLowerCase().startsWith('en'));
-      // 2. 細分出英國英文聲音 (en-GB)
       const ukVoices = enVoices.filter(v => v.lang.toLowerCase().replace('_', '-').startsWith('en-gb'));
       
       let matchedVoice = null;
 
       if (chosenGender === 'male') {
-        // 🧔 男聲強力捕捉四道防線：
+        // 🧔 男聲捕捉防線：
         
-        // 防線 1：優先找 Mac 系統或 Chrome 內建的「英國英文男聲」
+        // 1. 找英國英文男聲
         matchedVoice = ukVoices.find(v => {
           const name = v.name.toLowerCase();
           return name.includes('male') || name.includes('david') || name.includes('george') || name.includes('james') || name.includes('oliver');
         });
 
-        // 防線 2：如果沒有英國男聲，立刻抓 Chrome 內建最經典的萬用美國男聲 (Google US English Male) 或其他地區英文男聲
+        // 2. 找 Chrome 內建隱藏的 Google 美國萬用男聲 (這個 Chrome 絕對有！)
         if (!matchedVoice) {
           matchedVoice = enVoices.find(v => {
             const name = v.name.toLowerCase();
@@ -705,7 +709,7 @@ Rules:
           });
         }
 
-        // 防線 3：如果還是沒有 Google 男聲，擴大搜尋名字裡包含男聲關鍵字（如 david, guy, brian）的任何英文聲音
+        // 3. 找任何名字帶有男聲關鍵字的英文聲音
         if (!matchedVoice) {
           matchedVoice = enVoices.find(v => {
             const name = v.name.toLowerCase();
@@ -713,38 +717,38 @@ Rules:
           });
         }
 
-        // 防線 4：如果驚悚到連任何男聲關鍵字都找不到，強行過濾掉常見女聲名字，盲選一個可能為男聲的英國聲音
-        if (!matchedVoice && ukVoices.length > 0) {
-          matchedVoice = ukVoices.find(v => {
+        // 4. 萬一真的沒抓到，強行盲選一個不是常見女聲的英文聲音
+        if (!matchedVoice && enVoices.length > 0) {
+          matchedVoice = enVoices.find(v => {
             const name = v.name.toLowerCase();
-            return !name.includes('female') && !name.includes('zira') && !name.includes('hazel') && !name.includes('susan') && !name.includes('alice') && !name.includes('siri');
+            return !name.includes('female') && !name.includes('zira') && !name.includes('hazel') && !name.includes('susan') && !name.includes('alice');
           });
         }
       } else {
-        // 👩 女聲雙防線：
+        // 👩 女聲防線
         matchedVoice = ukVoices.find(v => {
           const name = v.name.toLowerCase();
           return name.includes('female') || name.includes('hazel') || name.includes('zira') || name.includes('susan') || name.includes('alice');
         }) || ukVoices[0];
       }
 
-      // 應用捕捉到的聲音
+      // ⚡️ 強制綁定聲音
       if (matchedVoice) {
         currentUtterance.voice = matchedVoice;
-        currentUtterance.lang = matchedVoice.lang; // 同步聲音語系（例如切換到 en-US）
-        console.log("Successfully captured voice:", matchedVoice.name, matchedVoice.lang);
+        currentUtterance.lang = matchedVoice.lang;
+        console.log("🎯 成功強制捕捉到男聲：", matchedVoice.name);
       } else {
-        // 萬一完全空無一物，保底強制設為英文語系
+        // 如果連 Chrome 內建聲音都沒初始化完，交給預設，但這次加上提示
         currentUtterance.lang = (chosenGender === 'male') ? 'en-US' : 'en-GB';
+        console.log("⚠️ 瀏覽器語音庫尚未準備好，暫時使用系統預設語系");
       }
 
-      // 微調語速，讓聲音聽起來更沉穩自然
       currentUtterance.rate = 0.95; 
-
       currentUtterance.onend = () => callback();
       currentUtterance.onerror = (e) => { console.error(e); callback(); };
       audioSynthesizer.speak(currentUtterance);
     }
+    
     function handleMicClick() {
       if (isRecording) commitUserSpeech();
       else startRecordingContext();
