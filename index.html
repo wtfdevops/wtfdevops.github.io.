@@ -46,24 +46,20 @@ html[data-dark] {
 body { background: var(--bg); color: var(--text); padding: 16px; min-height: 100vh; display: flex; flex-direction: column; align-items: center; transition: background .3s, color .3s; }
 .app-container { width: 100%; max-width: 540px; background: var(--surface); border-radius: var(--radius); box-shadow: var(--shadow); padding: 24px; position: relative; overflow: hidden; display: flex; flex-direction: column; min-height: 640px; }
 
-/* Header & Dark mode toggler */
 header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 1px solid var(--border); padding-bottom: 12px; }
 h1 { font-size: 20px; font-weight: 700; color: var(--primary); display: flex; align-items: center; gap: 8px; }
 html[data-dark] h1 { color: #60A5FA; }
 .theme-btn { background: none; border: none; font-size: 18px; cursor: pointer; padding: 6px; border-radius: 50%; width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; background: var(--surface2); border: 1px solid var(--border); color: var(--text); }
 
-/* Views switching */
 .view { display: none; flex-direction: column; flex-grow: 1; animation: fadeIn 0.25s ease-out; }
 .view.active { display: flex; }
 @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
 
-/* Forms & Inputs */
 .label { font-size: 13px; font-weight: 600; color: var(--muted); margin-bottom: 6px; display: block; text-transform: uppercase; letter-spacing: 0.5px; }
 .input-group { margin-bottom: 20px; }
 input[type="text"], input[type="password"], select { width: 100%; padding: 12px 14px; border-radius: 9px; border: 1px solid var(--border); background: var(--surface2); color: var(--text); font-size: 15px; outline: none; transition: border-color .2s; }
 input:focus, select:focus { border-color: var(--primary); box-shadow: 0 0 0 3px var(--primary-lt); }
 
-/* Buttons */
 .btn { width: 100%; padding: 14px; border-radius: 9px; border: none; font-size: 15px; font-weight: 600; cursor: pointer; transition: all .2s; display: flex; align-items: center; justify-content: center; gap: 8px; color: #fff; background: var(--primary); }
 .btn:hover { background: var(--primary-dk); transform: translateY(-1px); }
 .btn:active { transform: translateY(0); }
@@ -73,27 +69,22 @@ input:focus, select:focus { border-color: var(--primary); box-shadow: 0 0 0 3px 
 .btn-danger:hover { background: #DC2626; }
 .btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none !important; }
 
-/* Alerts / Errors */
 .err { background: #FEF2F2; border: 1px solid #FCA5A5; color: #991B1B; padding: 12px; border-radius: 9px; font-size: 14px; margin-bottom: 16px; display: none; align-items: center; gap: 8px; }
 html[data-dark] .err { background: #451A1A; border-color: #7F1D1D; color: #FECACA; }
 .err.show { display: flex; }
 
-/* ── VIEW: PASSWORD ─────────────────────────────────── */
 .pwd-footer { text-align: center; margin-top: auto; padding-top: 20px; }
 .pwd-footer button { background: none; border: none; color: var(--muted); font-size: 13px; cursor: pointer; text-decoration: underline; }
 .pwd-footer button:hover { color: var(--primary); }
 
-/* ── VIEW: DASHBOARD ────────────────────────────────── */
 .dash-card { background: var(--primary-lt); border-left: 4px solid var(--primary); padding: 14px; border-radius: 0 var(--radius) var(--radius) 0; margin-bottom: 24px; font-size: 14px; line-height: 1.5; color: var(--text); }
 html[data-dark] .dash-card { border-left-color: #3B82F6; }
 .topics-container { display: flex; flex-direction: column; gap: 10px; margin-bottom: 24px; }
 .topic-opt { background: var(--surface2); border: 1px solid var(--border); padding: 14px; border-radius: 9px; cursor: pointer; text-align: left; font-size: 15px; font-weight: 500; display: flex; align-items: center; gap: 12px; transition: all .2s; }
 .topic-opt:hover { border-color: var(--primary); background: var(--primary-lt); }
 
-/* ── VIEW: TOPIC FORM ───────────────────────────────── */
 .helper-text { font-size: 12px; color: var(--muted); margin-top: 4px; display: block; }
 
-/* ── VIEW: CHAT / EXAM ──────────────────────────────── */
 .exam-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; padding-bottom: 10px; border-bottom: 1px solid var(--border); }
 .exam-title { font-size: 14px; font-weight: 600; color: var(--muted); }
 .timer { font-size: 14px; font-weight: 700; color: var(--text); background: var(--surface2); padding: 4px 10px; border-radius: 20px; border: 1px solid var(--border); font-family: monospace; }
@@ -120,7 +111,6 @@ html[data-dark] .dash-card { border-left-color: #3B82F6; }
 
 .status-txt { font-size: 13px; font-weight: 500; color: var(--muted); margin-bottom: 4px; text-align: center; min-height: 18px; }
 
-/* ── VIEW: SCORING ──────────────────────────────────── */
 .score-header { text-align: center; margin-bottom: 20px; }
 .score-icon { font-size: 44px; margin-bottom: 6px; }
 .score-title { font-size: 18px; font-weight: 700; }
@@ -128,7 +118,6 @@ html[data-dark] .dash-card { border-left-color: #3B82F6; }
 .scoring-scroll::-webkit-scrollbar { width: 5px; }
 .scoring-scroll::-webkit-scrollbar-thumb { background: var(--border); border-radius: 10px; }
 
-.mode-note { background: var(--surface2); border: 1px solid var(--border); padding: 10px; border-radius: 8px; font-size: 12px; color: var(--muted); font-style: italic; margin-bottom: 14px; text-align: center; }
 .overall-wrap { display: flex; flex-direction: column; align-items: center; margin-bottom: 24px; background: var(--surface2); padding: 16px; border-radius: var(--radius); border: 1px solid var(--border); }
 .overall-circle { width: 90px; height: 90px; border-radius: 50%; border: 6px solid var(--primary); display: flex; align-items: center; justify-content: center; flex-direction: row; margin-bottom: 8px; background: var(--surface); }
 .overall-num { font-size: 32px; font-weight: 800; }
@@ -151,7 +140,6 @@ html[data-dark] .ns-title { color: #A78BFA; }
 .ns-list { padding-left: 20px; font-size: 13.5px; line-height: 1.5; }
 .ns-list li { margin-bottom: 6px; }
 
-/* ── VIEW: TEACHER / STATS ──────────────────────────── */
 .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 16px; }
 .stat-card { background: var(--surface2); border: 1px solid var(--border); padding: 12px; border-radius: 9px; text-align: center; }
 .sc-label { font-size: 12px; color: var(--muted); font-weight: 600; margin-bottom: 4px; }
@@ -162,7 +150,6 @@ html[data-dark] .ns-title { color: #A78BFA; }
 .bar-node:hover { background: var(--primary-dk); }
 .bar-node:hover::after { content: attr(data-tip); position: absolute; bottom: 100%; left: 50%; transform: translateX(-50%); background: #000; color: #fff; padding: 4px 6px; font-size: 10px; border-radius: 4px; white-space: nowrap; z-index: 10; pointer-events: none; }
 
-/* Utility Footer */
 .footer-note { text-align: center; color: var(--muted); font-size: 11px; margin-top: 16px; border-top: 1px solid var(--border); padding-top: 12px; }
   </style>
 </head>
@@ -230,6 +217,14 @@ html[data-dark] .ns-title { color: #A78BFA; }
     <div class="view" id="viewTopicSetup">
       <div id="topicIntroText" class="dash-card" style="margin-bottom:16px"></div>
       
+      <div class="input-group">
+        <label class="label" for="examinerGender">Select Examiner Voice (選擇考官聲音)</label>
+        <select id="examinerGender">
+          <option value="male">🧔 Mr. Smith (Male UK Voice)</option>
+          <option value="female" selected>👩 Ms. Davis (Female UK Voice)</option>
+        </select>
+      </div>
+
       <div id="topicFormFields" style="display:none">
         <div class="input-group">
           <label class="label" for="topicTitle">Overall Topic Title (主標題)</label>
@@ -356,13 +351,16 @@ html[data-dark] .ns-title { color: #A78BFA; }
     let practiceMode  = ''; 
     let history       = [];  
     let targetTimeLimit = 660; 
+    let systemInstructionGlobal = ''; 
+    let chosenGender  = 'female'; // ⭐️ 預設性別為女聲
+    let examinerName  = 'Ms. Davis'; // ⭐️ 預設名字
     
     let recognition       = null;
     let isRecording       = false;
     let currentUtterance  = null;
     let audioSynthesizer  = window.speechSynthesis;
     let speechTokenBox    = []; 
-    let currentLiveText   = ''; // ⭐️ 新增：追蹤目前畫面上看到的所有最新文字
+    let currentLiveText   = ''; 
 
     let examTimeSeconds   = 0;
     let timerInterval     = null;
@@ -391,7 +389,6 @@ html[data-dark] .ns-title { color: #A78BFA; }
           }
           if (finalizedText) speechTokenBox.push(finalizedText);
           
-          // ⭐️ 彙整當下所有文字，包含剛說完的跟臨時的
           currentLiveText = (speechTokenBox.join(' ') + ' ' + interimText).trim();
           renderLiveTranscription(currentLiveText);
         };
@@ -406,6 +403,14 @@ html[data-dark] .ns-title { color: #A78BFA; }
         recognition.onend = () => { isRecording = false; setMicUI(false); };
       } else {
         updateStatus('Critical Error: Web Speech API unsupported in this browser.', true);
+      }
+
+      // 預熱載入系統聲音庫
+      if (audioSynthesizer) {
+        audioSynthesizer.getVoices();
+        if (speechSynthesis.onvoiceschanged !== undefined) {
+          speechSynthesis.onvoiceschanged = () => audioSynthesizer.getVoices();
+        }
       }
 
       if (localStorage.getItem('dark-mode') === 'true') {
@@ -502,6 +507,11 @@ html[data-dark] .ns-title { color: #A78BFA; }
       const errEl = document.getElementById('setupErr');
       errEl.classList.remove('show');
 
+      // ⭐️ 抓取選定的考官聲音性別與名稱
+      chosenGender = document.getElementById('examinerGender').value;
+      examinerName = (chosenGender === 'male') ? 'Mr. Smith' : 'Ms. Davis';
+      const genderEmoji = (chosenGender === 'male') ? '🧔' : '👩';
+
       const allSubjects = [
         "Festivals / Celebrations",
         "Means of Transport",
@@ -511,13 +521,12 @@ html[data-dark] .ns-title { color: #A78BFA; }
         "Recent Personal Experiences"
       ];
 
-      let systemInstruction = `You are an expert oral examiner for Trinity College London GESE Grade 5 (CEFR B1 level). Your tone must be formal, encouraging, clear, and perfectly mimicking a British UK examiner. Speak at an appropriate speed for a language learner.
-
-Crucial Instruction Delivery Rules:
-1. Ask exactly ONE question at a time. Never group questions.
-2. Keep your spoken responses under 35 words. Be brief to let the candidate speak.
-3. If the candidate gives an extremely short answer, prompt them to expand using B1 vocabulary/structures.
-4. Systematically assess and target B1 structures: Past Simple, Future intentions (going to/inf), Present Perfect, Expressions of preference, reasons (because, because of).`;
+      let systemInstruction = `You are a British UK oral examiner named ${examinerName} (${chosenGender}) for Trinity GESE Grade 5 (CEFR B1). 
+Be friendly but brief. Speak clearly with a natural British tone fitting your character name.
+Rules:
+1. Ask EXACTLY ONE short question at a time. Never group questions.
+2. Keep your spoken responses ultra-short (under 25 words).
+3. Test B1 structures: Past Simple, Future (going to), Present Perfect, giving reasons (because).`;
 
       if (practiceMode === 'full') {
         const title = document.getElementById('topicTitle').value.trim();
@@ -539,20 +548,16 @@ Crucial Instruction Delivery Rules:
         const chosenSubj1 = shuffled[0];
         const chosenSubj2 = shuffled[1];
 
-        document.getElementById('examRoomTitle').textContent = 'Full Mock Exam (B1)';
+        document.getElementById('examRoomTitle').textContent = `${genderEmoji} Full Mock Exam — ${examinerName}`;
         
-        systemInstruction += `\n\n[TIMELINE & SESSION MANAGEMENT PROTOCOL]:
-You must rigorously pace the examination according to these standard guidelines. Do not explicitly tell the candidate about timer thresholds.
-- PHASE 1 (Introduction - Target: 1 Minute): Greet the candidate warmly, confirm their identity, and ask EXACTLY ONE introductory personal or baseline question (e.g., daily routine or hobbies). Maintain this for only 1 or 2 brief conversational exchanges, then immediately pivot.
-- PHASE 2 (Topic Phase - Target: 5 Minutes): Pivot strictly by stating: "Thank you. Now let's move on to your topic form about '${title}'." Systematically and deeply cross-examine the candidate on all 5 of their prepared sub-points through natural back-and-forth dialogue:\n${pts.map((p,i)=>`  Point ${i+1}: ${p}`).join('\n')}\nEnsure this stays active for about 5 full minutes to thoroughly test B1 grammar markers.
-- PHASE 3 (Conversation Phase - Target: 5 Minutes): Transition smoothly by stating: "Thank you. Now let's talk about some other subjects." You must cover exactly TWO distinct subject areas for roughly 2.5 minutes each. For this session, you have selected:
-  1. First Topic: "${chosenSubj1}" (Engage in 2-3 detailed question rounds)
-  2. Second Topic: "${chosenSubj2}" (Pivot dynamically halfway through, engage in 2-3 rounds)
-- CONCLUSION: Once the combined time approaches 11 minutes total, naturally wrap up the final conversation and conclude the text by saying exactly: "Thank you very much. That is the end of the test."`;
+        systemInstruction += `\n- PHASE 1 (Intro, 1m): Ask 1 quick question.
+- PHASE 2 (Topic, 5m): Ask about '${title}' and its nodes:\n${pts.map((p,i)=>` * ${p}`).join('\n')}
+- PHASE 3 (Convo, 5m): Discuss two areas: "${chosenSubj1}" then "${chosenSubj2}".
+- Conclude exactly with: "Thank you very much. That is the end of the test."`;
 
       } else if (practiceMode === 'intro') {
-        document.getElementById('examRoomTitle').textContent = 'Room: Introduction';
-        systemInstruction += `\n\nEngage the candidate in a warm, standard 1-minute greeting and introductory session. Ask basic conversational background questions. Conclude precisely when the interaction feels complete or at 1 minute by stating exactly: "Thank you very much. That is the end of the test."`;
+        document.getElementById('examRoomTitle').textContent = `${genderEmoji} Intro Room — ${examinerName}`;
+        systemInstruction += `\nEngage in a 1-minute greeting and simple background questions. End with: "Thank you very much. That is the end of the test."`;
       } else if (practiceMode === 'topic') {
         const title = document.getElementById('topicTitle').value.trim();
         const pts = [
@@ -568,19 +573,17 @@ You must rigorously pace the examination according to these standard guidelines.
           errEl.classList.add('show');
           return;
         }
-        document.getElementById('examRoomTitle').textContent = `Room: Topic — ${title}`;
-        systemInstruction += `\n\nThe candidate's topic form is titled "${title}". The 5 discussion nodes are:\n${pts.map((p,i) => `- Point ${i+1}: ${p}`).join('\n')}\n\nStart directly by asking the candidate about their topic form. Maintain an intense, focused 5-minute conversation covering these 5 sub-points. Conclude at the 5-minute mark by saying exactly: "Thank you very much. That is the end of the test."`;
+        document.getElementById('examRoomTitle').textContent = `${genderEmoji} Topic Form — ${examinerName}`;
+        systemInstruction += `\nDirectly test the topic "${title}" and these 5 points:\n${pts.map((p,i) => `* ${p}`).join('\n')}\nEnd at 5 mins with: "Thank you very much. That is the end of the test."`;
       } else if (practiceMode === 'conversation') {
         const subj = document.getElementById('convoSubject').value;
-        document.getElementById('examRoomTitle').textContent = `Room: Conversation — ${subj}`;
-        
-        systemInstruction += `\n\n[SESSION TIMING PROTOCOL - ISOLATED CONVERSATION]:
-The single conversation category selected is "${subj}". Engage the candidate in an immersive, deep dialogue entirely focused on this single subject domain. 
-Because this is an isolated single-topic practice session, the time limit is strictly **2.5 minutes**. You should ask around 3 to 4 varied, progressive questions about this topic to challenge their B1 grammar. 
-Once the exchange wraps up or approaches the 2.5-minute mark, finish immediately by saying exactly: "Thank you very much. That is the end of the test."`;
+        document.getElementById('examRoomTitle').textContent = `${genderEmoji} Convo Room — ${examinerName}`;
+        systemInstruction += `\nIntensely discuss the subject: "${subj}". Keep it strictly within 2.5 minutes. End with: "Thank you very much. That is the end of the test."`;
       }
 
-      history = [{ role: 'user', parts: [{ text: `SYSTEM_CONFIG: ${systemInstruction}` }] }];
+      systemInstructionGlobal = systemInstruction; 
+      history = [{ role: 'user', parts: [{ text: `SYSTEM_CONFIG: ${systemInstructionGlobal}` }] }];
+      
       document.getElementById('chatBox').innerHTML = '';
       document.getElementById('finishExamBtn').style.display = 'block';
       
@@ -608,12 +611,20 @@ Once the exchange wraps up or approaches the 2.5-minute mark, finish immediately
       updateStatus('Examiner is thinking...');
       document.getElementById('micBtn').disabled = true;
 
+      if (history.length > 13) { 
+        const latestExchanges = history.slice(-12); 
+        history = [
+          { role: 'user', parts: [{ text: `SYSTEM_CONFIG: ${systemInstructionGlobal} (Context active)` }] },
+          ...latestExchanges
+        ];
+      }
+
       try {
         const payload = { contents: history };
         const data = await apiRequest('/chat', { dailyPassword, payload });
         
         const responseText = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
-        if (!responseText) throw new Error('Empty response received from API layer.');
+        if (!responseText) throw new Error('Empty response');
 
         history.push({ role: 'model', parts: [{ text: responseText }] });
         appendMessage('examiner', responseText);
@@ -630,6 +641,7 @@ Once the exchange wraps up or approaches the 2.5-minute mark, finish immediately
       }
     }
 
+    // ⭐️ 核心語音調整：根據下拉選單的性別，動態指派男聲/女聲
     function speakOutputText(text, callback) {
       if (!audioSynthesizer) return callback();
       audioSynthesizer.cancel();
@@ -639,9 +651,36 @@ Once the exchange wraps up or approaches the 2.5-minute mark, finish immediately
       currentUtterance.lang = 'en-GB';
 
       const voices = audioSynthesizer.getVoices();
-      const ukVoice = voices.find(v => v.lang.startsWith('en-GB') && v.name.includes('Google')) || 
-                      voices.find(v => v.lang.startsWith('en-GB'));
-      if (ukVoice) currentUtterance.voice = ukVoice;
+      
+      // 篩選所有英國英語語音檔
+      const ukVoices = voices.filter(v => v.lang.startsWith('en-GB') || v.lang.startsWith('en_GB'));
+      
+      let matchedVoice = null;
+
+      if (chosenGender === 'male') {
+        // 男聲優先權：尋找包含 male, david, george, james, sam 等關鍵字的英國語音
+        matchedVoice = ukVoices.find(v => v.name.toLowerCase().includes('male') || 
+                                          v.name.toLowerCase().includes('david') || 
+                                          v.name.toLowerCase().includes('george') || 
+                                          v.name.toLowerCase().includes('james')) || 
+                       ukVoices.find(v => v.name.includes('Google') && !v.name.includes('Female'));
+      } else {
+        // 女聲優先權：尋找包含 female, hazel, zira, susan, hazel 等關鍵字的英國語音
+        matchedVoice = ukVoices.find(v => v.name.toLowerCase().includes('female') || 
+                                          v.name.toLowerCase().includes('hazel') || 
+                                          v.name.toLowerCase().includes('zira') || 
+                                          v.name.toLowerCase().includes('susan')) || 
+                       ukVoices.find(v => v.name.includes('Google') && v.name.includes('Female'));
+      }
+
+      // 如果完全找不到對應的性別，則使用隨機英國英語保底
+      if (!matchedVoice && ukVoices.length > 0) {
+        matchedVoice = ukVoices[0];
+      }
+
+      if (matchedVoice) {
+        currentUtterance.voice = matchedVoice;
+      }
 
       currentUtterance.onend = () => callback();
       currentUtterance.onerror = (e) => { console.error(e); callback(); };
@@ -657,7 +696,7 @@ Once the exchange wraps up or approaches the 2.5-minute mark, finish immediately
       if (!recognition || isRecording) return;
       if (audioSynthesizer && audioSynthesizer.speaking) audioSynthesizer.cancel();
       speechTokenBox = [];
-      currentLiveText = ''; // ⭐️ 重置暫存字串
+      currentLiveText = ''; 
       try { recognition.start(); } catch (e) {}
     }
 
@@ -672,7 +711,6 @@ Once the exchange wraps up or approaches the 2.5-minute mark, finish immediately
       stopRecordingContext();
       clearLiveTranscriptionBubble();
 
-      // ⭐️ 核心修正：如果 token 陣列沒合成功，改抓即時畫面上看得到的 currentLiveText 兜底
       let finalPhrase = speechTokenBox.join(' ').trim();
       if (!finalPhrase && currentLiveText) {
         finalPhrase = currentLiveText;
@@ -687,7 +725,6 @@ Once the exchange wraps up or approaches the 2.5-minute mark, finish immediately
       appendMessage('user', finalPhrase);
       history.push({ role: 'user', parts: [{ text: finalPhrase }] });
       
-      // ⭐️ 清空，為下一輪做準備
       currentLiveText = ''; 
       executeExaminerTurn();
     }
@@ -708,7 +745,8 @@ Once the exchange wraps up or approaches the 2.5-minute mark, finish immediately
       const box = document.getElementById('chatBox');
       const el = document.createElement('div');
       el.className = `msg ${role}`;
-      el.textContent = text;
+      // 讓泡泡左側動態加上考官名字
+      el.textContent = (role === 'examiner') ? `[${examinerName}]: ${text}` : text;
       box.appendChild(el);
       box.scrollTop = box.scrollHeight;
     }
