@@ -607,39 +607,41 @@ Rules:
       executeExaminerTurn();
     }
 
-    async function executeExaminerTurn() {
-      updateStatus('Examiner is thinking...');
-      document.getElementById('micBtn').disabled = true;
+async function executeExaminerTurn() {
+  updateStatus('Examiner is thinking...');
+  document.getElementById('micBtn').disabled = true;
 
-      if (history.length > 13) { 
-        const latestExchanges = history.slice(-12); 
-        history = [
-          { role: 'user', parts: [{ text: `SYSTEM_CONFIG: ${systemInstructionGlobal} (Context active)` }] },
-          ...latestExchanges
-        ];
-      }
+  // ⚡️ 加速關鍵：嚴格限制帶過去的歷史紀錄數量！
+  // 只保留最新的 6 句對話（約 3 回合），既能維持上下文記憶，又能大幅提升反應速度！
+  if (history.length > 7) { 
+    const latestExchanges = history.slice(-6); 
+    history = [
+      { role: 'user', parts: [{ text: `SYSTEM_CONFIG: ${systemInstructionGlobal} (Context active)` }] },
+      ...latestExchanges
+    ];
+  }
 
-      try {
-        const payload = { contents: history };
-        const data = await apiRequest('/chat', { dailyPassword, payload });
-        
-        const responseText = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
-        if (!responseText) throw new Error('Empty response');
+  try {
+    const payload = { contents: history };
+    const data = await apiRequest('/chat', { dailyPassword, payload });
+    
+    const responseText = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
+    if (!responseText) throw new Error('Empty response');
 
-        history.push({ role: 'model', parts: [{ text: responseText }] });
-        appendMessage('examiner', responseText);
-        updateStatus('Examiner speaking...');
-        
-        speakOutputText(responseText, () => {
-          updateStatus('Your turn. Click the mic button 🎙️ to start speaking.');
-          document.getElementById('micBtn').disabled = false;
-        });
+    history.push({ role: 'model', parts: [{ text: responseText }] });
+    appendMessage('examiner', responseText);
+    updateStatus('Examiner speaking...');
+    
+    speakOutputText(responseText, () => {
+      updateStatus('Your turn. Click the mic button 🎙️ to start speaking.');
+      document.getElementById('micBtn').disabled = false;
+    });
 
-      } catch (err) {
-        console.error(err);
-        updateStatus('Session disruption. Failed to contact Examiner.', true);
-      }
-    }
+  } catch (err) {
+    console.error(err);
+    updateStatus('Session disruption. Failed to contact Examiner.', true);
+  }
+}
 
     // ⭐️ 核心語音調整：根據下拉選單的性別，動態指派男聲/女聲
     function speakOutputText(text, callback) {
