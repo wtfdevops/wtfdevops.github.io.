@@ -81,6 +81,12 @@ input:focus, select:focus, textarea:focus { border-color: var(--primary); box-sh
 .btn-danger:hover { background: #DC2626; }
 .btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none !important; }
 
+/* 🎙️ 語音按鈕專用美化樣式 */
+.btn-mic { background: #E11D48; color: white; margin-bottom: 8px; }
+.btn-mic:hover { background: #BE123C; }
+.btn-mic.recording { background: #4ADE80; color: #065F46; animation: micPulse 1.2s infinite alternate ease-in-out; }
+@keyframes micPulse { from { transform: scale(1); box-shadow: 0 0 8px rgba(74, 222, 128, 0.5); } to { transform: scale(1.02); box-shadow: 0 0 20px rgba(74, 222, 128, 0.8); } }
+
 .err { background: #FEF2F2; border: 1px solid #FCA5A5; color: #991B1B; padding: 12px; border-radius: 9px; font-size: 14px; margin-bottom: 16px; display: none; align-items: center; gap: 8px; }
 html[data-dark] .err { background: #451A1A; border-color: #7F1D1D; color: #FECACA; }
 .err.show { display: flex; }
@@ -103,7 +109,7 @@ html[data-dark] .dash-card { border-left-color: #3B82F6; }
 .timer.warn { color: var(--danger); background: #FEF2F2; border-color: #FCA5A5; animation: pulse 1s infinite; }
 
 /* ══════════════════════════════════════════════════════
-   👩 NEW: VIRTUAL EXAMINER AVATAR SYSTEM
+   👩 DYNAMIC EXPRESSION AVATAR SYSTEM
 ══════════════════════════════════════════════════════ */
 .avatar-container {
   display: flex;
@@ -117,47 +123,50 @@ html[data-dark] .dash-card { border-left-color: #3B82F6; }
   margin-bottom: 16px;
   transition: all 0.3s ease;
 }
-.avatar-circle {
-  width: 84px;
-  height: 84px;
+.avatar-frame {
+  width: 100px;
+  height: 100px;
   border-radius: 50%;
-  background: #E0F2FE;
   border: 4px solid var(--border);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 42px;
+  font-size: 52px;
   position: relative;
-  transition: all 0.3s ease;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  background: radial-gradient(circle, #E0F2FE 0%, #BAE6FD 100%);
+  box-shadow: 0 4px 10px rgba(0,0,0,0.06);
 }
-/* 考官思考中的狀態 */
-.avatar-circle.thinking {
+.avatar-frame.thinking {
   border-color: var(--warn);
-  animation: avatarPulse 1.5s infinite ease-in-out;
+  animation: avatarThinking 1.8s infinite ease-in-out;
 }
-/* 考官正在說話發音的狀態 */
-.avatar-circle.speaking {
+.avatar-frame.speaking {
   border-color: var(--success);
-  box-shadow: 0 0 16px rgba(16, 185, 129, 0.4);
-  transform: scale(1.03);
+  box-shadow: 0 0 20px rgba(16, 185, 129, 0.5);
+  animation: avatarSpeaking 0.5s infinite alternate ease-in-out;
 }
 .avatar-status-badge {
-  margin-top: 8px;
+  margin-top: 10px;
   font-size: 13px;
   font-weight: 600;
   color: var(--muted);
-  display: flex;
-  align-items: center;
-  gap: 6px;
+  background: var(--surface);
+  padding: 3px 10px;
+  border-radius: 12px;
+  border: 1px solid var(--border);
 }
-@keyframes avatarPulse {
-  0% { transform: scale(1); opacity: 0.9; }
-  50% { transform: scale(1.04); opacity: 1; }
-  100% { transform: scale(1); opacity: 0.9; }
+@keyframes avatarThinking {
+  0% { transform: scale(1); filter: brightness(1); }
+  50% { transform: scale(1.03); filter: brightness(1.05); }
+  100% { transform: scale(1); filter: brightness(1); }
+}
+@keyframes avatarSpeaking {
+  from { transform: scale(1.02) translateY(0); }
+  to { transform: scale(1.04) translateY(-2px); }
 }
 
-.chat-box { flex-grow: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 12px; padding: 4px; margin-bottom: 16px; height: 260px; border-bottom: 1px solid var(--border); padding-bottom: 14px; scroll-behavior: smooth; }
+.chat-box { flex-grow: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 12px; padding: 4px; margin-bottom: 16px; height: 240px; border-bottom: 1px solid var(--border); padding-bottom: 14px; scroll-behavior: smooth; }
 .chat-box::-webkit-scrollbar { width: 5px; }
 .chat-box::-webkit-scrollbar-thumb { background: var(--border); border-radius: 10px; }
 
@@ -166,8 +175,7 @@ html[data-dark] .dash-card { border-left-color: #3B82F6; }
 .msg.examiner { background: var(--ex-bubble); color: var(--text); align-self: flex-start; border-top-left-radius: 2px; }
 .msg.user { background: var(--primary); color: #fff; align-self: flex-end; border-top-right-radius: 2px; }
 
-/* ✍️ 用戶打字輸入控制區 */
-.text-input-area { width: 100%; display: flex; flex-direction: column; gap: 8px; }
+.text-input-area { width: 100%; display: flex; flex-direction: column; gap: 6px; }
 
 .score-header { text-align: center; margin-bottom: 20px; }
 .score-icon { font-size: 44px; margin-bottom: 6px; }
@@ -219,7 +227,7 @@ html[data-dark] .ns-title { color: #A78BFA; }
 
     <div class="view active" id="viewPassword">
       <div style="text-align: center;">
-        <div class="version-badge">🚀 v2.5.0 • Avatar & Audio Optimised</div>
+        <div class="version-badge">🚀 v2.6.0 • Speech Input Re-enabled</div>
       </div>
       <div class="input-group" style="margin-top:20px">
         <label class="label" for="dailyPasswordInput">Daily Access Password</label>
@@ -329,7 +337,7 @@ html[data-dark] .ns-title { color: #A78BFA; }
       </div>
 
       <div class="avatar-container">
-        <div class="avatar-circle" id="examinerAvatar">👩</div>
+        <div class="avatar-frame" id="examinerAvatar">👩</div>
         <div class="avatar-status-badge" id="avatarStatusBadge">
           <span id="statusIndicatorText">Ms. Davis is ready</span>
         </div>
@@ -338,7 +346,10 @@ html[data-dark] .ns-title { color: #A78BFA; }
       <div class="chat-box" id="chatBox"></div>
       
       <div class="text-input-area">
-        <textarea id="userTextInput" rows="2" placeholder="Type what you want to say here... (Press Enter or Send)" style="resize: none;"></textarea>
+        <button class="btn btn-mic" id="micBtn" onclick="toggleSpeechRecognition()">🎙️ Click to Speak (開始落音)</button>
+        
+        <textarea id="userTextInput" rows="2" placeholder="語音辨識內容會顯示喺度...您亦可以直接喺度改字或者打字輸入。" style="resize: none; font-size:14px; padding:10px;"></textarea>
+        
         <div style="display:flex; gap:10px; width:100%">
           <button class="btn" id="sendTextBtn" onclick="commitUserText()" style="flex-grow:3">✉️ Send Response</button>
           <button class="btn btn-danger" id="finishExamBtn" onclick="confirmFinishExam()" style="flex-grow:1; margin:0; padding:10px; font-size:13px;">Finish</button>
@@ -423,11 +434,15 @@ html[data-dark] .ns-title { color: #A78BFA; }
     let history       = [];  
     let targetTimeLimit = 660; 
     let systemInstructionGlobal = ''; 
-    const chosenGender  = 'female'; // 固定女音
-    const examinerName  = 'Ms. Davis'; // 固定女考官
+    const chosenGender  = 'female'; 
+    const examinerName  = 'Ms. Davis'; 
     
     let currentUtterance  = null;
     let audioSynthesizer  = window.speechSynthesis;
+
+    // 🎙️ Web Speech API 語音辨識相關變數
+    let speechRecognizer  = null;
+    let isCurrentlyRecording = false;
 
     let examTimeSeconds   = 0;
     let timerInterval     = null;
@@ -441,12 +456,14 @@ html[data-dark] .ns-title { color: #A78BFA; }
         }
       }
 
+      // 初始化語音辨識器
+      initializeSpeechEngine();
+
       if (localStorage.getItem('dark-mode') === 'true') {
         document.documentElement.setAttribute('data-dark', '');
         document.getElementById('themeBtn').textContent = '☀️';
       }
 
-      // 監聽 Enter 鍵發送
       document.getElementById('userTextInput').addEventListener('keydown', (e) => {
         if (e.key === 'Enter' && !e.shiftKey) {
           e.preventDefault();
@@ -454,6 +471,72 @@ html[data-dark] .ns-title { color: #A78BFA; }
         }
       });
     });
+
+    // 🎙️ 初始化 Web Speech 語音引擎
+    function initializeSpeechEngine() {
+      const SpeechConstructor = window.SpeechRecognition || window.webkitSpeechRecognition;
+      if (!SpeechConstructor) {
+        console.warn("Speech recognition is not fully supported in this browser environment.");
+        document.getElementById('micBtn').textContent = "🎙️ Speech Input Not Supported";
+        document.getElementById('micBtn').disabled = true;
+        return;
+      }
+      speechRecognizer = new SpeechConstructor();
+      speechRecognizer.continuous = true;
+      speechRecognizer.interimResults = true;
+      speechRecognizer.lang = 'en-GB'; // 預設識別英文
+
+      speechRecognizer.onstart = () => {
+        isCurrentlyRecording = true;
+        const mic = document.getElementById('micBtn');
+        mic.textContent = "🛑 Stop Recording (錄音中...)";
+        mic.classList.add('recording');
+      };
+
+      speechRecognizer.onresult = (event) => {
+        let combinedTranscript = '';
+        for (let i = event.resultIndex; i < event.results.length; ++i) {
+          if (event.results[i].isFinal) {
+            combinedTranscript += event.results[i][0].transcript;
+          } else {
+            combinedTranscript += event.results[i][0].transcript;
+          }
+        }
+        if (combinedTranscript) {
+          document.getElementById('userTextInput').value = combinedTranscript;
+        }
+      };
+
+      speechRecognizer.onerror = (e) => {
+        console.error("Speech Recognition Error:", e.error);
+        stopSpeechEngine();
+      };
+
+      speechRecognizer.onend = () => {
+        stopSpeechEngine();
+      };
+    }
+
+    function toggleSpeechRecognition() {
+      if (!speechRecognizer) return;
+      if (isCurrentlyRecording) {
+        speechRecognizer.stop();
+        stopSpeechEngine();
+      } else {
+        if (audioSynthesizer) audioSynthesizer.cancel(); // 說話前先切斷考官聲音以免干擾
+        try {
+          document.getElementById('userTextInput').value = '';
+          speechRecognizer.start();
+        } catch (err) { console.error(err); }
+      }
+    }
+
+    function stopSpeechEngine() {
+      isCurrentlyRecording = false;
+      const mic = document.getElementById('micBtn');
+      mic.textContent = "🎙️ Click to Speak (開始落音)";
+      mic.classList.remove('recording');
+    }
 
     async function apiRequest(path, payload) {
       const response = await fetch(`${WORKER_URL}${path}`, {
@@ -499,6 +582,7 @@ html[data-dark] .ns-title { color: #A78BFA; }
       document.getElementById(viewId).classList.add('active');
     }
 
+    document.getElementById('themeBtn').textContent = '🌙';
     function toggleDarkMode() {
       const isDark = document.documentElement.hasAttribute('data-dark');
       if (isDark) {
@@ -646,6 +730,7 @@ Test B1 structures: Past Simple, Future (going to), Present Perfect, giving reas
     async function executeExaminerTurn() {
       setAvatarState('thinking');
       document.getElementById('sendTextBtn').disabled = true;
+      document.getElementById('micBtn').disabled = true;
 
       if (history.length > 7) { 
         const latestExchanges = history.slice(-6); 
@@ -665,10 +750,11 @@ Test B1 structures: Past Simple, Future (going to), Present Perfect, giving reas
         history.push({ role: 'model', parts: [{ text: responseText }] });
         appendMessage('examiner', responseText);
         
-        setAvatarState('speaking');
+        setAvatarState('speaking', responseText);
         speakOutputText(responseText, () => {
           setAvatarState('ready');
           document.getElementById('sendTextBtn').disabled = false;
+          if (speechRecognizer) document.getElementById('micBtn').disabled = false;
           document.getElementById('userTextInput').focus();
         });
 
@@ -676,10 +762,10 @@ Test B1 structures: Past Simple, Future (going to), Present Perfect, giving reas
         console.error(err);
         setAvatarState('ready');
         document.getElementById('sendTextBtn').disabled = false;
+        if (speechRecognizer) document.getElementById('micBtn').disabled = false;
       }
     }
 
-    // 🔊 一律採用穩定女音
     function speakOutputText(text, callback) {
       if (!audioSynthesizer) return callback();
       audioSynthesizer.cancel();
@@ -693,7 +779,6 @@ Test B1 structures: Past Simple, Future (going to), Present Perfect, giving reas
         voices = audioSynthesizer.getVoices();
       }
       
-      // 優先尋找女音
       const femaleVoice = voices.find(v => {
         const name = v.name.toLowerCase();
         return v.lang.toLowerCase().startsWith('en') && 
@@ -704,7 +789,7 @@ Test B1 structures: Past Simple, Future (going to), Present Perfect, giving reas
         currentUtterance.voice = femaleVoice;
         currentUtterance.lang = femaleVoice.lang;
       } else {
-        currentUtterance.lang = 'en-GB'; // 保底設定英國語系
+        currentUtterance.lang = 'en-GB'; 
       }
 
       currentUtterance.rate = 0.95; 
@@ -713,9 +798,14 @@ Test B1 structures: Past Simple, Future (going to), Present Perfect, giving reas
       audioSynthesizer.speak(currentUtterance);
     }
 
-    // ✍️ 處理用戶打字輸入發送
     function commitUserText() {
       if (document.getElementById('sendTextBtn').disabled) return;
+
+      // 如果仍在錄音，先關閉錄音
+      if (isCurrentlyRecording && speechRecognizer) {
+        speechRecognizer.stop();
+        stopSpeechEngine();
+      }
 
       const inputEl = document.getElementById('userTextInput');
       const text = inputEl.value.trim();
@@ -728,25 +818,45 @@ Test B1 structures: Past Simple, Future (going to), Present Perfect, giving reas
       executeExaminerTurn();
     }
 
-    // 👩 虛擬考官動態頭像狀態切換控制
-    function setAvatarState(state) {
-      const avatarCircle = document.getElementById('examinerAvatar');
+    // 👩 智慧型微表情引擎
+    function setAvatarState(state, text = '') {
+      const avatarEl = document.getElementById('examinerAvatar');
       const statusText = document.getElementById('statusIndicatorText');
       
-      avatarCircle.className = 'avatar-circle'; // 清除舊狀態
+      avatarEl.className = 'avatar-frame';
       
       if (state === 'thinking') {
-        avatarCircle.classList.add('thinking');
-        avatarCircle.textContent = '💭';
-        statusText.textContent = 'Ms. Davis is thinking...';
-      } else if (state === 'speaking') {
-        avatarCircle.classList.add('speaking');
-        avatarCircle.textContent = '🗣️';
-        statusText.textContent = 'Ms. Davis is speaking...';
-      } else {
-        avatarCircle.textContent = '👩';
-        statusText.textContent = 'Ms. Davis is listening to you';
+        avatarEl.classList.add('thinking');
+        avatarEl.textContent = '🧐'; 
+        statusText.textContent = 'Ms. Davis is listening & thinking...';
+        return;
       }
+      
+      if (state === 'speaking') {
+        avatarEl.classList.add('speaking');
+        const sentence = text.toLowerCase();
+        
+        if (sentence.includes('hello') || sentence.includes('hi ') || sentence.includes('nice to meet') || sentence.includes('welcome')) {
+          avatarEl.textContent = '😊'; 
+          statusText.textContent = 'Ms. Davis: Greeting you cheerfully';
+        } else if (sentence.includes('great') || sentence.includes('fascinating') || sentence.includes('wonderful') || sentence.includes('interesting') || sentence.includes('good luck')) {
+          avatarEl.textContent = '😮'; 
+          statusText.textContent = 'Ms. Davis: Impressed by your answer!';
+        } else if (sentence.includes('why') || sentence.includes('how') || sentence.includes('what') || sentence.includes('?') || sentence.includes('cross-examine')) {
+          avatarEl.textContent = '👩‍🏫'; 
+          statusText.textContent = 'Ms. Davis: Asking a follow-up question';
+        } else if (sentence.includes('thank you') || sentence.includes('end of the test') || sentence.includes('different')) {
+          avatarEl.textContent = '👵'; 
+          statusText.textContent = 'Ms. Davis: Nodding & transitioning';
+        } else {
+          avatarEl.textContent = '🗣️'; 
+          statusText.textContent = 'Ms. Davis is speaking...';
+        }
+        return;
+      }
+      
+      avatarEl.textContent = '👩';
+      statusText.textContent = 'Ms. Davis is ready to listen';
     }
 
     function appendMessage(role, text) {
@@ -772,19 +882,17 @@ Test B1 structures: Past Simple, Future (going to), Present Perfect, giving reas
       }
     }
 
-async function executeGradingProtocol() {
+    async function executeGradingProtocol() {
       clearInterval(timerInterval);
       if (audioSynthesizer) audioSynthesizer.cancel();
 
       switchView('viewScoring');
       document.getElementById('tryAgainBtn').style.display = 'none';
       document.getElementById('changeTopicBtn').style.display = 'none';
-      // 提示文字也改為廣東話
       displayScoring(null, '連線到評分引擎中...依家幫妳深度分析緊口說盲點，請等一等，廣東話詳細報告好快就出爐...');
 
       const exchangeLogs = history.filter(h => !h.parts[0].text.startsWith('SYSTEM_CONFIG:'));
 
-      // ⚡️ 核心修正：強制 AI 評分大腦必須用道地的廣東話（Cantonese）進行解說與提供建議
       const gradingPrompt = `You are the lead linguistic grading engine for Trinity College London assessments. Evaluate the following dialogue transcript against CEFR B1 / Grade 5 speaking criteria.
 
 Dialogue Context:
@@ -831,7 +939,6 @@ Scores must be integers between 1 and 10. Respond only with the raw object witho
       return `<div class="crit-en">${rawString}</div>`;
     }
 
-    style=crit('Fluency & Spontaneity (流暢度)', '🗣️', s.fluency)
     function crit(label, emoji, data){
       if (!data) return '';
       const c = scoreColor(data.score);
