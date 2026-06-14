@@ -44,13 +44,14 @@ html[data-dark] {
 ══════════════════════════════════════════════════════ */
 * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
 body { background: var(--bg); color: var(--text); padding: 16px; min-height: 100vh; display: flex; flex-direction: column; align-items: center; transition: background .3s, color .3s; }
-.app-container { width: 100%; max-width: 540px; background: var(--surface); border-radius: var(--radius); box-shadow: var(--shadow); padding: 24px; position: relative; overflow: hidden; display: flex; flex-direction: column; min-height: 660px; }
+.app-container { width: 100%; max-width: 540px; background: var(--surface); border-radius: var(--radius); box-shadow: var(--shadow); padding: 24px; position: relative; overflow: hidden; display: flex; flex-direction: column; min-height: 640px; }
 
 header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 1px solid var(--border); padding-bottom: 12px; }
 h1 { font-size: 20px; font-weight: 700; color: var(--primary); display: flex; align-items: center; gap: 8px; }
 html[data-dark] h1 { color: #60A5FA; }
 .theme-btn { background: none; border: none; font-size: 18px; cursor: pointer; padding: 6px; border-radius: 50%; width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; background: var(--surface2); border: 1px solid var(--border); color: var(--text); }
 
+/* ⚡️ 新增的頂部版本標籤樣式 */
 .version-badge { 
   font-size: 11px; 
   color: var(--muted); 
@@ -69,8 +70,8 @@ html[data-dark] h1 { color: #60A5FA; }
 
 .label { font-size: 13px; font-weight: 600; color: var(--muted); margin-bottom: 6px; display: block; text-transform: uppercase; letter-spacing: 0.5px; }
 .input-group { margin-bottom: 20px; }
-input[type="text"], input[type="password"], select, textarea { width: 100%; padding: 12px 14px; border-radius: 9px; border: 1px solid var(--border); background: var(--surface2); color: var(--text); font-size: 15px; outline: none; transition: border-color .2s; }
-input:focus, select:focus, textarea:focus { border-color: var(--primary); box-shadow: 0 0 0 3px var(--primary-lt); }
+input[type="text"], input[type="password"], select { width: 100%; padding: 12px 14px; border-radius: 9px; border: 1px solid var(--border); background: var(--surface2); color: var(--text); font-size: 15px; outline: none; transition: border-color .2s; }
+input:focus, select:focus { border-color: var(--primary); box-shadow: 0 0 0 3px var(--primary-lt); }
 
 .btn { width: 100%; padding: 14px; border-radius: 9px; border: none; font-size: 15px; font-weight: 600; cursor: pointer; transition: all .2s; display: flex; align-items: center; justify-content: center; gap: 8px; color: #fff; background: var(--primary); }
 .btn:hover { background: var(--primary-dk); transform: translateY(-1px); }
@@ -80,12 +81,6 @@ input:focus, select:focus, textarea:focus { border-color: var(--primary); box-sh
 .btn-danger { background: var(--danger); margin-top: 10px; }
 .btn-danger:hover { background: #DC2626; }
 .btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none !important; }
-
-/* 🎙️ 語音按鈕專用美化樣式 */
-.btn-mic { background: #E11D48; color: white; margin-bottom: 8px; }
-.btn-mic:hover { background: #BE123C; }
-.btn-mic.recording { background: #4ADE80; color: #065F46; animation: micPulse 1.2s infinite alternate ease-in-out; }
-@keyframes micPulse { from { transform: scale(1); box-shadow: 0 0 8px rgba(74, 222, 128, 0.5); } to { transform: scale(1.02); box-shadow: 0 0 20px rgba(74, 222, 128, 0.8); } }
 
 .err { background: #FEF2F2; border: 1px solid #FCA5A5; color: #991B1B; padding: 12px; border-radius: 9px; font-size: 14px; margin-bottom: 16px; display: none; align-items: center; gap: 8px; }
 html[data-dark] .err { background: #451A1A; border-color: #7F1D1D; color: #FECACA; }
@@ -108,65 +103,7 @@ html[data-dark] .dash-card { border-left-color: #3B82F6; }
 .timer { font-size: 14px; font-weight: 700; color: var(--text); background: var(--surface2); padding: 4px 10px; border-radius: 20px; border: 1px solid var(--border); font-family: monospace; }
 .timer.warn { color: var(--danger); background: #FEF2F2; border-color: #FCA5A5; animation: pulse 1s infinite; }
 
-/* ══════════════════════════════════════════════════════
-   👩 DYNAMIC EXPRESSION AVATAR SYSTEM
-══════════════════════════════════════════════════════ */
-.avatar-container {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 16px;
-  background: var(--surface2);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  margin-bottom: 16px;
-  transition: all 0.3s ease;
-}
-.avatar-frame {
-  width: 100px;
-  height: 100px;
-  border-radius: 50%;
-  border: 4px solid var(--border);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 52px;
-  position: relative;
-  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-  background: radial-gradient(circle, #E0F2FE 0%, #BAE6FD 100%);
-  box-shadow: 0 4px 10px rgba(0,0,0,0.06);
-}
-.avatar-frame.thinking {
-  border-color: var(--warn);
-  animation: avatarThinking 1.8s infinite ease-in-out;
-}
-.avatar-frame.speaking {
-  border-color: var(--success);
-  box-shadow: 0 0 20px rgba(16, 185, 129, 0.5);
-  animation: avatarSpeaking 0.5s infinite alternate ease-in-out;
-}
-.avatar-status-badge {
-  margin-top: 10px;
-  font-size: 13px;
-  font-weight: 600;
-  color: var(--muted);
-  background: var(--surface);
-  padding: 3px 10px;
-  border-radius: 12px;
-  border: 1px solid var(--border);
-}
-@keyframes avatarThinking {
-  0% { transform: scale(1); filter: brightness(1); }
-  50% { transform: scale(1.03); filter: brightness(1.05); }
-  100% { transform: scale(1); filter: brightness(1); }
-}
-@keyframes avatarSpeaking {
-  from { transform: scale(1.02) translateY(0); }
-  to { transform: scale(1.04) translateY(-2px); }
-}
-
-.chat-box { flex-grow: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 12px; padding: 4px; margin-bottom: 16px; height: 240px; border-bottom: 1px solid var(--border); padding-bottom: 14px; scroll-behavior: smooth; }
+.chat-box { flex-grow: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 12px; padding: 4px; margin-bottom: 16px; max-height: 340px; border-bottom: 1px solid var(--border); padding-bottom: 14px; scroll-behavior: smooth; }
 .chat-box::-webkit-scrollbar { width: 5px; }
 .chat-box::-webkit-scrollbar-thumb { background: var(--border); border-radius: 10px; }
 
@@ -174,8 +111,16 @@ html[data-dark] .dash-card { border-left-color: #3B82F6; }
 @keyframes bubbleUp { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
 .msg.examiner { background: var(--ex-bubble); color: var(--text); align-self: flex-start; border-top-left-radius: 2px; }
 .msg.user { background: var(--primary); color: #fff; align-self: flex-end; border-top-right-radius: 2px; }
+.msg.live-trans { background: transparent; border: 1px dashed var(--muted); color: var(--muted); align-self: flex-end; font-style: italic; border-top-right-radius: 2px; }
 
-.text-input-area { width: 100%; display: flex; flex-direction: column; gap: 6px; }
+.controls-area { display: flex; flex-direction: column; gap: 10px; align-items: center; justify-content: center; min-height: 80px; }
+.mic-btn { width: 68px; height: 68px; border-radius: 50%; border: none; background: var(--primary); color: white; font-size: 24px; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 12px rgba(37,99,235,0.3); transition: all .2s; position: relative; }
+.mic-btn:hover { background: var(--primary-dk); transform: scale(1.04); }
+.mic-btn:disabled { background: var(--muted) !important; box-shadow: none !important; cursor: not-allowed; transform: none; }
+.mic-btn.recording { background: var(--danger); box-shadow: 0 0 0 0 rgba(239,68,68,0.5); animation: pulseRing 1.4s infinite; }
+@keyframes pulseRing { 0% { box-shadow: 0 0 0 0 rgba(239,68,68,0.6); } 70% { box-shadow: 0 0 0 14px rgba(239,68,68,0); } 100% { box-shadow: 0 0 0 0 rgba(239,68,68,0); } }
+
+.status-txt { font-size: 13px; font-weight: 500; color: var(--muted); margin-bottom: 4px; text-align: center; min-height: 18px; }
 
 .score-header { text-align: center; margin-bottom: 20px; }
 .score-icon { font-size: 44px; margin-bottom: 6px; }
@@ -195,7 +140,7 @@ html[data-dark] .dash-card { border-left-color: #3B82F6; }
 .bar-wrap { width: 100%; height: 6px; background: var(--border); border-radius: 3px; overflow: hidden; margin-bottom: 10px; }
 .bar-fill { height: 100%; width: 0; transition: width 0.6s cubic-bezier(0.1, 0.8, 0.2, 1); }
 .crit-text { font-size: 13.5px; line-height: 1.5; color: var(--text); }
-.crit-zh { font-size: 13px; color: var(--muted); margin-top: 4px; border-top: 1px dashed var(--border); padding-top: 4px; }
+.crit-zh { font-size: 13px; color: var(--muted); margin-top: 4px; border-top: 1px dashed var(--border); padding-top: 4px; } /* 繁中翻譯樣式 */
 .crit-tip { font-size: 12.5px; background: var(--surface); border: 1px solid var(--border); padding: 8px; border-radius: 6px; margin-top: 8px; color: var(--text); }
 
 .next-steps { background: var(--ph2-lt); border: 1px solid #DDD6FE; border-radius: 10px; padding: 14px; margin-bottom: 12px; }
@@ -227,7 +172,7 @@ html[data-dark] .ns-title { color: #A78BFA; }
 
     <div class="view active" id="viewPassword">
       <div style="text-align: center;">
-        <div class="version-badge">🚀 v2.6.0 • Speech Input Re-enabled</div>
+        <div class="version-badge">🚀 v2.4.0 • Updated: 2026-06-12</div>
       </div>
       <div class="input-group" style="margin-top:20px">
         <label class="label" for="dailyPasswordInput">Daily Access Password</label>
@@ -285,14 +230,13 @@ html[data-dark] .ns-title { color: #A78BFA; }
       <div id="topicIntroText" class="dash-card" style="margin-bottom:16px"></div>
       
       <div class="input-group">
-        <label class="label">Examiner Profile (指定考官)</label>
-        <div style="display: flex; gap: 8px; align-items: center; background: var(--surface2); padding: 12px; border: 1px solid var(--border); border-radius: 9px;">
-          <span style="font-size: 24px;">👩</span>
-          <div style="flex-grow:1">
-            <div style="font-weight: 600; font-size: 14px;">Ms. Davis</div>
-            <div style="font-size: 12px; color: var(--muted);">Official Female UK Voice Engine</div>
-          </div>
-          <button class="btn" id="testVoiceBtn" onclick="testCurrentVoice()" style="width: auto; padding: 6px 12px; font-size: 13px; background: var(--surface); color: var(--text); border: 1px solid var(--border);">🎵 Preview Voice</button>
+        <label class="label" for="examinerGender">Select Examiner Voice (選擇考官聲音)</label>
+        <div style="display: flex; gap: 8px;">
+          <select id="examinerGender" onchange="resetSpeechState()">
+            <option value="male">🧔 Mr. Smith (Male UK Voice)</option>
+            <option value="female" selected>👩 Ms. Davis (Female UK Voice)</option>
+          </select>
+          <button class="btn" id="testVoiceBtn" onclick="testCurrentVoice()" style="width: auto; padding: 0 16px; white-space: nowrap; background: var(--surface2); color: var(--text); border: 1px solid var(--border);">🎵 Test Voice</button>
         </div>
       </div>
 
@@ -336,24 +280,13 @@ html[data-dark] .ns-title { color: #A78BFA; }
         <div class="timer" id="examTimer">00:00</div>
       </div>
 
-      <div class="avatar-container">
-        <div class="avatar-frame" id="examinerAvatar">👩</div>
-        <div class="avatar-status-badge" id="avatarStatusBadge">
-          <span id="statusIndicatorText">Ms. Davis is ready</span>
-        </div>
-      </div>
-
       <div class="chat-box" id="chatBox"></div>
+
+      <div class="status-txt" id="statusText">Initialising session...</div>
       
-      <div class="text-input-area">
-        <button class="btn btn-mic" id="micBtn" onclick="toggleSpeechRecognition()">🎙️ Click to Speak (開始落音)</button>
-        
-        <textarea id="userTextInput" rows="2" placeholder="語音辨識內容會顯示喺度...您亦可以直接喺度改字或者打字輸入。" style="resize: none; font-size:14px; padding:10px;"></textarea>
-        
-        <div style="display:flex; gap:10px; width:100%">
-          <button class="btn" id="sendTextBtn" onclick="commitUserText()" style="flex-grow:3">✉️ Send Response</button>
-          <button class="btn btn-danger" id="finishExamBtn" onclick="confirmFinishExam()" style="flex-grow:1; margin:0; padding:10px; font-size:13px;">Finish</button>
-        </div>
+      <div class="controls-area">
+        <button class="mic-btn" id="micBtn" onclick="handleMicClick()" disabled>🎙️</button>
+        <button class="btn btn-danger" id="finishExamBtn" onclick="confirmFinishExam()" style="display:none;width:auto;padding:8px 16px;font-size:13px;margin:0">Finish & Grade Exam</button>
       </div>
     </div>
 
@@ -434,21 +367,59 @@ html[data-dark] .ns-title { color: #A78BFA; }
     let history       = [];  
     let targetTimeLimit = 660; 
     let systemInstructionGlobal = ''; 
-    const chosenGender  = 'female'; 
-    const examinerName  = 'Ms. Davis'; 
+    let chosenGender  = 'female'; 
+    let examinerName  = 'Ms. Davis'; 
     
+    let recognition       = null;
+    let isRecording       = false;
     let currentUtterance  = null;
     let audioSynthesizer  = window.speechSynthesis;
-
-    // 🎙️ Web Speech API 語音辨識相關變數
-    let speechRecognizer  = null;
-    let isCurrentlyRecording = false;
+    let speechTokenBox    = []; 
+    let currentLiveText   = ''; 
 
     let examTimeSeconds   = 0;
     let timerInterval     = null;
     let masterTeacherPwd  = '';
 
     window.addEventListener('DOMContentLoaded', () => {
+      const SpeechComp = window.SpeechRecognition || window.webkitSpeechRecognition;
+      if (SpeechComp) {
+        recognition = new SpeechComp();
+        recognition.continuous = true;
+        recognition.interimResults = true;
+        recognition.lang = 'en-GB';
+
+        recognition.onstart = () => {
+          isRecording = true;
+          setMicUI(true);
+          updateStatus('Listening... Click the red button 🛑 to STOP and SEND.');
+        };
+
+        recognition.onresult = (e) => {
+          let interimText = '';
+          let finalizedText = '';
+          for (let i = e.resultIndex; i < e.results.length; ++i) {
+            if (e.results[i].isFinal) finalizedText += e.results[i][0].transcript;
+            else interimText += e.results[i][0].transcript;
+          }
+          if (finalizedText) speechTokenBox.push(finalizedText);
+          
+          currentLiveText = (speechTokenBox.join(' ') + ' ' + interimText).trim();
+          renderLiveTranscription(currentLiveText);
+        };
+
+        recognition.onerror = (e) => {
+          if (e.error !== 'no-speech') {
+            console.error('STT Subsystem Fault:', e.error);
+            stopRecordingContext();
+            updateStatus('Microphone error occurred.');
+          }
+        };
+        recognition.onend = () => { isRecording = false; setMicUI(false); };
+      } else {
+        updateStatus('Critical Error: Web Speech API unsupported in this browser.', true);
+      }
+
       if (audioSynthesizer) {
         audioSynthesizer.getVoices();
         if (speechSynthesis.onvoiceschanged !== undefined) {
@@ -456,87 +427,11 @@ html[data-dark] .ns-title { color: #A78BFA; }
         }
       }
 
-      // 初始化語音辨識器
-      initializeSpeechEngine();
-
       if (localStorage.getItem('dark-mode') === 'true') {
         document.documentElement.setAttribute('data-dark', '');
         document.getElementById('themeBtn').textContent = '☀️';
       }
-
-      document.getElementById('userTextInput').addEventListener('keydown', (e) => {
-        if (e.key === 'Enter' && !e.shiftKey) {
-          e.preventDefault();
-          commitUserText();
-        }
-      });
     });
-
-    // 🎙️ 初始化 Web Speech 語音引擎
-    function initializeSpeechEngine() {
-      const SpeechConstructor = window.SpeechRecognition || window.webkitSpeechRecognition;
-      if (!SpeechConstructor) {
-        console.warn("Speech recognition is not fully supported in this browser environment.");
-        document.getElementById('micBtn').textContent = "🎙️ Speech Input Not Supported";
-        document.getElementById('micBtn').disabled = true;
-        return;
-      }
-      speechRecognizer = new SpeechConstructor();
-      speechRecognizer.continuous = true;
-      speechRecognizer.interimResults = true;
-      speechRecognizer.lang = 'en-GB'; // 預設識別英文
-
-      speechRecognizer.onstart = () => {
-        isCurrentlyRecording = true;
-        const mic = document.getElementById('micBtn');
-        mic.textContent = "🛑 Stop Recording (錄音中...)";
-        mic.classList.add('recording');
-      };
-
-      speechRecognizer.onresult = (event) => {
-        let combinedTranscript = '';
-        for (let i = event.resultIndex; i < event.results.length; ++i) {
-          if (event.results[i].isFinal) {
-            combinedTranscript += event.results[i][0].transcript;
-          } else {
-            combinedTranscript += event.results[i][0].transcript;
-          }
-        }
-        if (combinedTranscript) {
-          document.getElementById('userTextInput').value = combinedTranscript;
-        }
-      };
-
-      speechRecognizer.onerror = (e) => {
-        console.error("Speech Recognition Error:", e.error);
-        stopSpeechEngine();
-      };
-
-      speechRecognizer.onend = () => {
-        stopSpeechEngine();
-      };
-    }
-
-    function toggleSpeechRecognition() {
-      if (!speechRecognizer) return;
-      if (isCurrentlyRecording) {
-        speechRecognizer.stop();
-        stopSpeechEngine();
-      } else {
-        if (audioSynthesizer) audioSynthesizer.cancel(); // 說話前先切斷考官聲音以免干擾
-        try {
-          document.getElementById('userTextInput').value = '';
-          speechRecognizer.start();
-        } catch (err) { console.error(err); }
-      }
-    }
-
-    function stopSpeechEngine() {
-      isCurrentlyRecording = false;
-      const mic = document.getElementById('micBtn');
-      mic.textContent = "🎙️ Click to Speak (開始落音)";
-      mic.classList.remove('recording');
-    }
 
     async function apiRequest(path, payload) {
       const response = await fetch(`${WORKER_URL}${path}`, {
@@ -570,10 +465,18 @@ html[data-dark] .ns-title { color: #A78BFA; }
       switchView('viewPassword');
     }
     
+// 🎵 測試目前選擇的考官聲音功能
     function testCurrentVoice() {
+      // 先暫停所有正在播放的聲音
       if (audioSynthesizer) audioSynthesizer.cancel();
-      speakOutputText(`Hello, I am Ms. Davis. Nice to meet you.`, () => {
-        console.log(`Voice test completed.`);
+      
+      // 讀取當前選單點選的性別
+      chosenGender = document.getElementById('examinerGender').value;
+      const exName = (chosenGender === 'male') ? 'Mr. Smith' : 'Ms. Davis';
+      
+      // 臨時觸發一次語音朗讀，測試抓取到的聲音
+      speakOutputText(`Hello, I am ${exName}. Nice to meet you.`, () => {
+        console.log(`Voice test completed for ${exName}`);
       });
     }
     
@@ -582,7 +485,11 @@ html[data-dark] .ns-title { color: #A78BFA; }
       document.getElementById(viewId).classList.add('active');
     }
 
-    document.getElementById('themeBtn').textContent = '🌙';
+    function resetSpeechState() {
+      if (audioSynthesizer) audioSynthesizer.cancel();
+      stopRecordingContext();
+    }
+
     function toggleDarkMode() {
       const isDark = document.documentElement.hasAttribute('data-dark');
       if (isDark) {
@@ -597,8 +504,6 @@ html[data-dark] .ns-title { color: #A78BFA; }
     }
 
     function choosePracticeMode(mode) {
-      practiceMode = mode; 
-
       const introText = document.getElementById('topicIntroText');
       const formFields = document.getElementById('topicFormFields');
       const convoField = document.getElementById('conversationSubjectField');
@@ -630,6 +535,10 @@ html[data-dark] .ns-title { color: #A78BFA; }
       const errEl = document.getElementById('setupErr');
       errEl.classList.remove('show');
 
+      chosenGender = document.getElementById('examinerGender').value;
+      examinerName = (chosenGender === 'male') ? 'Mr. Smith' : 'Ms. Davis';
+      const genderEmoji = (chosenGender === 'male') ? '🧔' : '👩';
+
       const allSubjects = [
         "Festivals / Celebrations",
         "Means of Transport",
@@ -639,10 +548,12 @@ html[data-dark] .ns-title { color: #A78BFA; }
         "Recent Personal Experiences"
       ];
 
-      let systemInstruction = `You are a professional British UK oral examiner named Ms. Davis (female) for Trinity GESE Grade 5 (CEFR B1), strictly mimicking real exam videos.
-Be friendly but brief. Ask EXACTLY ONE short question at a time. Do not group questions.
-Keep your responses under 20 words. Be conversational but test-oriented.
-Test B1 structures: Past Simple, Future (going to), Present Perfect, giving reasons (because).`;
+      let systemInstruction = `You are a British UK oral examiner named ${examinerName} (${chosenGender}) for Trinity GESE Grade 5 (CEFR B1). 
+Be friendly but brief. Speak clearly with a natural British tone fitting your character name.
+Rules:
+1. Ask EXACTLY ONE short question at a time. Never group questions.
+2. Keep your spoken responses ultra-short (under 25 words).
+3. Test B1 structures: Past Simple, Future (going to), Present Perfect, giving reasons (because).`;
 
       if (practiceMode === 'full') {
         const title = document.getElementById('topicTitle').value.trim();
@@ -664,16 +575,17 @@ Test B1 structures: Past Simple, Future (going to), Present Perfect, giving reas
         const chosenSubj1 = shuffled[0];
         const chosenSubj2 = shuffled[1];
 
-        document.getElementById('examRoomTitle').textContent = `👩 Full Mock Exam — Ms. Davis`;
+        document.getElementById('examRoomTitle').textContent = `${genderEmoji} Full Mock Exam — ${examinerName}`;
         
+        // ⚡️ 核心修正：融入現實考場流程，強制考官口頭詢問題目
         systemInstruction += `\n- PHASE 1 (Intro, 1m): Ask 1 quick greeting/background question.
-- TRANSITION TO PHASE 2 (CRITICAL): Right after the first greeting question, you MUST say exactly: "Thank you. Now, what are you going to talk about today and what are your discussion points?" to let the candidate state their topic orally.
-- PHASE 2 (Topic, 5m): Cross-examine them on points one by one. Drill down using different B1 tenses. Near the end of Topic phase, you MUST ask: "Do you have a question for me about your topic, please?". Here is their topic '${title}':\n${pts.map((p,i)=>` * ${p}`).join('\n')}
-- PHASE 3 (Convo, 5m): Discuss two areas: "${chosenSubj1}" then "${chosenSubj2}". Near the end of Phase 3, you MUST ask: "Can you ask me a question about either [Subject 1] or [Subject 2]?"
+- TRANSITION TO PHASE 2 (CRITICAL): Right after the first greeting question, you MUST say exactly: "Thank you. Now, what are you going to talk about today and what are your discussion points?" to let the candidate state their topic orally. Do NOT skip this mouth-reporting step!
+- PHASE 2 (Topic, 5m): After they tell you their topic orally, cross-examine them naturally on their topic '${title}' and its nodes:\n${pts.map((p,i)=>` * ${p}`).join('\n')}
+- PHASE 3 (Convo, 5m): Discuss two areas: "${chosenSubj1}" then "${chosenSubj2}".
 - Conclude exactly with: "Thank you very much. That is the end of the test."`;
 
       } else if (practiceMode === 'intro') {
-        document.getElementById('examRoomTitle').textContent = `👩 Intro Room — Ms. Davis`;
+        document.getElementById('examRoomTitle').textContent = `${genderEmoji} Intro Room — ${examinerName}`;
         systemInstruction += `\nEngage in a 1-minute greeting and simple background questions. End with: "Thank you very much. That is the end of the test."`;
       } else if (practiceMode === 'topic') {
         const title = document.getElementById('topicTitle').value.trim();
@@ -690,21 +602,22 @@ Test B1 structures: Past Simple, Future (going to), Present Perfect, giving reas
           errEl.classList.add('show');
           return;
         }
-        document.getElementById('examRoomTitle').textContent = `👩 Topic Form — Ms. Davis`;
+        document.getElementById('examRoomTitle').textContent = `${genderEmoji} Topic Form — ${examinerName}`;
         
+        // ⚡️ 核心修正：即使是單獨練習 Topic 模式，一開始也要口頭詢問題目
         systemInstruction += `\n- START STEP: Your very first sentence MUST be: "Hello. What are you going to talk about today and what are your discussion points?"
-- PHASE 2: After they report, cross-examine them on points one by one using different B1 tenses. Near the end, you MUST ask: "Do you have a question for me about your topic, please?". Topic: "${title}", points:\n${pts.map((p,i) => `* ${p}`).join('\n')}\nEnd at 5 mins with: "Thank you very much. That is the end of the test."`;
+- PHASE 2: After they tell you, cross-examine them on the topic "${title}" and these 5 points:\n${pts.map((p,i) => `* ${p}`).join('\n')}\nEnd at 5 mins with: "Thank you very much. That is the end of the test."`;
       } else if (practiceMode === 'conversation') {
         const subj = document.getElementById('convoSubject').value;
-        document.getElementById('examRoomTitle').textContent = `👩 Convo Room — Ms. Davis`;
-        systemInstruction += `\nIntensely discuss the subject: "${subj}". Keep it strictly within 2.5 minutes. Near the end, you MUST ask them to ask you a question about this subject. End with: "Thank you very much. That is the end of the test."`;
+        document.getElementById('examRoomTitle').textContent = `${genderEmoji} Convo Room — ${examinerName}`;
+        systemInstruction += `\nIntensely discuss the subject: "${subj}". Keep it strictly within 2.5 minutes. End with: "Thank you very much. That is the end of the test."`;
       }
 
       systemInstructionGlobal = systemInstruction; 
       history = [{ role: 'user', parts: [{ text: `SYSTEM_CONFIG: ${systemInstructionGlobal}` }] }];
       
       document.getElementById('chatBox').innerHTML = '';
-      document.getElementById('userTextInput').value = '';
+      document.getElementById('finishExamBtn').style.display = 'block';
       
       examTimeSeconds = 0;
       document.getElementById('examTimer').textContent = '00:00';
@@ -723,15 +636,14 @@ Test B1 structures: Past Simple, Future (going to), Present Perfect, giving reas
       }, 1000);
 
       switchView('viewChat');
-      setAvatarState('ready');
       executeExaminerTurn();
     }
 
     async function executeExaminerTurn() {
-      setAvatarState('thinking');
-      document.getElementById('sendTextBtn').disabled = true;
+      updateStatus('Examiner is thinking...');
       document.getElementById('micBtn').disabled = true;
 
+      // ⚡️ 保持輕量化的 6 句歷史對話限制，防止 Gemini 卡頓
       if (history.length > 7) { 
         const latestExchanges = history.slice(-6); 
         history = [
@@ -749,23 +661,20 @@ Test B1 structures: Past Simple, Future (going to), Present Perfect, giving reas
 
         history.push({ role: 'model', parts: [{ text: responseText }] });
         appendMessage('examiner', responseText);
+        updateStatus('Examiner speaking...');
         
-        setAvatarState('speaking', responseText);
         speakOutputText(responseText, () => {
-          setAvatarState('ready');
-          document.getElementById('sendTextBtn').disabled = false;
-          if (speechRecognizer) document.getElementById('micBtn').disabled = false;
-          document.getElementById('userTextInput').focus();
+          updateStatus('Your turn. Click the mic button 🎙️ to start speaking.');
+          document.getElementById('micBtn').disabled = false;
         });
 
       } catch (err) {
         console.error(err);
-        setAvatarState('ready');
-        document.getElementById('sendTextBtn').disabled = false;
-        if (speechRecognizer) document.getElementById('micBtn').disabled = false;
+        updateStatus('Session disruption. Failed to contact Examiner.', true);
       }
     }
 
+// 🎵 強力捕捉與測試聲音的核心函數（加入 Chrome 異步刷新機制）
     function speakOutputText(text, callback) {
       if (!audioSynthesizer) return callback();
       audioSynthesizer.cancel();
@@ -773,23 +682,69 @@ Test B1 structures: Past Simple, Future (going to), Present Perfect, giving reas
       const cleanText = text.replace(/SYSTEM_CONFIG:.*$/gi, '').trim();
       currentUtterance = new SpeechSynthesisUtterance(cleanText);
       
+      // ⚡️ 核心修正：強制重新向瀏覽器索取最新的聲音清單
       let voices = audioSynthesizer.getVoices();
+      
+      // 如果第一次拿是空的（Chrome 常見盲點），嘗試重新觸發一次
       if (!voices || voices.length === 0) {
         window.speechSynthesis.getVoices();
         voices = audioSynthesizer.getVoices();
       }
       
-      const femaleVoice = voices.find(v => {
-        const name = v.name.toLowerCase();
-        return v.lang.toLowerCase().startsWith('en') && 
-               (name.includes('female') || name.includes('hazel') || name.includes('zira') || name.includes('susan') || name.includes('alice'));
-      });
+      const enVoices = voices.filter(v => v.lang.toLowerCase().startsWith('en'));
+      const ukVoices = enVoices.filter(v => v.lang.toLowerCase().replace('_', '-').startsWith('en-gb'));
+      
+      let matchedVoice = null;
 
-      if (femaleVoice) {
-        currentUtterance.voice = femaleVoice;
-        currentUtterance.lang = femaleVoice.lang;
+      if (chosenGender === 'male') {
+        // 🧔 男聲捕捉防線：
+        
+        // 1. 找英國英文男聲
+        matchedVoice = ukVoices.find(v => {
+          const name = v.name.toLowerCase();
+          return name.includes('male') || name.includes('david') || name.includes('george') || name.includes('james') || name.includes('oliver');
+        });
+
+        // 2. 找 Chrome 內建隱藏的 Google 美國萬用男聲 (這個 Chrome 絕對有！)
+        if (!matchedVoice) {
+          matchedVoice = enVoices.find(v => {
+            const name = v.name.toLowerCase();
+            return name.includes('google') && name.includes('male');
+          });
+        }
+
+        // 3. 找任何名字帶有男聲關鍵字的英文聲音
+        if (!matchedVoice) {
+          matchedVoice = enVoices.find(v => {
+            const name = v.name.toLowerCase();
+            return name.includes('male') || name.includes('david') || name.includes('george') || name.includes('guy') || name.includes('andrew') || name.includes('brian');
+          });
+        }
+
+        // 4. 萬一真的沒抓到，強行盲選一個不是常見女聲的英文聲音
+        if (!matchedVoice && enVoices.length > 0) {
+          matchedVoice = enVoices.find(v => {
+            const name = v.name.toLowerCase();
+            return !name.includes('female') && !name.includes('zira') && !name.includes('hazel') && !name.includes('susan') && !name.includes('alice');
+          });
+        }
       } else {
-        currentUtterance.lang = 'en-GB'; 
+        // 👩 女聲防線
+        matchedVoice = ukVoices.find(v => {
+          const name = v.name.toLowerCase();
+          return name.includes('female') || name.includes('hazel') || name.includes('zira') || name.includes('susan') || name.includes('alice');
+        }) || ukVoices[0];
+      }
+
+      // ⚡️ 強制綁定聲音
+      if (matchedVoice) {
+        currentUtterance.voice = matchedVoice;
+        currentUtterance.lang = matchedVoice.lang;
+        console.log("🎯 成功強制捕捉到男聲：", matchedVoice.name);
+      } else {
+        // 如果連 Chrome 內建聲音都沒初始化完，交給預設，但這次加上提示
+        currentUtterance.lang = (chosenGender === 'male') ? 'en-US' : 'en-GB';
+        console.log("⚠️ 瀏覽器語音庫尚未準備好，暫時使用系統預設語系");
       }
 
       currentUtterance.rate = 0.95; 
@@ -797,75 +752,97 @@ Test B1 structures: Past Simple, Future (going to), Present Perfect, giving reas
       currentUtterance.onerror = (e) => { console.error(e); callback(); };
       audioSynthesizer.speak(currentUtterance);
     }
+    
+    function handleMicClick() {
+      if (isRecording) commitUserSpeech();
+      else startRecordingContext();
+    }
 
-    function commitUserText() {
-      if (document.getElementById('sendTextBtn').disabled) return;
+    function startRecordingContext() {
+      if (!recognition || isRecording) return;
+      if (audioSynthesizer && audioSynthesizer.speaking) audioSynthesizer.cancel();
+      speechTokenBox = [];
+      currentLiveText = ''; 
+      try { recognition.start(); } catch (e) {}
+    }
 
-      // 如果仍在錄音，先關閉錄音
-      if (isCurrentlyRecording && speechRecognizer) {
-        speechRecognizer.stop();
-        stopSpeechEngine();
+    function stopRecordingContext() {
+      if (!recognition || !isRecording) return;
+      try { recognition.stop(); } catch (e) {}
+      isRecording = false;
+      setMicUI(false);
+    }
+
+    function commitUserSpeech() {
+      stopRecordingContext();
+      clearLiveTranscriptionBubble();
+
+      let finalPhrase = speechTokenBox.join(' ').trim();
+      if (!finalPhrase && currentLiveText) {
+        finalPhrase = currentLiveText;
       }
 
-      const inputEl = document.getElementById('userTextInput');
-      const text = inputEl.value.trim();
-      if (!text) return;
+      if (!finalPhrase) {
+        updateStatus('No speech captured. Click mic to try again.');
+        document.getElementById('micBtn').disabled = false;
+        return;
+      }
 
-      inputEl.value = '';
-      appendMessage('user', text);
-      history.push({ role: 'user', parts: [{ text: text }] });
+      appendMessage('user', finalPhrase);
+      history.push({ role: 'user', parts: [{ text: finalPhrase }] });
       
+      currentLiveText = ''; 
       executeExaminerTurn();
     }
 
-    // 👩 智慧型微表情引擎
-    function setAvatarState(state, text = '') {
-      const avatarEl = document.getElementById('examinerAvatar');
-      const statusText = document.getElementById('statusIndicatorText');
-      
-      avatarEl.className = 'avatar-frame';
-      
-      if (state === 'thinking') {
-        avatarEl.classList.add('thinking');
-        avatarEl.textContent = '🧐'; 
-        statusText.textContent = 'Ms. Davis is listening & thinking...';
-        return;
-      }
-      
-      if (state === 'speaking') {
-        avatarEl.classList.add('speaking');
-        const sentence = text.toLowerCase();
-        
-        if (sentence.includes('hello') || sentence.includes('hi ') || sentence.includes('nice to meet') || sentence.includes('welcome')) {
-          avatarEl.textContent = '😊'; 
-          statusText.textContent = 'Ms. Davis: Greeting you cheerfully';
-        } else if (sentence.includes('great') || sentence.includes('fascinating') || sentence.includes('wonderful') || sentence.includes('interesting') || sentence.includes('good luck')) {
-          avatarEl.textContent = '😮'; 
-          statusText.textContent = 'Ms. Davis: Impressed by your answer!';
-        } else if (sentence.includes('why') || sentence.includes('how') || sentence.includes('what') || sentence.includes('?') || sentence.includes('cross-examine')) {
-          avatarEl.textContent = '👩‍🏫'; 
-          statusText.textContent = 'Ms. Davis: Asking a follow-up question';
-        } else if (sentence.includes('thank you') || sentence.includes('end of the test') || sentence.includes('different')) {
-          avatarEl.textContent = '👵'; 
-          statusText.textContent = 'Ms. Davis: Nodding & transitioning';
-        } else {
-          avatarEl.textContent = '🗣️'; 
-          statusText.textContent = 'Ms. Davis is speaking...';
-        }
-        return;
-      }
-      
-      avatarEl.textContent = '👩';
-      statusText.textContent = 'Ms. Davis is ready to listen';
+    function setMicUI(active) {
+      const btn = document.getElementById('micBtn');
+      if (active) { btn.classList.add('recording'); btn.textContent = '🛑'; }
+      else { btn.classList.remove('recording'); btn.textContent = '🎙️'; }
+    }
+
+    function updateStatus(txt, isErr = false) {
+      const el = document.getElementById('statusText');
+      el.textContent = txt;
+      el.style.color = isErr ? 'var(--danger)' : 'var(--muted)';
     }
 
     function appendMessage(role, text) {
       const box = document.getElementById('chatBox');
       const el = document.createElement('div');
       el.className = `msg ${role}`;
-      el.textContent = (role === 'examiner') ? `[Ms. Davis]: ${text}` : text;
+      el.textContent = (role === 'examiner') ? `[${examinerName}]: ${text}` : text;
       box.appendChild(el);
       box.scrollTop = box.scrollHeight;
+    }
+
+    document.addEventListener('keydown', (e) => {
+      if (e.code === 'Space' && document.activeElement.tagName !== 'INPUT' && document.activeElement.tagName !== 'SELECT') {
+        const activeView = document.querySelector('.view.active');
+        if (activeView && activeView.id === 'viewChat') {
+          e.preventDefault();
+          const micBtn = document.getElementById('micBtn');
+          if (!micBtn.disabled) handleMicClick();
+        }
+      }
+    });
+
+    function renderLiveTranscription(text) {
+      const box = document.getElementById('chatBox');
+      let liveEl = document.getElementById('liveTransBubble');
+      if (!liveEl) {
+        liveEl = document.createElement('div');
+        liveEl.id = 'liveTransBubble';
+        liveEl.className = 'msg live-trans';
+        box.appendChild(liveEl);
+      }
+      liveEl.textContent = text;
+      box.scrollTop = box.scrollHeight;
+    }
+
+    function clearLiveTranscriptionBubble() {
+      const liveEl = document.getElementById('liveTransBubble');
+      if (liveEl) liveEl.remove();
     }
 
     function restartSameMode() { choosePracticeMode(practiceMode); }
@@ -873,7 +850,7 @@ Test B1 structures: Past Simple, Future (going to), Present Perfect, giving reas
     function confirmFinishExam() {
       if (history.length < 3) {
         clearInterval(timerInterval);
-        if (audioSynthesizer) audioSynthesizer.cancel();
+        resetSpeechState();
         switchView('viewDashboard');
         return;
       }
@@ -884,35 +861,36 @@ Test B1 structures: Past Simple, Future (going to), Present Perfect, giving reas
 
     async function executeGradingProtocol() {
       clearInterval(timerInterval);
-      if (audioSynthesizer) audioSynthesizer.cancel();
+      resetSpeechState();
 
       switchView('viewScoring');
       document.getElementById('tryAgainBtn').style.display = 'none';
       document.getElementById('changeTopicBtn').style.display = 'none';
-      displayScoring(null, '連線到評分引擎中...依家幫妳深度分析緊口說盲點，請等一等，廣東話詳細報告好快就出爐...');
+      displayScoring(null, '連結評分引擎中，正在深度分析您的口說盲點並生成繁中翻譯報告...');
 
       const exchangeLogs = history.filter(h => !h.parts[0].text.startsWith('SYSTEM_CONFIG:'));
 
+      // ⚡️ 核心提示詞優化：強制 AI 回傳中英雙語對照的 JSON 資料
       const gradingPrompt = `You are the lead linguistic grading engine for Trinity College London assessments. Evaluate the following dialogue transcript against CEFR B1 / Grade 5 speaking criteria.
 
 Dialogue Context:
 ${exchangeLogs.map(m => `${m.role.toUpperCase()}: ${m.parts[0].text}`).join('\n')}
 
 You MUST respond with a single, valid JSON object matching this exact schema. 
-CRITICAL REQUIREMENT FOR TEXT AND TIP FIELDS: You must write the English feedback first, followed IMMEDIATELY by its Cantonese (廣東話/香港俗語) translation in parentheses. 
-Use authentic Hong Kong Cantonese phrasing for the translation (e.g., using words like "妳、有啲、留意返、唔夠、番").
+CRITICAL REQUIREMENT FOR TEXT AND TIP FIELDS: You must write the English feedback first, followed IMMEDIATELY by its Traditional Chinese (繁體中文) translation in parentheses.
+Example format for text/tip fields: "Your grammar was mostly correct. (您的語法基本正確。)"
 
 Schema:
 {
   "overall": 7,
   "overall_zh": "良好 (Merit)",
-  "fluency": { "score": 8, "text": "English text (廣東話分析講解)", "tip": "English tip (廣東話改善建議)" },
-  "vocabulary": { "score": 6, "text": "English text (廣東話分析講解)", "tip": "English tip (廣東話改善建議)" },
-  "grammar": { "score": 7, "text": "English text (廣東話分析講解)", "tip": "English tip (廣東話改善建議)" },
-  "communication": { "score": 7, "text": "English text (廣東話分析講解)", "tip": "English tip (廣東話改善建議)" },
+  "fluency": { "score": 8, "text": "English text (繁中翻譯)", "tip": "English tip (繁中建議)" },
+  "vocabulary": { "score": 6, "text": "English text (繁中翻譯)", "tip": "English tip (繁中建議)" },
+  "grammar": { "score": 7, "text": "English text (繁中翻譯)", "tip": "English tip (繁中建議)" },
+  "communication": { "score": 7, "text": "English text (繁中翻譯)", "tip": "English tip (繁中建議)" },
   "nextSteps": [
-    "First action item in English (第一個廣東話衝刺行動建議)",
-    "Second action item in English (第二個廣東話衝刺行動建議)"
+    "First action item in English (第一個繁中行動建議)",
+    "Second action item in English (第二個繁中行動建議)"
   ]
 }
 Scores must be integers between 1 and 10. Respond only with the raw object without markdown blocks.`;
@@ -926,10 +904,11 @@ Scores must be integers between 1 and 10. Respond only with the raw object witho
         displayScoring(scoreObj, null);
       } catch (err) {
         console.error(err);
-        displayScoring(null, '❌ 評分解析失敗。請檢查網絡連線，或者再試多次。');
+        displayScoring(null, '❌ 評分解析失敗。請確認網路連線或嘗試重新評分。');
       }
     }
 
+    // ⚡️ 前端排版拆解：自動將括號內的繁體中文抽出來獨立換行顯示，版面更整齊
     function splitEnZh(rawString) {
       if (!rawString) return '';
       const match = rawString.match(/^([\s\S]*?)\(([\s\S]*?)\)\s*$/);
@@ -963,6 +942,8 @@ Scores must be integers between 1 and 10. Respond only with the raw object witho
         return;
       }
       const oc = scoreColor(s.overall);
+      
+      // 動態對照總分評級
       let displayLabel = overallLabel(s.overall);
       if (s.overall_zh) {
         displayLabel = `${displayLabel.split('(')[0]} (${s.overall_zh})`;
