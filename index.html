@@ -504,6 +504,7 @@ html[data-dark] .ns-title { color: #A78BFA; }
     }
 
     function choosePracticeMode(mode) {
+      practiceMode = mode;
       const introText = document.getElementById('topicIntroText');
       const formFields = document.getElementById('topicFormFields');
       const convoField = document.getElementById('conversationSubjectField');
@@ -548,7 +549,7 @@ html[data-dark] .ns-title { color: #A78BFA; }
         "Recent Personal Experiences"
       ];
 
-  let systemInstruction = `You are a professional British UK oral examiner named ${examinerName} (${chosenGender}) for Trinity GESE Grade 5 (CEFR B1), strictly mimicking real exam videos.
+    let systemInstruction = `You are a professional British UK oral examiner named ${examinerName} (${chosenGender}) for Trinity GESE Grade 5 (CEFR B1), strictly mimicking real exam videos.
 Rules:
 1. Ask EXACTLY ONE short, natural question at a time. Do not make statements, just drive the conversation.
 2. Keep your responses under 20 words. Be conversational but test-oriented.
@@ -578,10 +579,8 @@ Rules:
 
         document.getElementById('examRoomTitle').textContent = `${genderEmoji} Full Mock Exam — ${examinerName}`;
         
-        // ⚡️ 核心修正：融入現實考場流程，強制考官口頭詢問題目
-        systemInstruction += `\n- PHASE 1 (Intro, 1m): Ask 1 quick greeting/background question.
-- TRANSITION TO PHASE 2 (CRITICAL): Right after the first greeting question, you MUST say exactly: "Thank you. Now, what are you going to talk about today and what are your discussion points?" to let the candidate state their topic orally. Do NOT skip this mouth-reporting step!
-- PHASE 2 (Topic, 5m): After they tell you their topic orally, cross-examine them naturally on their topic '${title}' and its nodes:\n${pts.map((p,i)=>` * ${p}`).join('\n')}
+        systemInstruction += `\n- PHASE 1 (Intro, 1m): Ask 1 quick question.
+- PHASE 2 (Topic, 5m): Ask about '${title}' and its nodes:\n${pts.map((p,i)=>` * ${p}`).join('\n')}
 - PHASE 3 (Convo, 5m): Discuss two areas: "${chosenSubj1}" then "${chosenSubj2}".
 - Conclude exactly with: "Thank you very much. That is the end of the test."`;
 
@@ -604,10 +603,7 @@ Rules:
           return;
         }
         document.getElementById('examRoomTitle').textContent = `${genderEmoji} Topic Form — ${examinerName}`;
-        
-        // ⚡️ 核心修正：即使是單獨練習 Topic 模式，一開始也要口頭詢問題目
-        systemInstruction += `\n- START STEP: Your very first sentence MUST be: "Hello. What are you going to talk about today and what are your discussion points?"
-- PHASE 2: After they tell you, cross-examine them on the topic "${title}" and these 5 points:\n${pts.map((p,i) => `* ${p}`).join('\n')}\nEnd at 5 mins with: "Thank you very much. That is the end of the test."`;
+        systemInstruction += `\nDirectly test the topic "${title}" and these 5 points:\n${pts.map((p,i) => `* ${p}`).join('\n')}\nEnd at 5 mins with: "Thank you very much. That is the end of the test."`;
       } else if (practiceMode === 'conversation') {
         const subj = document.getElementById('convoSubject').value;
         document.getElementById('examRoomTitle').textContent = `${genderEmoji} Convo Room — ${examinerName}`;
