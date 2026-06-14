@@ -640,9 +640,13 @@ Rules:
       executeExaminerTurn();
     }
 
-    async function executeExaminerTurn() {
+  async function executeExaminerTurn() {
       updateStatus('Examiner is thinking...');
       document.getElementById('micBtn').disabled = true;
+
+      // ⚡️ 修正：時間判斷邏輯
+      // 如果時間已經超標，但不強制打斷，而是標記為「最後一輪」
+      let isFinalRound = (examTimeSeconds >= targetTimeLimit);
 
       if (history.length > 7) { 
         const latestExchanges = history.slice(-6); 
@@ -653,7 +657,14 @@ Rules:
       }
 
       try {
-        const payload = { contents: history };
+        let currentPrompt = [...history]; // 複製歷史紀錄
+        
+        // 如果是最後一輪，給 AI 指令：完成這次問答後，下一次就必須結束
+        if (isFinalRound) {
+           currentPrompt.push({ role: 'user', parts: [{ text: "TIME_UP: You have reached the time limit. After this exchange, you MUST conclude the test by saying: 'Thank you very much. That is the end of the test.' Do not start any new discussion topics." }] });
+        }
+
+        const payload = { contents: currentPrompt };
         const data = await apiRequest('/chat', { dailyPassword, payload });
         
         const responseText = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
@@ -664,8 +675,15 @@ Rules:
         updateStatus('Examiner speaking...');
         
         speakOutputText(responseText, () => {
-          updateStatus('Your turn. Click the mic button 🎙️ to start speaking.');
-          document.getElementById('micBtn').disabled = false;
+          // 檢查 AI 是否已經說出了結束詞
+          if (responseText.toLowerCase().includes("end of the test")) {
+            document.getElementById('micBtn').style.display = 'none';
+            document.getElementById('finishExamBtn').style.display = 'block';
+            updateStatus('Exam finished. Please click "Finish & Grade Exam".');
+          } else {
+            updateStatus('Your turn. Click the mic button 🎙️ to start speaking.');
+            document.getElementById('micBtn').disabled = false;
+          }
         });
 
       } catch (err) {
