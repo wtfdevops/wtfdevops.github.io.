@@ -124,7 +124,7 @@ html[data-dark] .dash-card { border-left-color: #3B82F6; }
 .score-header { text-align: center; margin-bottom: 20px; }
 .score-icon { font-size: 44px; margin-bottom: 6px; }
 .score-title { font-size: 18px; font-weight: 700; }
-.scoring-scroll { flex-grow: 1; overflow-y: auto; max-height: 420px; padding-right: 4px; margin-bottom: 16px; }
+.scoring-scroll { flex-grow: 1; overflow-y: auto; max-height: 380px; padding-right: 4px; margin-bottom: 16px; }
 
 .overall-wrap { display: flex; flex-direction: column; align-items: center; margin-bottom: 24px; background: var(--surface2); padding: 16px; border-radius: var(--radius); border: 1px solid var(--border); }
 .overall-circle { width: 90px; height: 90px; border-radius: 50%; border: 6px solid var(--primary); display: flex; align-items: center; justify-content: center; flex-direction: row; margin-bottom: 8px; background: var(--surface); }
@@ -132,7 +132,7 @@ html[data-dark] .dash-card { border-left-color: #3B82F6; }
 .overall-den { font-size: 15px; color: var(--muted); font-weight: 500; margin-top: 8px; }
 .overall-label { font-size: 15px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
 
-.crit-card { background: var(--surface2); border: 1px solid var(--border); padding: 14px; border-radius: 10px; margin-bottom: 12px; position: relative; }
+.crit-card { background: var(--surface2); border: 1px solid var(--border); padding: 14px; border-radius: 10px; margin-bottom: 12px; }
 .crit-header { display: flex; justify-content: space-between; align-items: center; font-size: 14px; font-weight: 700; margin-bottom: 8px; }
 .crit-label { flex-grow: 1; margin-left: 8px; color: var(--text); }
 .crit-score { font-family: monospace; font-size: 15px; }
@@ -142,33 +142,12 @@ html[data-dark] .dash-card { border-left-color: #3B82F6; }
 .crit-zh { font-size: 13px; color: var(--muted); margin-top: 4px; border-top: 1px dashed var(--border); padding-top: 4px; }
 .crit-tip { font-size: 12.5px; background: var(--surface); border: 1px solid var(--border); padding: 8px; border-radius: 6px; margin-top: 8px; color: var(--text); }
 
-/* 🎧 新增：朗讀按鈕微調樣式 */
-.read-report-btn {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  color: var(--primary);
-  font-size: 12px;
-  font-weight: 600;
-  padding: 4px 10px;
-  border-radius: 6px;
-  cursor: pointer;
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  margin-top: 8px;
-  transition: all 0.2s;
-}
-.read-report-btn:hover {
-  background: var(--primary-lt);
-  border-color: var(--primary);
-}
-
 .next-steps { background: var(--ph2-lt); border: 1px solid #DDD6FE; border-radius: 10px; padding: 14px; margin-bottom: 12px; }
 html[data-dark] .next-steps { background: #2E1065; border-color: #4C1D95; }
 .ns-title { font-size: 14px; font-weight: 700; color: #6D28D9; margin-bottom: 8px; }
 html[data-dark] .ns-title { color: #A78BFA; }
 .ns-list { padding-left: 20px; font-size: 13.5px; line-height: 1.5; }
-.ns-list li { margin-bottom: 12px; }
+.ns-list li { margin-bottom: 8px; }
 
 .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 16px; }
 .stat-card { background: var(--surface2); border: 1px solid var(--border); padding: 12px; border-radius: 9px; text-align: center; }
@@ -192,7 +171,7 @@ html[data-dark] .ns-title { color: #A78BFA; }
 
     <div class="view active" id="viewPassword">
       <div style="text-align: center;">
-        <div class="version-badge">🚀 v2.7.0 • Cantonese Report Read-Aloud Support</div>
+        <div class="version-badge">🚀 v2.5.0 • Audio Report Reader Engine Added</div>
       </div>
       <div class="input-group" style="margin-top:20px">
         <label class="label" for="dailyPasswordInput">Daily Access Password</label>
@@ -263,7 +242,7 @@ html[data-dark] .ns-title { color: #A78BFA; }
       <div id="topicFormFields" style="display:none">
         <div class="input-group">
           <label class="label" for="topicTitle">Overall Topic Title (主標題)</label>
-          <input text="text" id="topicTitle" placeholder="e.g., My Festive Trip to Japan" maxlength="50"/>
+          <input type="text" id="topicTitle" placeholder="e.g., My Festive Trip to Japan" maxlength="50"/>
         </div>
         <div class="input-group" style="margin-bottom:10px">
           <label class="label">5 Discussion Sub-points (分項點)</label>
@@ -314,11 +293,11 @@ html[data-dark] .ns-title { color: #A78BFA; }
       <div class="score-header">
         <div class="score-icon" id="scoringIcon">📊</div>
         <div class="score-title">Performance Feedback Report</div>
+        <button class="btn btn-sec" id="readReportBtn" onclick="toggleReadReport()" style="margin: 10px auto 0 auto; max-width: 280px; font-size: 13.5px; padding: 8px 14px; border-color: var(--primary); color: var(--primary);">🔊 語音朗讀完整報告 (Read Full Report)</button>
       </div>
 
       <div class="scoring-scroll" id="scoringContent"></div>
 
-      <button class="btn" id="retryGradingBtn" onclick="executeGradingProtocol()" style="display:none; background: var(--ph2); margin-bottom: 10px;">🔄 Retry Report Evaluation (重新嘗試評分)</button>
       <button class="btn" id="tryAgainBtn" onclick="restartSameMode()" style="display:none">🔄 Practice This Component Again</button>
       <button class="btn btn-sec" id="changeTopicBtn" onclick="switchView('viewDashboard')" style="display:none">🏠 Return to Dashboard</button>
     </div>
@@ -386,7 +365,7 @@ html[data-dark] .ns-title { color: #A78BFA; }
     let dailyPassword = '';
     let practiceMode  = ''; 
     let history       = [];  
-    let targetTimeLimit = 60; 
+    let targetTimeLimit = 660; 
     let systemInstructionGlobal = ''; 
     let chosenGender  = 'female'; 
     let examinerName  = 'Ms. Davis'; 
@@ -401,7 +380,10 @@ html[data-dark] .ns-title { color: #A78BFA; }
     let examTimeSeconds   = 0;
     let timerInterval     = null;
     let masterTeacherPwd  = '';
-    let isExamFinished     = false;
+
+    // ⚡️ 全域快取，儲存當前解析好的評分 JSON 資料與朗讀狀態
+    let activeScoreObject = null;
+    let isReadingReport   = false;
 
     window.addEventListener('DOMContentLoaded', () => {
       const SpeechComp = window.SpeechRecognition || window.webkitSpeechRecognition;
@@ -412,14 +394,12 @@ html[data-dark] .ns-title { color: #A78BFA; }
         recognition.lang = 'en-GB';
 
         recognition.onstart = () => {
-          if (isExamFinished) { stopRecordingContext(); return; }
           isRecording = true;
           setMicUI(true);
           updateStatus('Listening... Click the red button 🛑 to STOP and SEND.');
         };
 
         recognition.onresult = (e) => {
-          if (isExamFinished) return;
           let interimText = '';
           let finalizedText = '';
           for (let i = e.resultIndex; i < e.results.length; ++i) {
@@ -501,6 +481,10 @@ html[data-dark] .ns-title { color: #A78BFA; }
     function switchView(viewId) {
       document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
       document.getElementById(viewId).classList.add('active');
+      // 離開評分畫面時，自動停止任何正在進行的報告朗讀
+      if (viewId !== 'viewScoring' && audioSynthesizer) {
+        stopReadingReportState();
+      }
     }
 
     function resetSpeechState() {
@@ -523,8 +507,6 @@ html[data-dark] .ns-title { color: #A78BFA; }
 
     function choosePracticeMode(mode) {
       practiceMode = mode;
-      isExamFinished = false;
-
       const introText = document.getElementById('topicIntroText');
       const formFields = document.getElementById('topicFormFields');
       const convoField = document.getElementById('conversationSubjectField');
@@ -539,14 +521,14 @@ html[data-dark] .ns-title { color: #A78BFA; }
         formFields.style.display = 'block';
       } else if (mode === 'intro') {
         targetTimeLimit = 60; 
-        introText.innerHTML = `<h3>👋 Component 1: Introduction</h3><p style="margin-top:6px;font-size:13.5px;color:var(--muted)">The examiner will greet you and ask basic background questions about your life, hobbies, or studies (Target: 1 minute). <strong>[時間到會自動收卷攔截]</strong></p>`;
+        introText.innerHTML = `<h3>👋 Component 1: Introduction</h3><p style="margin-top:6px;font-size:13.5px;color:var(--muted)">The examiner will greet you and ask basic background questions about your life, hobbies, or studies (Target: 1 minute).</p>`;
       } else if (mode === 'topic') {
         targetTimeLimit = 300; 
-        introText.innerHTML = `<h3>📋 Component 2: Topic Phase</h3><p style="margin-top:6px;font-size:13.5px;color:var(--muted)">Please input your pre-prepared Topic Form details. The AI will cross-examine you on these 5 nodes (Target: 5 minutes). <strong>[時間到會自動收卷攔截]</strong></p>`;
+        introText.innerHTML = `<h3>📋 Component 2: Topic Phase</h3><p style="margin-top:6px;font-size:13.5px;color:var(--muted)">Please input your pre-prepared Topic Form details. The AI will cross-examine you on these 5 nodes (Target: 5 minutes).</p>`;
         formFields.style.display = 'block';
       } else if (mode === 'conversation') {
         targetTimeLimit = 150; 
-        introText.innerHTML = `<h3>💬 Component 3: Conversation Phase (單選練習)</h3><p style="margin-top:6px;font-size:13.5px;color:var(--muted)">在此模式下，您只需選擇一個主題。考官將針對該主題與您進行密集的 <strong>2.5 分鐘</strong> 深入交流。 <strong>[時間到會自動收卷攔截]</strong></p>`;
+        introText.innerHTML = `<h3>💬 Component 3: Conversation Phase (單選練習)</h3><p style="margin-top:6px;font-size:13.5px;color:var(--muted)">在此模式下，您只需選擇一個主題。考官將針對該主題與您進行密集的 <strong>2.5 分鐘</strong> 深入交流。</p>`;
         convoField.style.display = 'block';
       }
       switchView('viewTopicSetup');
@@ -556,7 +538,6 @@ html[data-dark] .ns-title { color: #A78BFA; }
       const errEl = document.getElementById('setupErr');
       errEl.classList.remove('show');
 
-      isExamFinished = false;
       chosenGender = document.getElementById('examinerGender').value;
       examinerName = (chosenGender === 'male') ? 'Mr. Smith' : 'Ms. Davis';
       const genderEmoji = (chosenGender === 'male') ? '🧔' : '👩';
@@ -645,7 +626,6 @@ Rules:
       clearInterval(timerInterval);
       
       timerInterval = setInterval(() => {
-        if (isExamFinished) { clearInterval(timerInterval); return; }
         examTimeSeconds++;
         const m = String(Math.floor(examTimeSeconds / 60)).padStart(2, '0');
         const s = String(examTimeSeconds % 60).padStart(2, '0');
@@ -653,7 +633,6 @@ Rules:
         
         if (examTimeSeconds >= targetTimeLimit) {
           document.getElementById('examTimer').classList.add('warn');
-          handleTimeEnforcementIntercept();
         }
       }, 1000);
 
@@ -661,27 +640,7 @@ Rules:
       executeExaminerTurn();
     }
 
-    function handleTimeEnforcementIntercept() {
-      if (isExamFinished) return;
-      isExamFinished = true;
-      clearInterval(timerInterval);
-      resetSpeechState();
-
-      document.getElementById('micBtn').disabled = true;
-      updateStatus('Time is up! Securing transcript...');
-
-      const closingPhrase = "Thank you very much. That is the end of the test.";
-      appendMessage('examiner', closingPhrase);
-      history.push({ role: 'model', parts: [{ text: closingPhrase }] });
-
-      speakOutputText(closingPhrase, () => {
-        updateStatus('Exam auto-submitted. Evaluating performance...');
-        executeGradingProtocol();
-      });
-    }
-
     async function executeExaminerTurn() {
-      if (isExamFinished) return;
       updateStatus('Examiner is thinking...');
       document.getElementById('micBtn').disabled = true;
 
@@ -697,8 +656,6 @@ Rules:
         const payload = { contents: history };
         const data = await apiRequest('/chat', { dailyPassword, payload });
         
-        if (isExamFinished) return;
-
         const responseText = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
         if (!responseText) throw new Error('Empty response');
 
@@ -707,20 +664,17 @@ Rules:
         updateStatus('Examiner speaking...');
         
         speakOutputText(responseText, () => {
-          if (isExamFinished) return;
           updateStatus('Your turn. Click the mic button 🎙️ to start speaking.');
           document.getElementById('micBtn').disabled = false;
         });
 
       } catch (err) {
         console.error(err);
-        if (!isExamFinished) {
-          updateStatus('Session disruption. Failed to contact Examiner.', true);
-        }
+        updateStatus('Session disruption. Failed to contact Examiner.', true);
       }
     }
 
-    function speakOutputText(text, callback) {
+    function speakOutputText(text, callback, customVoiceLang = null) {
       if (!audioSynthesizer) return callback();
       audioSynthesizer.cancel();
 
@@ -733,6 +687,20 @@ Rules:
         voices = audioSynthesizer.getVoices();
       }
       
+      // 如果有指定特定語言（如讀中文報告內容），優先尋找對應語音
+      if (customVoiceLang) {
+        const targetVoice = voices.find(v => v.lang.toLowerCase().replace('_', '-').startsWith(customVoiceLang.toLowerCase()));
+        if (targetVoice) {
+          currentUtterance.voice = targetVoice;
+          currentUtterance.lang = targetVoice.lang;
+          currentUtterance.rate = 1.0;
+          currentUtterance.onend = () => callback();
+          currentUtterance.onerror = (e) => { callback(); };
+          audioSynthesizer.speak(currentUtterance);
+          return;
+        }
+      }
+
       const enVoices = voices.filter(v => v.lang.toLowerCase().startsWith('en'));
       const ukVoices = enVoices.filter(v => v.lang.toLowerCase().replace('_', '-').startsWith('en-gb'));
       
@@ -784,45 +752,13 @@ Rules:
       audioSynthesizer.speak(currentUtterance);
     }
     
-    // 🎧 新增：專屬廣東話朗讀模組
-    function readCantoneseReportText(rawString) {
-      if (!audioSynthesizer) return;
-      audioSynthesizer.cancel();
-
-      // 精準擷取括號內的廣東話文本
-      let cantoneseText = '';
-      const match = rawString.match(/\(([^)]+)\)/);
-      if (match && match[1]) {
-        cantoneseText = match[1].trim();
-      } else {
-        cantoneseText = rawString.trim();
-      }
-
-      const utterance = new SpeechSynthesisUtterance(cantoneseText);
-      const voices = audioSynthesizer.getVoices();
-      
-      // 搜尋香港廣東話語音引擎
-      let hkVoice = voices.find(v => v.lang.toLowerCase().replace('_', '-').startsWith('zh-hk'));
-      
-      if (hkVoice) {
-        utterance.voice = hkVoice;
-        utterance.lang = hkVoice.lang;
-      } else {
-        utterance.lang = 'zh-HK';
-      }
-
-      utterance.rate = 1.0; 
-      audioSynthesizer.speak(utterance);
-    }
-
     function handleMicClick() {
-      if (isExamFinished) return;
       if (isRecording) commitUserSpeech();
       else startRecordingContext();
     }
 
     function startRecordingContext() {
-      if (!recognition || isRecording || isExamFinished) return;
+      if (!recognition || isRecording) return;
       if (audioSynthesizer && audioSynthesizer.speaking) audioSynthesizer.cancel();
       speechTokenBox = [];
       currentLiveText = ''; 
@@ -839,8 +775,6 @@ Rules:
     function commitUserSpeech() {
       stopRecordingContext();
       clearLiveTranscriptionBubble();
-
-      if (isExamFinished) return;
 
       let finalPhrase = speechTokenBox.join(' ').trim();
       if (!finalPhrase && currentLiveText) {
@@ -913,7 +847,6 @@ Rules:
     function restartSameMode() { choosePracticeMode(practiceMode); }
 
     function confirmFinishExam() {
-      if (isExamFinished) return;
       if (history.length < 3) {
         clearInterval(timerInterval);
         resetSpeechState();
@@ -921,24 +854,19 @@ Rules:
         return;
       }
       if (confirm('Are you ready to submit your spoken transcript to the evaluation engine?')) {
-        isExamFinished = true;
-        clearInterval(timerInterval);
-        resetSpeechState();
         executeGradingProtocol();
       }
     }
 
     async function executeGradingProtocol() {
-      if (timerInterval) {
-        clearInterval(timerInterval);
-      }
+      clearInterval(timerInterval);
       resetSpeechState();
 
       switchView('viewScoring');
-      document.getElementById('retryGradingBtn').style.display = 'none';
+      document.getElementById('readReportBtn').style.display = 'none';
       document.getElementById('tryAgainBtn').style.display = 'none';
       document.getElementById('changeTopicBtn').style.display = 'none';
-      displayScoring(null, '連結評分引擎中，正在以道地廣東話為您深度分析口說盲點並生成評分報告...');
+      displayScoring(null, '連結評分引擎中，正在深度分析您的口說盲點並生成繁中翻譯報告...');
 
       const exchangeLogs = history.filter(h => !h.parts[0].text.startsWith('SYSTEM_CONFIG:'));
 
@@ -948,20 +876,20 @@ Dialogue Context:
 ${exchangeLogs.map(m => `${m.role.toUpperCase()}: ${m.parts[0].text}`).join('\n')}
 
 You MUST respond with a single, valid JSON object matching this exact schema. 
-CRITICAL REQUIREMENT FOR TEXT, TIP, AND NEXTSTEPS FIELDS: You must write the English feedback first, followed IMMEDIATELY by its Traditional Hong Kong Cantonese (廣東話/粵語) translation in parentheses.
-Example format for text/tip/nextSteps fields: "Your grammar was mostly correct. (你嘅文法基本上係正確嘅。)" or "Try to use more past tense. (試吓用多啲過去式。)"
+CRITICAL REQUIREMENT FOR TEXT AND TIP FIELDS: You must write the English feedback first, followed IMMEDIATELY by its Traditional Chinese (繁體中文) translation in parentheses.
+Example format for text/tip fields: "Your grammar was mostly correct. (您的語法基本正確。)"
 
 Schema:
 {
   "overall": 7,
   "overall_zh": "良好 (Merit)",
-  "fluency": { "score": 8, "text": "English text (廣東話翻譯)", "tip": "English tip (廣東話建議)" },
-  "vocabulary": { "score": 6, "text": "English text (廣東話翻譯)", "tip": "English tip (廣東話建議)" },
-  "grammar": { "score": 7, "text": "English text (廣東話翻譯)", "tip": "English tip (廣東話建議)" },
-  "communication": { "score": 7, "text": "English text (廣東話翻譯)", "tip": "English tip (廣東話建議)" },
+  "fluency": { "score": 8, "text": "English text (繁中翻譯)", "tip": "English tip (繁中建議)" },
+  "vocabulary": { "score": 6, "text": "English text (繁中翻譯)", "tip": "English tip (繁中建議)" },
+  "grammar": { "score": 7, "text": "English text (繁中翻譯)", "tip": "English tip (繁中建議)" },
+  "communication": { "score": 7, "text": "English text (繁中翻譯)", "tip": "English tip (繁中建議)" },
   "nextSteps": [
-    "First action item in English (第一個廣東話衝刺建議)",
-    "Second action item in English (第二個廣東話衝刺建議)"
+    "First action item in English (第一個繁中行動建議)",
+    "Second action item in English (第二個繁中行動建議)"
   ]
 }
 Scores must be integers between 1 and 10. Respond only with the raw object without markdown blocks.`;
@@ -972,10 +900,13 @@ Scores must be integers between 1 and 10. Respond only with the raw object witho
         let rawText = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
         rawText = rawText.replace(/```json/g, '').replace(/```/g, '').trim();
         const scoreObj = JSON.parse(rawText);
+        
+        // 保存到全域快取供讀取報告引擎使用
+        activeScoreObject = scoreObj; 
         displayScoring(scoreObj, null);
       } catch (err) {
         console.error(err);
-        displayScoring(null, '❌ 評分生成超時或解析失敗。請確保網絡連線正常，並點擊下方「重新嘗試評分」按鈕重試。');
+        displayScoring(null, '❌ 評分解析失敗。請確認網路連線或嘗試重新評分。');
       }
     }
 
@@ -988,14 +919,9 @@ Scores must be integers between 1 and 10. Respond only with the raw object witho
       return `<div class="crit-en">${rawString}</div>`;
     }
 
-    // 🎧 修改：在細項評價卡片內，嵌入朗讀按鈕
     function crit(label, emoji, data){
       if (!data) return '';
       const c = scoreColor(data.score);
-      // 轉義單引號，防止點擊事件破壞結構
-      const safeText = data.text.replace(/'/g, "\\'");
-      const safeTip = data.tip ? data.tip.replace(/'/g, "\\'") : '';
-      
       return `
       <div class="crit-card">
         <div class="crit-header">
@@ -1006,19 +932,14 @@ Scores must be integers between 1 and 10. Respond only with the raw object witho
         <div class="bar-wrap"><div class="bar-fill" style="width:${data.score*10}%;background:${c}"></div></div>
         <div class="crit-text">${splitEnZh(data.text)}</div>
         ${data.tip ? `<div class="crit-tip">💡 ${splitEnZh(data.tip)}</div>` : ''}
-        
-        <div style="display:flex; gap:8px;">
-          <button class="read-report-btn" onclick="readCantoneseReportText('${safeText}')">📢 聽取分析 (廣東話)</button>
-          ${data.tip ? `<button class="read-report-btn" onclick="readCantoneseReportText('${safeTip}')">💡 聽取建議 (廣東話)</button>` : ''}
-        </div>
       </div>`;
     }
 
     function displayScoring(s, errMsg){
       if(errMsg){
         document.getElementById('scoringContent').innerHTML = `<p class="err show" style="text-align:center;margin:20px 0">${errMsg}</p>`;
-        document.getElementById('retryGradingBtn').style.display = 'block';
-        document.getElementById('tryAgainBtn').style.display = 'none';
+        document.getElementById('readReportBtn').style.display = 'none';
+        document.getElementById('tryAgainBtn').style.display = 'block';
         document.getElementById('changeTopicBtn').style.display = 'block';
         return;
       }
@@ -1027,20 +948,6 @@ Scores must be integers between 1 and 10. Respond only with the raw object witho
       let displayLabel = overallLabel(s.overall);
       if (s.overall_zh) {
         displayLabel = `${displayLabel.split('(')[0]} (${s.overall_zh})`;
-      }
-
-      // 🎧 修改：在沖刺建議部分，也為每條清單加上語音播放鍵
-      let nextStepsHtml = '';
-      if (s.nextSteps) {
-        const listItems = s.nextSteps.map(t => {
-          const safeT = t.replace(/'/g, "\\'");
-          return `
-            <li style="margin-bottom:14px;">
-              ${splitEnZh(t)}
-              <button class="read-report-btn" onclick="readCantoneseReportText('${safeT}')" style="margin-top:4px;">📢 聽取這條建議 (廣東話)</button>
-            </li>`;
-        }).join('');
-        nextStepsHtml = `<div class="next-steps"><div class="ns-title">📋 Next Steps / 廣東話衝刺改善建議</div><ul class="ns-list">${listItems}</ul></div>`;
       }
 
       document.getElementById('scoringContent').innerHTML = `
@@ -1055,17 +962,123 @@ Scores must be integers between 1 and 10. Respond only with the raw object witho
         ${crit('Vocabulary (詞彙豐富度)', '📚', s.vocabulary)}
         ${crit('Grammar (文法準確度)', '✏️', s.grammar)}
         ${crit('Communication (溝通成效)', '💬', s.communication)}
-        ${nextStepsHtml}`;
+        ${s.nextSteps ? `<div class="next-steps"><div class="ns-title">📋 Next Steps / 衝刺改善建議</div><ul class="ns-list">${s.nextSteps.map(t=>`<li>${splitEnZh(t)}</li>`).join('')}</ul></div>`:''}`;
 
       document.getElementById('scoringIcon').textContent = s.overall >= 7 ? '🏆' : '📊';
-      
-      document.getElementById('retryGradingBtn').style.display = 'none';
+      document.getElementById('readReportBtn').style.display = 'block';
       document.getElementById('tryAgainBtn').style.display  = 'block';
       document.getElementById('changeTopicBtn').style.display = 'block';
     }
 
     function scoreColor(v) { return v >= 8 ? 'var(--success)' : (v >= 5 ? 'var(--warn)' : 'var(--danger)'); }
     function overallLabel(v) { return v >= 8.5 ? 'Distinction' : (v >= 7.0 ? 'Merit' : (v >= 5.0 ? 'Pass' : 'Fail')); }
+
+    // ⚡️ 全新功能：音訊報告朗讀佇列控制引擎
+    function toggleReadReport() {
+      if (!activeScoreObject) return;
+
+      if (isReadingReport) {
+        stopReadingReportState();
+        return;
+      }
+
+      isReadingReport = true;
+      const btn = document.getElementById('readReportBtn');
+      btn.textContent = '⏹️ 停止朗讀報告 (Stop Reading)';
+      btn.style.color = 'var(--danger)';
+      btn.style.borderColor = 'var(--danger)';
+
+      // 建立播放音訊佇列任務
+      const speechQueue = [];
+
+      // 1. 總評分
+      speechQueue.push({ text: `Overall Score: ${activeScoreObject.overall} out of 10. Band level is ${overallLabel(activeScoreObject.overall)}.`, lang: 'en' });
+      if (activeScoreObject.overall_zh) {
+        speechQueue.push({ text: `整體評價為：${activeScoreObject.overall_zh}。`, lang: 'zh' });
+      }
+
+      // 2. 處理四大指標項目
+      const categories = [
+        { label: 'Fluency', key: 'fluency' },
+        { label: 'Vocabulary', key: 'vocabulary' },
+        { label: 'Grammar', key: 'grammar' },
+        { label: 'Communication', key: 'communication' }
+      ];
+
+      categories.forEach(c => {
+        const item = activeScoreObject[c.key];
+        if (item) {
+          speechQueue.push({ text: `${c.label} score: ${item.score} out of 10.`, lang: 'en' });
+          
+          // 擷取括號前後的英、中反饋
+          const textMatch = item.text.match(/^([\s\S]*?)\(([\s\S]*?)\)\s*$/);
+          if (textMatch) {
+            speechQueue.push({ text: textMatch[1].trim(), lang: 'en' });
+            speechQueue.push({ text: textMatch[2].trim(), lang: 'zh' });
+          } else {
+            speechQueue.push({ text: item.text, lang: 'en' });
+          }
+
+          // 擷取括號前後的英、中💡建議
+          if (item.tip) {
+            const tipMatch = item.tip.match(/^([\s\S]*?)\(([\s\S]*?)\)\s*$/);
+            if (tipMatch) {
+              speechQueue.push({ text: "Teacher's tip: " + tipMatch[1].trim(), lang: 'en' });
+              speechQueue.push({ text: "修補建議：" + tipMatch[2].trim(), lang: 'zh' });
+            } else {
+              speechQueue.push({ text: item.tip, lang: 'en' });
+            }
+          }
+        }
+      });
+
+      // 3. 處理衝刺建議 (Next Steps)
+      if (activeScoreObject.nextSteps && activeScoreObject.nextSteps.length > 0) {
+        speechQueue.push({ text: "Next steps for improvements.", lang: 'en' });
+        speechQueue.push({ text: "後續衝刺行動指引。", lang: 'zh' });
+        
+        activeScoreObject.nextSteps.forEach((ns, index) => {
+          const nsMatch = ns.match(/^([\s\S]*?)\(([\s\S]*?)\)\s*$/);
+          if (nsMatch) {
+            speechQueue.push({ text: `Point ${index + 1}: ${nsMatch[1].trim()}`, lang: 'en' });
+            speechQueue.push({ text: `第 ${index + 1} 點：${nsMatch[2].trim()}`, lang: 'zh' });
+          } else {
+            speechQueue.push({ text: ns, lang: 'en' });
+          }
+        });
+      }
+
+      speechQueue.push({ text: "End of the feedback report.", lang: 'en' });
+      speechQueue.push({ text: "報告朗讀完畢。", lang: 'zh' });
+
+      // 依序遞迴執行播放佇列
+      function playNextToken() {
+        if (!isReadingReport) return;
+        if (speechQueue.length === 0) {
+          stopReadingReportState();
+          return;
+        }
+        const nextItem = speechQueue.shift();
+        
+        // 呼叫底層發音引擎，傳入對應的語系代碼進行切換
+        speakOutputText(nextItem.text, () => {
+          setTimeout(playNextToken, 250); // 每句之間保留小停頓，聽起來更清晰舒適
+        }, nextItem.lang);
+      }
+
+      playNextToken();
+    }
+
+    function stopReadingReportState() {
+      isReadingReport = false;
+      if (audioSynthesizer) audioSynthesizer.cancel();
+      const btn = document.getElementById('readReportBtn');
+      if (btn) {
+        btn.textContent = '🔊 語音朗讀完整報告 (Read Full Report)';
+        btn.style.color = 'var(--primary)';
+        btn.style.borderColor = 'var(--primary)';
+      }
+    }
 
     async function authenticateTeacher() {
       const pwd = document.getElementById('masterPasswordInput').value;
