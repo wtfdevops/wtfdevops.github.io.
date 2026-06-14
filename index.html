@@ -51,7 +51,7 @@ h1 { font-size: 20px; font-weight: 700; color: var(--primary); display: flex; al
 html[data-dark] h1 { color: #60A5FA; }
 .theme-btn { background: none; border: none; font-size: 18px; cursor: pointer; padding: 6px; border-radius: 50%; width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; background: var(--surface2); border: 1px solid var(--border); color: var(--text); }
 
-/* ⚡️ 頂部版本標籤樣式 */
+/* ⚡️ 新增的頂部版本標籤樣式 */
 .version-badge { 
   font-size: 11px; 
   color: var(--muted); 
@@ -113,7 +113,6 @@ html[data-dark] .dash-card { border-left-color: #3B82F6; }
 .msg.user { background: var(--primary); color: #fff; align-self: flex-end; border-top-right-radius: 2px; }
 .msg.live-trans { background: transparent; border: 1px dashed var(--muted); color: var(--muted); align-self: flex-end; font-style: italic; border-top-right-radius: 2px; }
 
-/* 🎙️ 還原 b-o.html 的經典大圓形麥克風控制區樣式 */
 .controls-area { display: flex; flex-direction: column; gap: 10px; align-items: center; justify-content: center; min-height: 80px; }
 .mic-btn { width: 68px; height: 68px; border-radius: 50%; border: none; background: var(--primary); color: white; font-size: 24px; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 12px rgba(37,99,235,0.3); transition: all .2s; position: relative; }
 .mic-btn:hover { background: var(--primary-dk); transform: scale(1.04); }
@@ -141,7 +140,7 @@ html[data-dark] .dash-card { border-left-color: #3B82F6; }
 .bar-wrap { width: 100%; height: 6px; background: var(--border); border-radius: 3px; overflow: hidden; margin-bottom: 10px; }
 .bar-fill { height: 100%; width: 0; transition: width 0.6s cubic-bezier(0.1, 0.8, 0.2, 1); }
 .crit-text { font-size: 13.5px; line-height: 1.5; color: var(--text); }
-.crit-zh { font-size: 13px; color: var(--muted); margin-top: 4px; border-top: 1px dashed var(--border); padding-top: 4px; }
+.crit-zh { font-size: 13px; color: var(--muted); margin-top: 4px; border-top: 1px dashed var(--border); padding-top: 4px; } /* 繁中翻譯樣式 */
 .crit-tip { font-size: 12.5px; background: var(--surface); border: 1px solid var(--border); padding: 8px; border-radius: 6px; margin-top: 8px; color: var(--text); }
 
 .next-steps { background: var(--ph2-lt); border: 1px solid #DDD6FE; border-radius: 10px; padding: 14px; margin-bottom: 12px; }
@@ -173,7 +172,7 @@ html[data-dark] .ns-title { color: #A78BFA; }
 
     <div class="view active" id="viewPassword">
       <div style="text-align: center;">
-        <div class="version-badge">🚀 v2.4.5 • Speech Sync Engine restored</div>
+        <div class="version-badge">🚀 v2.4.0 • Updated: 2026-06-12</div>
       </div>
       <div class="input-group" style="margin-top:20px">
         <label class="label" for="dailyPasswordInput">Daily Access Password</label>
@@ -382,7 +381,6 @@ html[data-dark] .ns-title { color: #A78BFA; }
     let timerInterval     = null;
     let masterTeacherPwd  = '';
 
-    // 🎙️ 這裡百分之百移植了原始 b-o.html 的 Web Speech 語音輸入辨識驅動邏輯
     window.addEventListener('DOMContentLoaded', () => {
       const SpeechComp = window.SpeechRecognition || window.webkitSpeechRecognition;
       if (SpeechComp) {
@@ -467,10 +465,16 @@ html[data-dark] .ns-title { color: #A78BFA; }
       switchView('viewPassword');
     }
     
+// 🎵 測試目前選擇的考官聲音功能
     function testCurrentVoice() {
+      // 先暫停所有正在播放的聲音
       if (audioSynthesizer) audioSynthesizer.cancel();
+      
+      // 讀取當前選單點選的性別
       chosenGender = document.getElementById('examinerGender').value;
       const exName = (chosenGender === 'male') ? 'Mr. Smith' : 'Ms. Davis';
+      
+      // 臨時觸發一次語音朗讀，測試抓取到的聲音
       speakOutputText(`Hello, I am ${exName}. Nice to meet you.`, () => {
         console.log(`Voice test completed for ${exName}`);
       });
@@ -500,9 +504,6 @@ html[data-dark] .ns-title { color: #A78BFA; }
     }
 
     function choosePracticeMode(mode) {
-      // ⚡️ 核心修正：將選定模式保存到全域狀態變數，防止 startExamSession 漏判模式！
-      practiceMode = mode;
-
       const introText = document.getElementById('topicIntroText');
       const formFields = document.getElementById('topicFormFields');
       const convoField = document.getElementById('conversationSubjectField');
@@ -547,12 +548,13 @@ html[data-dark] .ns-title { color: #A78BFA; }
         "Recent Personal Experiences"
       ];
 
-      let systemInstruction = `You are a British UK oral examiner named ${examinerName} (${chosenGender}) for Trinity GESE Grade 5 (CEFR B1). 
-Be friendly but brief. Speak clearly with a natural British tone fitting your character name.
+  let systemInstruction = `You are a professional British UK oral examiner named ${examinerName} (${chosenGender}) for Trinity GESE Grade 5 (CEFR B1), strictly mimicking real exam videos.
 Rules:
-1. Ask EXACTLY ONE short question at a time. Never group questions.
-2. Keep your spoken responses ultra-short (under 25 words).
-3. Test B1 structures: Past Simple, Future (going to), Present Perfect, giving reasons (because).`;
+1. Ask EXACTLY ONE short, natural question at a time. Do not make statements, just drive the conversation.
+2. Keep your responses under 20 words. Be conversational but test-oriented.
+3. For the Topic Phase, pick their sub-points one by one. For each point, drill down using different B1 tenses (e.g. Past Simple question, Present Perfect question, Future 'going to' question ,giving reason 'because').
+4. CRITICAL TRINITY RULE: Near the end of the Topic Phase (after 3-4 exchanges), you MUST explicitly ask the candidate: "Do you have a question for me about your topic, please?" and wait for them to ask you.
+5. If they ask you a question, give a very brief personal answer (under 15 words) and say "Thank you."`;
 
       if (practiceMode === 'full') {
         const title = document.getElementById('topicTitle').value.trim();
@@ -576,7 +578,7 @@ Rules:
 
         document.getElementById('examRoomTitle').textContent = `${genderEmoji} Full Mock Exam — ${examinerName}`;
         
-        // ⚡️ 保留口頭申報流程與追問引導機制
+        // ⚡️ 核心修正：融入現實考場流程，強制考官口頭詢問題目
         systemInstruction += `\n- PHASE 1 (Intro, 1m): Ask 1 quick greeting/background question.
 - TRANSITION TO PHASE 2 (CRITICAL): Right after the first greeting question, you MUST say exactly: "Thank you. Now, what are you going to talk about today and what are your discussion points?" to let the candidate state their topic orally. Do NOT skip this mouth-reporting step!
 - PHASE 2 (Topic, 5m): After they tell you their topic orally, cross-examine them naturally on their topic '${title}' and its nodes:\n${pts.map((p,i)=>` * ${p}`).join('\n')}
@@ -603,6 +605,7 @@ Rules:
         }
         document.getElementById('examRoomTitle').textContent = `${genderEmoji} Topic Form — ${examinerName}`;
         
+        // ⚡️ 核心修正：即使是單獨練習 Topic 模式，一開始也要口頭詢問題目
         systemInstruction += `\n- START STEP: Your very first sentence MUST be: "Hello. What are you going to talk about today and what are your discussion points?"
 - PHASE 2: After they tell you, cross-examine them on the topic "${title}" and these 5 points:\n${pts.map((p,i) => `* ${p}`).join('\n')}\nEnd at 5 mins with: "Thank you very much. That is the end of the test."`;
       } else if (practiceMode === 'conversation') {
@@ -641,6 +644,7 @@ Rules:
       updateStatus('Examiner is thinking...');
       document.getElementById('micBtn').disabled = true;
 
+      // ⚡️ 保持輕量化的 6 句歷史對話限制，防止 Gemini 卡頓
       if (history.length > 7) { 
         const latestExchanges = history.slice(-6); 
         history = [
@@ -671,7 +675,7 @@ Rules:
       }
     }
 
-    // 🎵 強力捕捉與測試聲音的核心函數（還原自 b1-trinity-practice (2).html 確保相容性）
+// 🎵 強力捕捉與測試聲音的核心函數（加入 Chrome 異步刷新機制）
     function speakOutputText(text, callback) {
       if (!audioSynthesizer) return callback();
       audioSynthesizer.cancel();
@@ -679,7 +683,10 @@ Rules:
       const cleanText = text.replace(/SYSTEM_CONFIG:.*$/gi, '').trim();
       currentUtterance = new SpeechSynthesisUtterance(cleanText);
       
+      // ⚡️ 核心修正：強制重新向瀏覽器索取最新的聲音清單
       let voices = audioSynthesizer.getVoices();
+      
+      // 如果第一次拿是空的（Chrome 常見盲點），嘗試重新觸發一次
       if (!voices || voices.length === 0) {
         window.speechSynthesis.getVoices();
         voices = audioSynthesizer.getVoices();
@@ -691,11 +698,15 @@ Rules:
       let matchedVoice = null;
 
       if (chosenGender === 'male') {
+        // 🧔 男聲捕捉防線：
+        
+        // 1. 找英國英文男聲
         matchedVoice = ukVoices.find(v => {
           const name = v.name.toLowerCase();
           return name.includes('male') || name.includes('david') || name.includes('george') || name.includes('james') || name.includes('oliver');
         });
 
+        // 2. 找 Chrome 內建隱藏的 Google 美國萬用男聲 (這個 Chrome 絕對有！)
         if (!matchedVoice) {
           matchedVoice = enVoices.find(v => {
             const name = v.name.toLowerCase();
@@ -703,6 +714,7 @@ Rules:
           });
         }
 
+        // 3. 找任何名字帶有男聲關鍵字的英文聲音
         if (!matchedVoice) {
           matchedVoice = enVoices.find(v => {
             const name = v.name.toLowerCase();
@@ -710,6 +722,7 @@ Rules:
           });
         }
 
+        // 4. 萬一真的沒抓到，強行盲選一個不是常見女聲的英文聲音
         if (!matchedVoice && enVoices.length > 0) {
           matchedVoice = enVoices.find(v => {
             const name = v.name.toLowerCase();
@@ -717,17 +730,22 @@ Rules:
           });
         }
       } else {
+        // 👩 女聲防線
         matchedVoice = ukVoices.find(v => {
           const name = v.name.toLowerCase();
           return name.includes('female') || name.includes('hazel') || name.includes('zira') || name.includes('susan') || name.includes('alice');
         }) || ukVoices[0];
       }
 
+      // ⚡️ 強制綁定聲音
       if (matchedVoice) {
         currentUtterance.voice = matchedVoice;
         currentUtterance.lang = matchedVoice.lang;
+        console.log("🎯 成功強制捕捉到男聲：", matchedVoice.name);
       } else {
+        // 如果連 Chrome 內建聲音都沒初始化完，交給預設，但這次加上提示
         currentUtterance.lang = (chosenGender === 'male') ? 'en-US' : 'en-GB';
+        console.log("⚠️ 瀏覽器語音庫尚未準備好，暫時使用系統預設語系");
       }
 
       currentUtterance.rate = 0.95; 
@@ -799,7 +817,6 @@ Rules:
       box.scrollTop = box.scrollHeight;
     }
 
-    // 🎙️ 按下空白鍵（Space）開關麥克風錄音的控制監聽器
     document.addEventListener('keydown', (e) => {
       if (e.code === 'Space' && document.activeElement.tagName !== 'INPUT' && document.activeElement.tagName !== 'SELECT') {
         const activeView = document.querySelector('.view.active');
@@ -854,6 +871,7 @@ Rules:
 
       const exchangeLogs = history.filter(h => !h.parts[0].text.startsWith('SYSTEM_CONFIG:'));
 
+      // ⚡️ 核心提示詞優化：強制 AI 回傳中英雙語對照的 JSON 資料
       const gradingPrompt = `You are the lead linguistic grading engine for Trinity College London assessments. Evaluate the following dialogue transcript against CEFR B1 / Grade 5 speaking criteria.
 
 Dialogue Context:
@@ -891,6 +909,7 @@ Scores must be integers between 1 and 10. Respond only with the raw object witho
       }
     }
 
+    // ⚡️ 前端排版拆解：自動將括號內的繁體中文抽出來獨立換行顯示，版面更整齊
     function splitEnZh(rawString) {
       if (!rawString) return '';
       const match = rawString.match(/^([\s\S]*?)\(([\s\S]*?)\)\s*$/);
@@ -925,6 +944,7 @@ Scores must be integers between 1 and 10. Respond only with the raw object witho
       }
       const oc = scoreColor(s.overall);
       
+      // 動態對照總分評級
       let displayLabel = overallLabel(s.overall);
       if (s.overall_zh) {
         displayLabel = `${displayLabel.split('(')[0]} (${s.overall_zh})`;
