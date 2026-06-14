@@ -51,7 +51,6 @@ h1 { font-size: 20px; font-weight: 700; color: var(--primary); display: flex; al
 html[data-dark] h1 { color: #60A5FA; }
 .theme-btn { background: none; border: none; font-size: 18px; cursor: pointer; padding: 6px; border-radius: 50%; width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; background: var(--surface2); border: 1px solid var(--border); color: var(--text); }
 
-/* ⚡️ 新增的頂部版本標籤樣式 */
 .version-badge { 
   font-size: 11px; 
   color: var(--muted); 
@@ -140,7 +139,7 @@ html[data-dark] .dash-card { border-left-color: #3B82F6; }
 .bar-wrap { width: 100%; height: 6px; background: var(--border); border-radius: 3px; overflow: hidden; margin-bottom: 10px; }
 .bar-fill { height: 100%; width: 0; transition: width 0.6s cubic-bezier(0.1, 0.8, 0.2, 1); }
 .crit-text { font-size: 13.5px; line-height: 1.5; color: var(--text); }
-.crit-zh { font-size: 13px; color: var(--muted); margin-top: 4px; border-top: 1px dashed var(--border); padding-top: 4px; } /* 繁中翻譯樣式 */
+.crit-zh { font-size: 13px; color: var(--muted); margin-top: 4px; border-top: 1px dashed var(--border); padding-top: 4px; }
 .crit-tip { font-size: 12.5px; background: var(--surface); border: 1px solid var(--border); padding: 8px; border-radius: 6px; margin-top: 8px; color: var(--text); }
 
 .next-steps { background: var(--ph2-lt); border: 1px solid #DDD6FE; border-radius: 10px; padding: 14px; margin-bottom: 12px; }
@@ -172,7 +171,7 @@ html[data-dark] .ns-title { color: #A78BFA; }
 
     <div class="view active" id="viewPassword">
       <div style="text-align: center;">
-        <div class="version-badge">🚀 v2.4.0 • Updated: 2026-06-12</div>
+        <div class="version-badge">🚀 v2.5.0 • Cantonese Report & Retry Sync Enabled</div>
       </div>
       <div class="input-group" style="margin-top:20px">
         <label class="label" for="dailyPasswordInput">Daily Access Password</label>
@@ -298,6 +297,7 @@ html[data-dark] .ns-title { color: #A78BFA; }
 
       <div class="scoring-scroll" id="scoringContent"></div>
 
+      <button class="btn" id="retryGradingBtn" onclick="executeGradingProtocol()" style="display:none; background: var(--ph2); margin-bottom: 10px;">🔄 Retry Report Evaluation (重新嘗試評分)</button>
       <button class="btn" id="tryAgainBtn" onclick="restartSameMode()" style="display:none">🔄 Practice This Component Again</button>
       <button class="btn btn-sec" id="changeTopicBtn" onclick="switchView('viewDashboard')" style="display:none">🏠 Return to Dashboard</button>
     </div>
@@ -465,16 +465,10 @@ html[data-dark] .ns-title { color: #A78BFA; }
       switchView('viewPassword');
     }
     
-// 🎵 測試目前選擇的考官聲音功能
     function testCurrentVoice() {
-      // 先暫停所有正在播放的聲音
       if (audioSynthesizer) audioSynthesizer.cancel();
-      
-      // 讀取當前選單點選的性別
       chosenGender = document.getElementById('examinerGender').value;
       const exName = (chosenGender === 'male') ? 'Mr. Smith' : 'Ms. Davis';
-      
-      // 臨時觸發一次語音朗讀，測試抓取到的聲音
       speakOutputText(`Hello, I am ${exName}. Nice to meet you.`, () => {
         console.log(`Voice test completed for ${exName}`);
       });
@@ -505,6 +499,7 @@ html[data-dark] .ns-title { color: #A78BFA; }
 
     function choosePracticeMode(mode) {
       practiceMode = mode;
+
       const introText = document.getElementById('topicIntroText');
       const formFields = document.getElementById('topicFormFields');
       const convoField = document.getElementById('conversationSubjectField');
@@ -549,13 +544,12 @@ html[data-dark] .ns-title { color: #A78BFA; }
         "Recent Personal Experiences"
       ];
 
-    let systemInstruction = `You are a professional British UK oral examiner named ${examinerName} (${chosenGender}) for Trinity GESE Grade 5 (CEFR B1), strictly mimicking real exam videos.
+      let systemInstruction = `You are a British UK oral examiner named ${examinerName} (${chosenGender}) for Trinity GESE Grade 5 (CEFR B1). 
+Be friendly but brief. Speak clearly with a natural British tone fitting your character name.
 Rules:
-1. Ask EXACTLY ONE short, natural question at a time. Do not make statements, just drive the conversation.
-2. Keep your responses under 20 words. Be conversational but test-oriented.
-3. For the Topic Phase, pick their sub-points one by one. For each point, drill down using different B1 tenses (e.g. Past Simple question, Present Perfect question, Future 'going to' question ,giving reason 'because').
-4. CRITICAL TRINITY RULE: Near the end of the Topic Phase (after 3-4 exchanges), you MUST explicitly ask the candidate: "Do you have a question for me about your topic, please?" and wait for them to ask you.
-5. If they ask you a question, give a very brief personal answer (under 15 words) and say "Thank you."`;
+1. Ask EXACTLY ONE short question at a time. Never group questions.
+2. Keep your spoken responses ultra-short (under 25 words).
+3. Test B1 structures: Past Simple, Future (going to), Present Perfect, giving reasons (because).`;
 
       if (practiceMode === 'full') {
         const title = document.getElementById('topicTitle').value.trim();
@@ -579,8 +573,9 @@ Rules:
 
         document.getElementById('examRoomTitle').textContent = `${genderEmoji} Full Mock Exam — ${examinerName}`;
         
-        systemInstruction += `\n- PHASE 1 (Intro, 1m): Ask 1 quick question.
-- PHASE 2 (Topic, 5m): Ask about '${title}' and its nodes:\n${pts.map((p,i)=>` * ${p}`).join('\n')}
+        systemInstruction += `\n- PHASE 1 (Intro, 1m): Ask 1 quick greeting/background question.
+- TRANSITION TO PHASE 2 (CRITICAL): Right after the first greeting question, you MUST say exactly: "Thank you. Now, what are you going to talk about today and what are your discussion points?" to let the candidate state their topic orally. Do NOT skip this mouth-reporting step!
+- PHASE 2 (Topic, 5m): After they tell you their topic orally, cross-examine them naturally on their topic '${title}' and its nodes:\n${pts.map((p,i)=>` * ${p}`).join('\n')}
 - PHASE 3 (Convo, 5m): Discuss two areas: "${chosenSubj1}" then "${chosenSubj2}".
 - Conclude exactly with: "Thank you very much. That is the end of the test."`;
 
@@ -603,7 +598,9 @@ Rules:
           return;
         }
         document.getElementById('examRoomTitle').textContent = `${genderEmoji} Topic Form — ${examinerName}`;
-        systemInstruction += `\nDirectly test the topic "${title}" and these 5 points:\n${pts.map((p,i) => `* ${p}`).join('\n')}\nEnd at 5 mins with: "Thank you very much. That is the end of the test."`;
+        
+        systemInstruction += `\n- START STEP: Your very first sentence MUST be: "Hello. What are you going to talk about today and what are your discussion points?"
+- PHASE 2: After they tell you, cross-examine them on the topic "${title}" and these 5 points:\n${pts.map((p,i) => `* ${p}`).join('\n')}\nEnd at 5 mins with: "Thank you very much. That is the end of the test."`;
       } else if (practiceMode === 'conversation') {
         const subj = document.getElementById('convoSubject').value;
         document.getElementById('examRoomTitle').textContent = `${genderEmoji} Convo Room — ${examinerName}`;
@@ -640,7 +637,6 @@ Rules:
       updateStatus('Examiner is thinking...');
       document.getElementById('micBtn').disabled = true;
 
-      // ⚡️ 保持輕量化的 6 句歷史對話限制，防止 Gemini 卡頓
       if (history.length > 7) { 
         const latestExchanges = history.slice(-6); 
         history = [
@@ -671,7 +667,6 @@ Rules:
       }
     }
 
-// 🎵 強力捕捉與測試聲音的核心函數（加入 Chrome 異步刷新機制）
     function speakOutputText(text, callback) {
       if (!audioSynthesizer) return callback();
       audioSynthesizer.cancel();
@@ -679,10 +674,7 @@ Rules:
       const cleanText = text.replace(/SYSTEM_CONFIG:.*$/gi, '').trim();
       currentUtterance = new SpeechSynthesisUtterance(cleanText);
       
-      // ⚡️ 核心修正：強制重新向瀏覽器索取最新的聲音清單
       let voices = audioSynthesizer.getVoices();
-      
-      // 如果第一次拿是空的（Chrome 常見盲點），嘗試重新觸發一次
       if (!voices || voices.length === 0) {
         window.speechSynthesis.getVoices();
         voices = audioSynthesizer.getVoices();
@@ -694,15 +686,11 @@ Rules:
       let matchedVoice = null;
 
       if (chosenGender === 'male') {
-        // 🧔 男聲捕捉防線：
-        
-        // 1. 找英國英文男聲
         matchedVoice = ukVoices.find(v => {
           const name = v.name.toLowerCase();
           return name.includes('male') || name.includes('david') || name.includes('george') || name.includes('james') || name.includes('oliver');
         });
 
-        // 2. 找 Chrome 內建隱藏的 Google 美國萬用男聲 (這個 Chrome 絕對有！)
         if (!matchedVoice) {
           matchedVoice = enVoices.find(v => {
             const name = v.name.toLowerCase();
@@ -710,7 +698,6 @@ Rules:
           });
         }
 
-        // 3. 找任何名字帶有男聲關鍵字的英文聲音
         if (!matchedVoice) {
           matchedVoice = enVoices.find(v => {
             const name = v.name.toLowerCase();
@@ -718,7 +705,6 @@ Rules:
           });
         }
 
-        // 4. 萬一真的沒抓到，強行盲選一個不是常見女聲的英文聲音
         if (!matchedVoice && enVoices.length > 0) {
           matchedVoice = enVoices.find(v => {
             const name = v.name.toLowerCase();
@@ -726,22 +712,17 @@ Rules:
           });
         }
       } else {
-        // 👩 女聲防線
         matchedVoice = ukVoices.find(v => {
           const name = v.name.toLowerCase();
           return name.includes('female') || name.includes('hazel') || name.includes('zira') || name.includes('susan') || name.includes('alice');
         }) || ukVoices[0];
       }
 
-      // ⚡️ 強制綁定聲音
       if (matchedVoice) {
         currentUtterance.voice = matchedVoice;
         currentUtterance.lang = matchedVoice.lang;
-        console.log("🎯 成功強制捕捉到男聲：", matchedVoice.name);
       } else {
-        // 如果連 Chrome 內建聲音都沒初始化完，交給預設，但這次加上提示
         currentUtterance.lang = (chosenGender === 'male') ? 'en-US' : 'en-GB';
-        console.log("⚠️ 瀏覽器語音庫尚未準備好，暫時使用系統預設語系");
       }
 
       currentUtterance.rate = 0.95; 
@@ -856,38 +837,43 @@ Rules:
       }
     }
 
+    // ⚡️ 升級版評分協定：重置定時器、進入評分頁面，並加強 Prompt 要求使用廣東話講解
     async function executeGradingProtocol() {
-      clearInterval(timerInterval);
+      if (timerInterval) {
+        clearInterval(timerInterval);
+      }
       resetSpeechState();
 
       switchView('viewScoring');
+      // 隱藏所有按鈕，進入讀取狀態
+      document.getElementById('retryGradingBtn').style.display = 'none';
       document.getElementById('tryAgainBtn').style.display = 'none';
       document.getElementById('changeTopicBtn').style.display = 'none';
-      displayScoring(null, '連結評分引擎中，正在深度分析您的口說盲點並生成繁中翻譯報告...');
+      displayScoring(null, '連結評分引擎中，正在以道地廣東話為您深度分析口說盲點並生成評分報告...');
 
       const exchangeLogs = history.filter(h => !h.parts[0].text.startsWith('SYSTEM_CONFIG:'));
 
-      // ⚡️ 核心提示詞優化：強制 AI 回傳中英雙語對照的 JSON 資料
+      // 🇭🇰 調整 Prompt：強制模型使用 Hong Kong Cantonese (廣東話) 做中文說明的生成
       const gradingPrompt = `You are the lead linguistic grading engine for Trinity College London assessments. Evaluate the following dialogue transcript against CEFR B1 / Grade 5 speaking criteria.
 
 Dialogue Context:
 ${exchangeLogs.map(m => `${m.role.toUpperCase()}: ${m.parts[0].text}`).join('\n')}
 
 You MUST respond with a single, valid JSON object matching this exact schema. 
-CRITICAL REQUIREMENT FOR TEXT AND TIP FIELDS: You must write the English feedback first, followed IMMEDIATELY by its Traditional Chinese (繁體中文) translation in parentheses.
-Example format for text/tip fields: "Your grammar was mostly correct. (您的語法基本正確。)"
+CRITICAL REQUIREMENT FOR TEXT, TIP, AND NEXTSTEPS FIELDS: You must write the English feedback first, followed IMMEDIATELY by its Traditional Hong Kong Cantonese (廣東話/粵語) translation in parentheses.
+Example format for text/tip/nextSteps fields: "Your grammar was mostly correct. (你嘅文法基本上係正確嘅。)" or "Try to use more past tense. (試吓用多啲過去式。)"
 
 Schema:
 {
   "overall": 7,
   "overall_zh": "良好 (Merit)",
-  "fluency": { "score": 8, "text": "English text (繁中翻譯)", "tip": "English tip (繁中建議)" },
-  "vocabulary": { "score": 6, "text": "English text (繁中翻譯)", "tip": "English tip (繁中建議)" },
-  "grammar": { "score": 7, "text": "English text (繁中翻譯)", "tip": "English tip (繁中建議)" },
-  "communication": { "score": 7, "text": "English text (繁中翻譯)", "tip": "English tip (繁中建議)" },
+  "fluency": { "score": 8, "text": "English text (廣東話翻譯)", "tip": "English tip (廣東話建議)" },
+  "vocabulary": { "score": 6, "text": "English text (廣東話翻譯)", "tip": "English tip (廣東話建議)" },
+  "grammar": { "score": 7, "text": "English text (廣東話翻譯)", "tip": "English tip (廣東話建議)" },
+  "communication": { "score": 7, "text": "English text (廣東話翻譯)", "tip": "English tip (廣東話建議)" },
   "nextSteps": [
-    "First action item in English (第一個繁中行動建議)",
-    "Second action item in English (第二個繁中行動建議)"
+    "First action item in English (第一個廣東話衝刺建議)",
+    "Second action item in English (第二個廣東話衝刺建議)"
   ]
 }
 Scores must be integers between 1 and 10. Respond only with the raw object without markdown blocks.`;
@@ -901,11 +887,11 @@ Scores must be integers between 1 and 10. Respond only with the raw object witho
         displayScoring(scoreObj, null);
       } catch (err) {
         console.error(err);
-        displayScoring(null, '❌ 評分解析失敗。請確認網路連線或嘗試重新評分。');
+        // ⚡️ 當評分出錯時，會顯示錯誤訊息，並把「重試評分」按鈕呼叫出來
+        displayScoring(null, '❌ 評分生成超時或解析失敗。請確保網絡連線正常，並點擊下方「重新嘗試評分」按鈕重試。');
       }
     }
 
-    // ⚡️ 前端排版拆解：自動將括號內的繁體中文抽出來獨立換行顯示，版面更整齊
     function splitEnZh(rawString) {
       if (!rawString) return '';
       const match = rawString.match(/^([\s\S]*?)\(([\s\S]*?)\)\s*$/);
@@ -934,13 +920,14 @@ Scores must be integers between 1 and 10. Respond only with the raw object witho
     function displayScoring(s, errMsg){
       if(errMsg){
         document.getElementById('scoringContent').innerHTML = `<p class="err show" style="text-align:center;margin:20px 0">${errMsg}</p>`;
-        document.getElementById('tryAgainBtn').style.display = 'block';
+        // ⚡️ 評分失敗時，顯示「重試評分」按鈕與「返回」按鈕
+        document.getElementById('retryGradingBtn').style.display = 'block';
+        document.getElementById('tryAgainBtn').style.display = 'none';
         document.getElementById('changeTopicBtn').style.display = 'block';
         return;
       }
       const oc = scoreColor(s.overall);
       
-      // 動態對照總分評級
       let displayLabel = overallLabel(s.overall);
       if (s.overall_zh) {
         displayLabel = `${displayLabel.split('(')[0]} (${s.overall_zh})`;
@@ -958,9 +945,12 @@ Scores must be integers between 1 and 10. Respond only with the raw object witho
         ${crit('Vocabulary (詞彙豐富度)', '📚', s.vocabulary)}
         ${crit('Grammar (文法準確度)', '✏️', s.grammar)}
         ${crit('Communication (溝通成效)', '💬', s.communication)}
-        ${s.nextSteps ? `<div class="next-steps"><div class="ns-title">📋 Next Steps / 衝刺改善建議</div><ul class="ns-list">${s.nextSteps.map(t=>`<li>${splitEnZh(t)}</li>`).join('')}</ul></div>`:''}`;
+        ${s.nextSteps ? `<div class="next-steps"><div class="ns-title">📋 Next Steps / 廣東話衝刺改善建議</div><ul class="ns-list">${s.nextSteps.map(t=>`<li>${splitEnZh(t)}</li>`).join('')}</ul></div>`:''}`;
 
       document.getElementById('scoringIcon').textContent = s.overall >= 7 ? '🏆' : '📊';
+      
+      // 評分成功後，隱藏評分重試，並顯示常規練習切換按鈕
+      document.getElementById('retryGradingBtn').style.display = 'none';
       document.getElementById('tryAgainBtn').style.display  = 'block';
       document.getElementById('changeTopicBtn').style.display = 'block';
     }
