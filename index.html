@@ -772,37 +772,39 @@ Test B1 structures: Past Simple, Future (going to), Present Perfect, giving reas
       }
     }
 
-    async function executeGradingProtocol() {
+async function executeGradingProtocol() {
       clearInterval(timerInterval);
       if (audioSynthesizer) audioSynthesizer.cancel();
 
       switchView('viewScoring');
       document.getElementById('tryAgainBtn').style.display = 'none';
       document.getElementById('changeTopicBtn').style.display = 'none';
-      displayScoring(null, '連結評分引擎中，正在深度分析您的口說盲點並生成繁中翻譯報告...');
+      // 提示文字也改為廣東話
+      displayScoring(null, '連線到評分引擎中...依家幫妳深度分析緊口說盲點，請等一等，廣東話詳細報告好快就出爐...');
 
       const exchangeLogs = history.filter(h => !h.parts[0].text.startsWith('SYSTEM_CONFIG:'));
 
+      // ⚡️ 核心修正：強制 AI 評分大腦必須用道地的廣東話（Cantonese）進行解說與提供建議
       const gradingPrompt = `You are the lead linguistic grading engine for Trinity College London assessments. Evaluate the following dialogue transcript against CEFR B1 / Grade 5 speaking criteria.
 
 Dialogue Context:
 ${exchangeLogs.map(m => `${m.role.toUpperCase()}: ${m.parts[0].text}`).join('\n')}
 
 You MUST respond with a single, valid JSON object matching this exact schema. 
-CRITICAL REQUIREMENT FOR TEXT AND TIP FIELDS: You must write the English feedback first, followed IMMEDIATELY by its Traditional Chinese (繁體中文) translation in parentheses.
-Example format for text/tip fields: "Your grammar was mostly correct. (您的語法基本正確。)"
+CRITICAL REQUIREMENT FOR TEXT AND TIP FIELDS: You must write the English feedback first, followed IMMEDIATELY by its Cantonese (廣東話/香港俗語) translation in parentheses. 
+Use authentic Hong Kong Cantonese phrasing for the translation (e.g., using words like "妳、有啲、留意返、唔夠、番").
 
 Schema:
 {
   "overall": 7,
   "overall_zh": "良好 (Merit)",
-  "fluency": { "score": 8, "text": "English text (繁中翻譯)", "tip": "English tip (繁中建議)" },
-  "vocabulary": { "score": 6, "text": "English text (繁中翻譯)", "tip": "English tip (繁中建議)" },
-  "grammar": { "score": 7, "text": "English text (繁中翻譯)", "tip": "English tip (繁中建議)" },
-  "communication": { "score": 7, "text": "English text (繁中翻譯)", "tip": "English tip (繁中建議)" },
+  "fluency": { "score": 8, "text": "English text (廣東話分析講解)", "tip": "English tip (廣東話改善建議)" },
+  "vocabulary": { "score": 6, "text": "English text (廣東話分析講解)", "tip": "English tip (廣東話改善建議)" },
+  "grammar": { "score": 7, "text": "English text (廣東話分析講解)", "tip": "English tip (廣東話改善建議)" },
+  "communication": { "score": 7, "text": "English text (廣東話分析講解)", "tip": "English tip (廣東話改善建議)" },
   "nextSteps": [
-    "First action item in English (第一個繁中行動建議)",
-    "Second action item in English (第二個繁中行動建議)"
+    "First action item in English (第一個廣東話衝刺行動建議)",
+    "Second action item in English (第二個廣東話衝刺行動建議)"
   ]
 }
 Scores must be integers between 1 and 10. Respond only with the raw object without markdown blocks.`;
@@ -816,7 +818,7 @@ Scores must be integers between 1 and 10. Respond only with the raw object witho
         displayScoring(scoreObj, null);
       } catch (err) {
         console.error(err);
-        displayScoring(null, '❌ 評分解析失敗。請確認網路連線或嘗試重新評分。');
+        displayScoring(null, '❌ 評分解析失敗。請檢查網絡連線，或者再試多次。');
       }
     }
 
