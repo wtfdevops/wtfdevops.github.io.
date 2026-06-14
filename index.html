@@ -288,7 +288,16 @@ html[data-dark] .ns-title { color: #A78BFA; }
         <button class="btn btn-danger" id="finishExamBtn" onclick="confirmFinishExam()" style="display:none;width:auto;padding:8px 16px;font-size:13px;margin:0">Finish & Grade Exam</button>
       </div>
     </div>
-
+    
+<div style="margin-bottom: 15px; text-align: center;">
+  <label class="label" style="font-size: 11px; margin-bottom: 4px;">選擇朗讀語言 (Read Language)</label>
+  <select id="reportLangSelect" style="max-width: 200px; padding: 6px 10px; font-size: 13px;">
+    <option value="both">英文 + 繁中 (Both)</option>
+    <option value="en">僅英文 (English Only)</option>
+    <option value="zh">僅繁中 (Traditional Chinese Only)</option>
+  </select>
+</div>
+    
     <div class="view" id="viewScoring">
       <div class="score-header">
         <div class="score-icon" id="scoringIcon">📊</div>
@@ -992,15 +1001,12 @@ Scores must be integers between 1 and 10. Respond only with the raw object witho
     function overallLabel(v) { return v >= 8.5 ? 'Distinction' : (v >= 7.0 ? 'Merit' : (v >= 5.0 ? 'Pass' : 'Fail')); }
 
     // ⚡️ 全新功能：音訊報告朗讀佇列控制引擎
-    function toggleReadReport() {
-      if (!activeScoreObject) return;
+function toggleReadReport() {
+  if (!activeScoreObject) return;
+  if (isReadingReport) { stopReadingReportState(); return; }
 
-      if (isReadingReport) {
-        stopReadingReportState();
-        return;
-      }
-
-      isReadingReport = true;
+  const langMode = document.getElementById('reportLangSelect').value; // 獲取選單值
+  isReadingReport = true;
       const btn = document.getElementById('readReportBtn');
       btn.textContent = '⏹️ 停止朗讀報告 (Stop Reading)';
       btn.style.color = 'var(--danger)';
@@ -1070,22 +1076,24 @@ Scores must be integers between 1 and 10. Respond only with the raw object witho
       speechQueue.push({ text: "報告朗讀完畢。", lang: 'zh' });
 
       // 依序遞迴執行播放佇列
-      function playNextToken() {
-        if (!isReadingReport) return;
-        if (speechQueue.length === 0) {
-          stopReadingReportState();
-          return;
-        }
-        const nextItem = speechQueue.shift();
-        
-        // 呼叫底層發音引擎，傳入對應的語系代碼進行切換
-        speakOutputText(nextItem.text, () => {
-          setTimeout(playNextToken, 250); // 每句之間保留小停頓，聽起來更清晰舒適
-        }, nextItem.lang);
-      }
+function playNextToken() {
+    if (!isReadingReport) return;
+    if (speechQueue.length === 0) { stopReadingReportState(); return; }
+    const nextItem = speechQueue.shift();
 
-      playNextToken();
+    // 核心優化：根據選擇決定是否跳過某種語言
+    if ((langMode === 'en' && nextItem.lang === 'zh') || 
+        (langMode === 'zh' && nextItem.lang === 'en')) {
+      playNextToken(); // 直接跳過並執行下一個
+      return;
     }
+
+    speakOutputText(nextItem.text, () => {
+      setTimeout(playNextToken, 250);
+    }, nextItem.lang);
+  }
+  playNextToken();
+}
 
     function stopReadingReportState() {
       isReadingReport = false;
