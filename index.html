@@ -503,7 +503,10 @@ html[data-dark] .ns-title { color: #A78BFA; }
       }
     }
 
-    function choosePracticeMode(mode) {
+function choosePracticeMode(mode) {
+      // ⚡️ 核心修正：確保將選擇的模式正確寫入全域變數，後台 Gemini 才能順利讀取對應流程！
+      practiceMode = mode; 
+
       const introText = document.getElementById('topicIntroText');
       const formFields = document.getElementById('topicFormFields');
       const convoField = document.getElementById('conversationSubjectField');
