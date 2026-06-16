@@ -66,30 +66,57 @@
     audioSynthesizer.speak(utt);
   }
 
+// 增加一個全局變數來追蹤重試次數
+  let retryCount = 0;
+  const MAX_RETRIES = 5;
+
   async function executeExaminerTurn() {
     document.getElementById('micBtn').disabled = true;
     let isFinalRound = (examTimeSeconds >= targetTimeLimit);
     let prompt = [...history];
     if (isFinalRound) prompt.push({ role: 'user', parts: [{ text: "TIME_UP: Conclude the test now." }] });
 
-    const data = await fetch('https://b1-trinity.jingplus.workers.dev/chat', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ dailyPassword: 'demo', payload: { contents: prompt } })
-    }).then(r => r.json());
+    try {
+      const response = await fetch('https://b1-trinity.jingplus.workers.dev/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ dailyPassword: 'demo', payload: { contents: prompt } })
+      });
 
-    const resText = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
-    history.push({ role: 'model', parts: [{ text: resText }] });
-    document.getElementById('chatBox').innerHTML += `<div class="msg examiner">${resText}</div>`;
+      if (!response.ok) throw new Error('Network response was not ok');
+      
+      const data = await response.json();
+      const resText = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
+      
+      // 成功連接，重置計數器
+      retryCount = 0;
+      
+      history.push({ role: 'model', parts: [{ text: resText }] });
+      document.getElementById('chatBox').innerHTML += `<div class="msg examiner">${resText}</div>`;
 
-    speakOutputText(resText, () => {
-      if (resText.toLowerCase().includes("end of the test")) {
-        document.getElementById('micBtn').style.display = 'none';
-        document.getElementById('finishExamBtn').style.display = 'block';
+      speakOutputText(resText, () => {
+        if (resText.toLowerCase().includes("end of the test")) {
+          document.getElementById('micBtn').style.display = 'none';
+          document.getElementById('finishExamBtn').style.display = 'block';
+        } else {
+          document.getElementById('micBtn').disabled = false;
+        }
+      });
+
+    } catch (err) {
+      retryCount++;
+      if (retryCount <= MAX_RETRIES) {
+        console.warn(`Connection failed. Retrying (${retryCount}/${MAX_RETRIES})...`);
+        document.getElementById('chatBox').innerHTML += `<div style="color:red; font-size:12px;">連線中斷，嘗試自動重連中 (${retryCount}/${MAX_RETRIES})...</div>`;
+        
+        // 等待 2 秒後再次執行
+        setTimeout(executeExaminerTurn, 2000);
       } else {
-        document.getElementById('micBtn').disabled = false;
+        // 超過 5 次
+        document.getElementById('chatBox').innerHTML += `<div style="color:red; font-weight:bold;">Session disruption. Failed to contact Examiner after ${MAX_RETRIES} attempts.</div>`;
+        document.getElementById('micBtn').disabled = false; // 讓使用者可以嘗試手動點擊
       }
-    });
+    }
   }
 
   async function performScoring() {
