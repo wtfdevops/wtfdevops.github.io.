@@ -171,7 +171,7 @@ html[data-dark] .ns-title { color: #A78BFA; }
 
     <div class="view active" id="viewPassword">
       <div style="text-align: center;">
-        <div class="version-badge">🚀 v2.5.0 • Audio Report Reader Engine Added</div>
+        <div class="version-badge">🚀 v2.5.1 • Retry System Added</div>
       </div>
       <div class="input-group" style="margin-top:20px">
         <label class="label" for="dailyPasswordInput">Daily Access Password</label>
@@ -390,7 +390,6 @@ html[data-dark] .ns-title { color: #A78BFA; }
     let timerInterval     = null;
     let masterTeacherPwd  = '';
 
-    // ⚡️ 全域快取，儲存當前解析好的評分 JSON 資料與朗讀狀態
     let activeScoreObject = null;
     let isReadingReport   = false;
 
@@ -490,7 +489,6 @@ html[data-dark] .ns-title { color: #A78BFA; }
     function switchView(viewId) {
       document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
       document.getElementById(viewId).classList.add('active');
-      // 離開評分畫面時，自動停止任何正在進行的報告朗讀
       if (viewId !== 'viewScoring' && audioSynthesizer) {
         stopReadingReportState();
       }
@@ -589,15 +587,19 @@ Rules:
 
         document.getElementById('examRoomTitle').textContent = `${genderEmoji} Full Mock Exam — ${examinerName}`;
         
-        systemInstruction += `\n- PHASE 1 (Intro, 1m): Ask 1 quick greeting/background question.
+        systemInstruction += `
+- PHASE 1 (Intro, 1m): Ask 1 quick greeting/background question.
 - TRANSITION TO PHASE 2 (CRITICAL): Right after the first greeting question, you MUST say exactly: "Thank you. Now, what are you going to talk about today and what are your discussion points?" to let the candidate state their topic orally. Do NOT skip this mouth-reporting step!
-- PHASE 2 (Topic, 5m): After they tell you their topic orally, cross-examine them naturally on their topic '${title}' and its nodes:\n${pts.map((p,i)=>` * ${p}`).join('\n')}
+- PHASE 2 (Topic, 5m): After they tell you their topic orally, cross-examine them naturally on their topic '${title}' and its nodes:
+${pts.map((p,i)=>` * ${p}`).join('
+')}
 - PHASE 3 (Convo, 5m): Discuss two areas: "${chosenSubj1}" then "${chosenSubj2}".
 - Conclude exactly with: "Thank you very much. That is the end of the test."`;
 
       } else if (practiceMode === 'intro') {
         document.getElementById('examRoomTitle').textContent = `${genderEmoji} Intro Room — ${examinerName}`;
-        systemInstruction += `\nEngage in a 1-minute greeting and simple background questions. End with: "Thank you very much. That is the end of the test."`;
+        systemInstruction += `
+Engage in a 1-minute greeting and simple background questions. End with: "Thank you very much. That is the end of the test."`;
       } else if (practiceMode === 'topic') {
         const title = document.getElementById('topicTitle').value.trim();
         const pts = [
@@ -615,12 +617,17 @@ Rules:
         }
         document.getElementById('examRoomTitle').textContent = `${genderEmoji} Topic Form — ${examinerName}`;
         
-        systemInstruction += `\n- START STEP: Your very first sentence MUST be: "Hello. What are you going to talk about today and what are your discussion points?"
-- PHASE 2: After they tell you, cross-examine them on the topic "${title}" and these 5 points:\n${pts.map((p,i) => `* ${p}`).join('\n')}\nEnd at 5 mins with: "Thank you very much. That is the end of the test."`;
+        systemInstruction += `
+- START STEP: Your very first sentence MUST be: "Hello. What are you going to talk about today and what are your discussion points?"
+- PHASE 2: After they tell you, cross-examine them on the topic "${title}" and these 5 points:
+${pts.map((p,i) => `* ${p}`).join('
+')}
+End at 5 mins with: "Thank you very much. That is the end of the test."`;
       } else if (practiceMode === 'conversation') {
         const subj = document.getElementById('convoSubject').value;
         document.getElementById('examRoomTitle').textContent = `${genderEmoji} Convo Room — ${examinerName}`;
-        systemInstruction += `\nIntensely discuss the subject: "${subj}". Keep it strictly within 2.5 minutes. End with: "Thank you very much. That is the end of the test."`;
+        systemInstruction += `
+Intensely discuss the subject: "${subj}". Keep it strictly within 2.5 minutes. End with: "Thank you very much. That is the end of the test."`;
       }
 
       systemInstructionGlobal = systemInstruction; 
@@ -653,8 +660,6 @@ Rules:
       updateStatus('Examiner is thinking...');
       document.getElementById('micBtn').disabled = true;
 
-      // ⚡️ 修正：時間判斷邏輯
-      // 如果時間已經超標，但不強制打斷，而是標記為「最後一輪」
       let isFinalRound = (examTimeSeconds >= targetTimeLimit);
 
       if (history.length > 7) { 
@@ -666,9 +671,8 @@ Rules:
       }
 
       try {
-        let currentPrompt = [...history]; // 複製歷史紀錄
+        let currentPrompt = [...history]; 
         
-        // 如果是最後一輪，給 AI 指令：完成這次問答後，下一次就必須結束
         if (isFinalRound) {
            currentPrompt.push({ role: 'user', parts: [{ text: "TIME_UP: You have reached the time limit. After this exchange, you MUST conclude the test by saying: 'Thank you very much. That is the end of the test.' Do not start any new discussion topics." }] });
         }
@@ -684,7 +688,6 @@ Rules:
         updateStatus('Examiner speaking...');
         
         speakOutputText(responseText, () => {
-          // 檢查 AI 是否已經說出了結束詞
           if (responseText.toLowerCase().includes("end of the test")) {
             document.getElementById('micBtn').style.display = 'none';
             document.getElementById('finishExamBtn').style.display = 'block';
@@ -714,7 +717,6 @@ Rules:
         voices = audioSynthesizer.getVoices();
       }
       
-      // 如果有指定特定語言（如讀中文報告內容），優先尋找對應語音
       if (customVoiceLang) {
         const targetVoice = voices.find(v => v.lang.toLowerCase().replace('_', '-').startsWith(customVoiceLang.toLowerCase()));
         if (targetVoice) {
@@ -900,7 +902,8 @@ Rules:
       const gradingPrompt = `You are the lead linguistic grading engine for Trinity College London assessments. Evaluate the following dialogue transcript against CEFR B1 / Grade 5 speaking criteria.
 
 Dialogue Context:
-${exchangeLogs.map(m => `${m.role.toUpperCase()}: ${m.parts[0].text}`).join('\n')}
+${exchangeLogs.map(m => `${m.role.toUpperCase()}: ${m.parts[0].text}`).join('
+')}
 
 You MUST respond with a single, valid JSON object matching this exact schema. 
 CRITICAL REQUIREMENT FOR TEXT AND TIP FIELDS: You must write the English feedback first, followed IMMEDIATELY by its Traditional Chinese (繁體中文) translation in parentheses.
@@ -928,7 +931,6 @@ Scores must be integers between 1 and 10. Respond only with the raw object witho
         rawText = rawText.replace(/```json/g, '').replace(/```/g, '').trim();
         const scoreObj = JSON.parse(rawText);
         
-        // 保存到全域快取供讀取報告引擎使用
         activeScoreObject = scoreObj; 
         displayScoring(scoreObj, null);
       } catch (err) {
@@ -963,21 +965,31 @@ Scores must be integers between 1 and 10. Respond only with the raw object witho
     }
 
     function displayScoring(s, errMsg){
-      if(errMsg){
-        document.getElementById('scoringContent').innerHTML = `<p class="err show" style="text-align:center;margin:20px 0">${errMsg}</p>`;
+      const contentEl = document.getElementById('scoringContent');
+      
+      if (errMsg) {
+        contentEl.innerHTML = `
+          <div style="text-align:center; margin:20px 0;">
+            <p class="err show" style="margin-bottom: 15px;">${errMsg}</p>
+            <button class="btn" onclick="executeGradingProtocol()" 
+                    style="background:var(--primary); color:white; padding:10px 20px; border-radius:var(--radius); border:none; cursor:pointer;">
+              🔄 重新評分
+            </button>
+          </div>
+        `;
         document.getElementById('readReportBtn').style.display = 'none';
         document.getElementById('tryAgainBtn').style.display = 'block';
         document.getElementById('changeTopicBtn').style.display = 'block';
         return;
       }
-      const oc = scoreColor(s.overall);
       
+      const oc = scoreColor(s.overall);
       let displayLabel = overallLabel(s.overall);
       if (s.overall_zh) {
         displayLabel = `${displayLabel.split('(')[0]} (${s.overall_zh})`;
       }
 
-      document.getElementById('scoringContent').innerHTML = `
+      contentEl.innerHTML = `
         <div class="overall-wrap">
           <div class="overall-circle" style="border-color:${oc}">
             <div class="overall-num" style="color:${oc}">${s.overall}</div>
@@ -1000,28 +1012,24 @@ Scores must be integers between 1 and 10. Respond only with the raw object witho
     function scoreColor(v) { return v >= 8 ? 'var(--success)' : (v >= 5 ? 'var(--warn)' : 'var(--danger)'); }
     function overallLabel(v) { return v >= 8.5 ? 'Distinction' : (v >= 7.0 ? 'Merit' : (v >= 5.0 ? 'Pass' : 'Fail')); }
 
-    // ⚡️ 全新功能：音訊報告朗讀佇列控制引擎
-function toggleReadReport() {
-  if (!activeScoreObject) return;
-  if (isReadingReport) { stopReadingReportState(); return; }
+    function toggleReadReport() {
+      if (!activeScoreObject) return;
+      if (isReadingReport) { stopReadingReportState(); return; }
 
-  const langMode = document.getElementById('reportLangSelect').value; // 獲取選單值
-  isReadingReport = true;
+      const langMode = document.getElementById('reportLangSelect').value; 
+      isReadingReport = true;
       const btn = document.getElementById('readReportBtn');
       btn.textContent = '⏹️ 停止朗讀報告 (Stop Reading)';
       btn.style.color = 'var(--danger)';
       btn.style.borderColor = 'var(--danger)';
 
-      // 建立播放音訊佇列任務
       const speechQueue = [];
 
-      // 1. 總評分
       speechQueue.push({ text: `Overall Score: ${activeScoreObject.overall} out of 10. Band level is ${overallLabel(activeScoreObject.overall)}.`, lang: 'en' });
       if (activeScoreObject.overall_zh) {
         speechQueue.push({ text: `整體評價為：${activeScoreObject.overall_zh}。`, lang: 'zh' });
       }
 
-      // 2. 處理四大指標項目
       const categories = [
         { label: 'Fluency', key: 'fluency' },
         { label: 'Vocabulary', key: 'vocabulary' },
@@ -1034,7 +1042,6 @@ function toggleReadReport() {
         if (item) {
           speechQueue.push({ text: `${c.label} score: ${item.score} out of 10.`, lang: 'en' });
           
-          // 擷取括號前後的英、中反饋
           const textMatch = item.text.match(/^([\s\S]*?)\(([\s\S]*?)\)\s*$/);
           if (textMatch) {
             speechQueue.push({ text: textMatch[1].trim(), lang: 'en' });
@@ -1043,7 +1050,6 @@ function toggleReadReport() {
             speechQueue.push({ text: item.text, lang: 'en' });
           }
 
-          // 擷取括號前後的英、中💡建議
           if (item.tip) {
             const tipMatch = item.tip.match(/^([\s\S]*?)\(([\s\S]*?)\)\s*$/);
             if (tipMatch) {
@@ -1056,7 +1062,6 @@ function toggleReadReport() {
         }
       });
 
-      // 3. 處理衝刺建議 (Next Steps)
       if (activeScoreObject.nextSteps && activeScoreObject.nextSteps.length > 0) {
         speechQueue.push({ text: "Next steps for improvements.", lang: 'en' });
         speechQueue.push({ text: "後續衝刺行動指引。", lang: 'zh' });
@@ -1075,25 +1080,23 @@ function toggleReadReport() {
       speechQueue.push({ text: "End of the feedback report.", lang: 'en' });
       speechQueue.push({ text: "報告朗讀完畢。", lang: 'zh' });
 
-      // 依序遞迴執行播放佇列
-function playNextToken() {
-    if (!isReadingReport) return;
-    if (speechQueue.length === 0) { stopReadingReportState(); return; }
-    const nextItem = speechQueue.shift();
+      function playNextToken() {
+        if (!isReadingReport) return;
+        if (speechQueue.length === 0) { stopReadingReportState(); return; }
+        const nextItem = speechQueue.shift();
 
-    // 核心優化：根據選擇決定是否跳過某種語言
-    if ((langMode === 'en' && nextItem.lang === 'zh') || 
-        (langMode === 'zh' && nextItem.lang === 'en')) {
-      playNextToken(); // 直接跳過並執行下一個
-      return;
+        if ((langMode === 'en' && nextItem.lang === 'zh') || 
+            (langMode === 'zh' && nextItem.lang === 'en')) {
+          playNextToken(); 
+          return;
+        }
+
+        speakOutputText(nextItem.text, () => {
+          setTimeout(playNextToken, 250);
+        }, nextItem.lang);
+      }
+      playNextToken();
     }
-
-    speakOutputText(nextItem.text, () => {
-      setTimeout(playNextToken, 250);
-    }, nextItem.lang);
-  }
-  playNextToken();
-}
 
     function stopReadingReportState() {
       isReadingReport = false;
