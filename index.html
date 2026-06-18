@@ -962,22 +962,34 @@ Scores must be integers between 1 and 10. Respond only with the raw object witho
       </div>`;
     }
 
-    function displayScoring(s, errMsg){
-      if(errMsg){
-        document.getElementById('scoringContent').innerHTML = `<p class="err show" style="text-align:center;margin:20px 0">${errMsg}</p>`;
+function displayScoring(s, errMsg){
+      const contentEl = document.getElementById('scoringContent');
+      
+      // 1. 如果有錯誤，顯示錯誤訊息與重試按鈕
+      if (errMsg) {
+        contentEl.innerHTML = `
+          <div style="text-align:center; margin:20px 0;">
+            <p class="err show" style="margin-bottom: 15px;">${errMsg}</p>
+            <button class="btn" onclick="executeGradingProtocol()" 
+                    style="background:var(--primary); color:white; padding:12px 24px; border-radius:var(--radius); border:none; cursor:pointer; font-weight:bold;">
+              🔄 重新評分 (Retry Grading)
+            </button>
+          </div>
+        `;
         document.getElementById('readReportBtn').style.display = 'none';
         document.getElementById('tryAgainBtn').style.display = 'block';
         document.getElementById('changeTopicBtn').style.display = 'block';
         return;
       }
-      const oc = scoreColor(s.overall);
       
+      // 2. 如果正常，則執行原有的顯示邏輯
+      const oc = scoreColor(s.overall);
       let displayLabel = overallLabel(s.overall);
       if (s.overall_zh) {
         displayLabel = `${displayLabel.split('(')[0]} (${s.overall_zh})`;
       }
 
-      document.getElementById('scoringContent').innerHTML = `
+      contentEl.innerHTML = `
         <div class="overall-wrap">
           <div class="overall-circle" style="border-color:${oc}">
             <div class="overall-num" style="color:${oc}">${s.overall}</div>
