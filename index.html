@@ -30,1162 +30,1404 @@
 html[data-dark] {
   --bg:             #0F172A;
   --surface:        #1E293B;
-  --surface2:       #334155;
-  --text:           #F8FAFC;
+  --surface2:       #253447;
+  --text:           #F1F5F9;
   --muted:          #94A3B8;
   --border:         #334155;
-  --primary-lt:     #1E3A8A;
-  --ph2-lt:         #4C1D95;
-  --ex-bubble:      #0369A1;
+  --ex-bubble:      #1E3A5F;
+  --primary-lt:     #1E3A5F;
+  --ph2-lt:         #2D1B69;
+  --shadow:         0 4px 14px rgba(0,0,0,.35);
 }
 
 /* ══════════════════════════════════════════════════════
-   GLOBAL STYLES
+   BASE
 ══════════════════════════════════════════════════════ */
-* { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
-body { background: var(--bg); color: var(--text); padding: 16px; min-height: 100vh; display: flex; flex-direction: column; align-items: center; transition: background .3s, color .3s; }
-.app-container { width: 100%; max-width: 540px; background: var(--surface); border-radius: var(--radius); box-shadow: var(--shadow); padding: 24px; position: relative; overflow: hidden; display: flex; flex-direction: column; min-height: 640px; }
-
-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 1px solid var(--border); padding-bottom: 12px; }
-h1 { font-size: 20px; font-weight: 700; color: var(--primary); display: flex; align-items: center; gap: 8px; }
-html[data-dark] h1 { color: #60A5FA; }
-.theme-btn { background: none; border: none; font-size: 18px; cursor: pointer; padding: 6px; border-radius: 50%; width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; background: var(--surface2); border: 1px solid var(--border); color: var(--text); }
-
-.version-badge { 
-  font-size: 11px; 
-  color: var(--muted); 
-  background: var(--surface2); 
-  border: 1px solid var(--border); 
-  padding: 3px 8px; 
-  border-radius: 12px; 
-  display: inline-block; 
-  margin-top: -10px; 
-  margin-bottom: 16px; 
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{
+  font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;
+  background:var(--bg);color:var(--text);
+  min-height:100vh;display:flex;align-items:center;justify-content:center;
+  transition:background .3s,color .3s;
 }
-    
-.view { display: none; flex-direction: column; flex-grow: 1; animation: fadeIn 0.25s ease-out; }
-.view.active { display: flex; }
-@keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
 
-.label { font-size: 13px; font-weight: 600; color: var(--muted); margin-bottom: 6px; display: block; text-transform: uppercase; letter-spacing: 0.5px; }
-.input-group { margin-bottom: 20px; }
-input[type="text"], input[type="password"], select { width: 100%; padding: 12px 14px; border-radius: 9px; border: 1px solid var(--border); background: var(--surface2); color: var(--text); font-size: 15px; outline: none; transition: border-color .2s; }
-input:focus, select:focus { border-color: var(--primary); box-shadow: 0 0 0 3px var(--primary-lt); }
+/* ── Screens ────────────────────────────────────────── */
+.screen{display:none;width:100%;max-width:480px;padding:20px;flex-direction:column}
+.screen.active{display:flex}
+#examScreen{max-width:600px;padding:0;height:100vh}
 
-.btn { width: 100%; padding: 14px; border-radius: 9px; border: none; font-size: 15px; font-weight: 600; cursor: pointer; transition: all .2s; display: flex; align-items: center; justify-content: center; gap: 8px; color: #fff; background: var(--primary); }
-.btn:hover { background: var(--primary-dk); transform: translateY(-1px); }
-.btn:active { transform: translateY(0); }
-.btn-sec { background: var(--surface2); color: var(--text); border: 1px solid var(--border); margin-top: 10px; }
-.btn-sec:hover { background: var(--border); }
-.btn-danger { background: var(--danger); margin-top: 10px; }
-.btn-danger:hover { background: #DC2626; }
-.btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none !important; }
+/* ── Card ───────────────────────────────────────────── */
+.card{background:var(--surface);border-radius:var(--radius);padding:28px 30px;box-shadow:var(--shadow)}
 
-.err { background: #FEF2F2; border: 1px solid #FCA5A5; color: #991B1B; padding: 12px; border-radius: 9px; font-size: 14px; margin-bottom: 16px; display: none; align-items: center; gap: 8px; }
-html[data-dark] .err { background: #451A1A; border-color: #7F1D1D; color: #FECACA; }
-.err.show { display: flex; }
+/* ── Dark-mode toggle ───────────────────────────────── */
+.dm-toggle{
+  position:fixed;top:14px;right:16px;z-index:999;
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:20px;padding:6px 12px;cursor:pointer;
+  font-size:16px;box-shadow:var(--shadow);transition:all .2s;
+}
+.dm-toggle:hover{background:var(--surface2)}
 
-.pwd-footer { text-align: center; margin-top: auto; padding-top: 20px; }
-.pwd-footer button { background: none; border: none; color: var(--muted); font-size: 13px; cursor: pointer; text-decoration: underline; }
-.pwd-footer button:hover { color: var(--primary); }
+/* ── Logo ───────────────────────────────────────────── */
+.logo{text-align:center;margin-bottom:22px}
+.logo .icon{font-size:46px;display:block;margin-bottom:8px}
+.logo h1{font-size:19px;font-weight:800;color:var(--primary)}
+.logo p{font-size:13px;color:var(--muted);margin-top:3px}
 
-.dash-card { background: var(--primary-lt); border-left: 4px solid var(--primary); padding: 14px; border-radius: 0 var(--radius) var(--radius) 0; margin-bottom: 24px; font-size: 14px; line-height: 1.5; color: var(--text); }
-html[data-dark] .dash-card { border-left-color: #3B82F6; }
-.topics-container { display: flex; flex-direction: column; gap: 10px; margin-bottom: 24px; }
-.topic-opt { background: var(--surface2); border: 1px solid var(--border); padding: 14px; border-radius: 9px; cursor: pointer; text-align: left; font-size: 15px; font-weight: 500; display: flex; align-items: center; gap: 12px; transition: all .2s; }
-.topic-opt:hover { border-color: var(--primary); background: var(--primary-lt); }
+/* ── Form elements ──────────────────────────────────── */
+label{display:block;font-size:11px;font-weight:700;letter-spacing:.07em;
+      text-transform:uppercase;color:var(--muted);margin-bottom:5px}
+input[type=text],input[type=password]{
+  width:100%;padding:12px 14px;border:2px solid var(--border);border-radius:9px;
+  font-size:16px;outline:none;transition:border .2s;color:var(--text);
+  background:var(--surface);letter-spacing:.06em;
+}
+input:focus{border-color:var(--primary)}
 
-.helper-text { font-size: 12px; color: var(--muted); margin-top: 4px; display: block; }
+.err{font-size:13px;color:var(--danger);margin-top:6px;display:none}
+.err.show{display:block}
 
-.exam-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; padding-bottom: 10px; border-bottom: 1px solid var(--border); }
-.exam-title { font-size: 14px; font-weight: 600; color: var(--muted); }
-.timer { font-size: 14px; font-weight: 700; color: var(--text); background: var(--surface2); padding: 4px 10px; border-radius: 20px; border: 1px solid var(--border); font-family: monospace; }
-.timer.warn { color: var(--danger); background: #FEF2F2; border-color: #FCA5A5; animation: pulse 1s infinite; }
+/* ── Buttons ────────────────────────────────────────── */
+.btn{width:100%;padding:12px;border:none;border-radius:9px;font-size:15px;
+     font-weight:700;cursor:pointer;transition:all .2s;margin-top:10px}
+.btn-primary{background:var(--primary);color:#fff}
+.btn-primary:hover{background:var(--primary-dk)}
+.btn-primary:disabled{opacity:.4;cursor:not-allowed}
+.btn-secondary{background:var(--border);color:var(--text)}
+.btn-secondary:hover{filter:brightness(.94)}
 
-.chat-box { flex-grow: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 12px; padding: 4px; margin-bottom: 16px; max-height: 340px; border-bottom: 1px solid var(--border); padding-bottom: 14px; scroll-behavior: smooth; }
-.chat-box::-webkit-scrollbar { width: 5px; }
-.chat-box::-webkit-scrollbar-thumb { background: var(--border); border-radius: 10px; }
+.teacher-link{text-align:center;margin-top:16px}
+.teacher-link span{font-size:12px;color:var(--border);cursor:pointer;transition:color .2s}
+.teacher-link span:hover{color:var(--muted)}
 
-.msg { max-width: 85%; padding: 12px 14px; border-radius: 14px; font-size: 14.5px; line-height: 1.45; animation: bubbleUp 0.2s ease-out; word-wrap: break-word; position: relative; }
-@keyframes bubbleUp { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
-.msg.examiner { background: var(--ex-bubble); color: var(--text); align-self: flex-start; border-top-left-radius: 2px; }
-.msg.user { background: var(--primary); color: #fff; align-self: flex-end; border-top-right-radius: 2px; }
-.msg.live-trans { background: transparent; border: 1px dashed var(--muted); color: var(--muted); align-self: flex-end; font-style: italic; border-top-right-radius: 2px; }
+/* ══════════════════════════════════════════════════════
+   PRACTICE MODE SCREEN
+══════════════════════════════════════════════════════ */
+.page-title{font-size:19px;font-weight:800;margin-bottom:2px}
+.page-sub{font-size:13px;color:var(--muted);margin-bottom:14px}
 
-.controls-area { display: flex; flex-direction: column; gap: 10px; align-items: center; justify-content: center; min-height: 80px; }
-.mic-btn { width: 68px; height: 68px; border-radius: 50%; border: none; background: var(--primary); color: white; font-size: 24px; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 12px rgba(37,99,235,0.3); transition: all .2s; position: relative; }
-.mic-btn:hover { background: var(--primary-dk); transform: scale(1.04); }
-.mic-btn:disabled { background: var(--muted) !important; box-shadow: none !important; cursor: not-allowed; transform: none; }
-.mic-btn.recording { background: var(--danger); box-shadow: 0 0 0 0 rgba(239,68,68,0.5); animation: pulseRing 1.4s infinite; }
-@keyframes pulseRing { 0% { box-shadow: 0 0 0 0 rgba(239,68,68,0.6); } 70% { box-shadow: 0 0 0 14px rgba(239,68,68,0); } 100% { box-shadow: 0 0 0 0 rgba(239,68,68,0); } }
+.mode-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px}
+.mode-card{
+  border:2px solid var(--border);border-radius:11px;padding:16px 12px;
+  text-align:center;cursor:pointer;transition:all .2s;background:var(--surface);
+}
+.mode-card:hover,.mode-card.selected{border-color:var(--primary);background:var(--primary-lt)}
+.mode-card.selected{box-shadow:0 0 0 3px rgba(37,99,235,.15)}
+.mode-card .mc-icon{font-size:30px;margin-bottom:6px}
+.mode-card .mc-title{font-size:13px;font-weight:700}
+.mode-card .mc-sub{font-size:11px;color:var(--muted);margin-top:2px}
+.mode-card .mc-badge{
+  display:inline-block;font-size:10px;font-weight:700;
+  padding:2px 7px;border-radius:20px;margin-top:5px;
+}
+.badge-grey{background:#E2E8F0;color:#475569}
+.badge-blue{background:#DBEAFE;color:#1D4ED8}
+.badge-purple{background:#EDE9FE;color:#6D28D9}
+.badge-green{background:#D1FAE5;color:#065F46}
+html[data-dark] .badge-grey{background:#334155;color:#94A3B8}
+html[data-dark] .badge-blue{background:#1E3A5F;color:#93C5FD}
+html[data-dark] .badge-purple{background:#2D1B69;color:#C4B5FD}
+html[data-dark] .badge-green{background:#064E3B;color:#6EE7B7}
 
-.status-txt { font-size: 13px; font-weight: 500; color: var(--muted); margin-bottom: 4px; text-align: center; min-height: 18px; }
+/* ══════════════════════════════════════════════════════
+   TOPIC SCREEN
+══════════════════════════════════════════════════════ */
+.format-box{
+  background:var(--primary-lt);border-left:4px solid var(--primary);
+  border-radius:8px;padding:13px;margin-bottom:13px;font-size:13px;line-height:1.7;
+}
+.format-box strong{color:var(--primary)}
+.format-tip{margin-top:8px;padding:7px 11px;background:#FEF3C7;border-radius:6px;
+            font-size:12px;color:#92400E}
+html[data-dark] .format-tip{background:#451A03;color:#FCD34D}
 
-.score-header { text-align: center; margin-bottom: 20px; }
-.score-icon { font-size: 44px; margin-bottom: 6px; }
-.score-title { font-size: 18px; font-weight: 700; }
-.scoring-scroll { flex-grow: 1; overflow-y: auto; max-height: 380px; padding-right: 4px; margin-bottom: 16px; }
+.topic-grid{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-bottom:12px}
+.topic-card{
+  border:2px solid var(--border);border-radius:10px;padding:13px 10px;
+  text-align:center;cursor:pointer;transition:all .2s;background:var(--surface);
+}
+.topic-card:hover,.topic-card.selected{border-color:var(--primary);background:var(--primary-lt)}
+.topic-card.selected{box-shadow:0 0 0 3px rgba(37,99,235,.15)}
+.topic-card .em{font-size:28px;margin-bottom:4px}
+.topic-card .en{font-size:13px;font-weight:700}
+.topic-card .zh{font-size:11px;color:var(--muted);margin-top:2px}
 
-.overall-wrap { display: flex; flex-direction: column; align-items: center; margin-bottom: 24px; background: var(--surface2); padding: 16px; border-radius: var(--radius); border: 1px solid var(--border); }
-.overall-circle { width: 90px; height: 90px; border-radius: 50%; border: 6px solid var(--primary); display: flex; align-items: center; justify-content: center; flex-direction: row; margin-bottom: 8px; background: var(--surface); }
-.overall-num { font-size: 32px; font-weight: 800; }
-.overall-den { font-size: 15px; color: var(--muted); font-weight: 500; margin-top: 8px; }
-.overall-label { font-size: 15px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
+/* ══════════════════════════════════════════════════════
+   EXAM SCREEN
+══════════════════════════════════════════════════════ */
+#examScreen{display:none;flex-direction:column}
+#examScreen.active{display:flex}
 
-.crit-card { background: var(--surface2); border: 1px solid var(--border); padding: 14px; border-radius: 10px; margin-bottom: 12px; }
-.crit-header { display: flex; justify-content: space-between; align-items: center; font-size: 14px; font-weight: 700; margin-bottom: 8px; }
-.crit-label { flex-grow: 1; margin-left: 8px; color: var(--text); }
-.crit-score { font-family: monospace; font-size: 15px; }
-.bar-wrap { width: 100%; height: 6px; background: var(--border); border-radius: 3px; overflow: hidden; margin-bottom: 10px; }
-.bar-fill { height: 100%; width: 0; transition: width 0.6s cubic-bezier(0.1, 0.8, 0.2, 1); }
-.crit-text { font-size: 13.5px; line-height: 1.5; color: var(--text); }
-.crit-zh { font-size: 13px; color: var(--muted); margin-top: 4px; border-top: 1px dashed var(--border); padding-top: 4px; }
-.crit-tip { font-size: 12.5px; background: var(--surface); border: 1px solid var(--border); padding: 8px; border-radius: 6px; margin-top: 8px; color: var(--text); }
+.exam-header{
+  color:#fff;padding:12px 16px;
+  display:flex;align-items:center;justify-content:space-between;flex-shrink:0;
+  transition:background .5s;
+}
+.exam-header.intro {background:#475569}
+.exam-header.phase1{background:var(--primary)}
+.exam-header.phase2{background:var(--ph2)}
+.exam-header.scoring{background:#059669}
 
-.next-steps { background: var(--ph2-lt); border: 1px solid #DDD6FE; border-radius: 10px; padding: 14px; margin-bottom: 12px; }
-html[data-dark] .next-steps { background: #2E1065; border-color: #4C1D95; }
-.ns-title { font-size: 14px; font-weight: 700; color: #6D28D9; margin-bottom: 8px; }
-html[data-dark] .ns-title { color: #A78BFA; }
-.ns-list { padding-left: 20px; font-size: 13.5px; line-height: 1.5; }
-.ns-list li { margin-bottom: 8px; }
+.exam-header .htitle{font-weight:800;font-size:14px}
+.exam-header .htopic{font-size:11px;opacity:.75;margin-top:1px}
+.exam-counter{background:rgba(255,255,255,.2);padding:4px 11px;
+              border-radius:20px;font-size:12px;font-weight:700;white-space:nowrap}
 
-.stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 16px; }
-.stat-card { background: var(--surface2); border: 1px solid var(--border); padding: 12px; border-radius: 9px; text-align: center; }
-.sc-label { font-size: 12px; color: var(--muted); font-weight: 600; margin-bottom: 4px; }
-.sc-val { font-size: 18px; font-weight: 700; color: var(--text); }
-.sc-sub { font-size: 11px; color: var(--muted); margin-top: 2px; }
-.chart-title { font-size: 13px; font-weight: 600; color: var(--muted); margin: 14px 0 8px 0; text-transform: uppercase; }
-.bar-node { flex-grow: 1; background: var(--primary); border-radius: 3px 3px 0 0; min-width: 6px; position: relative; cursor: pointer; }
-.bar-node:hover { background: var(--primary-dk); }
+/* Phase bar */
+.phase-bar{
+  display:flex;align-items:center;
+  background:#1e293b;padding:7px 16px;flex-shrink:0;overflow-x:auto;
+}
+.phase-step{
+  font-size:11px;font-weight:600;padding:4px 10px;
+  border-radius:20px;color:rgba(255,255,255,.35);white-space:nowrap;
+}
+.phase-step.done  {color:rgba(255,255,255,.55)}
+.phase-step.active{background:rgba(255,255,255,.18);color:#fff}
+.phase-sep{color:rgba(255,255,255,.25);font-size:11px;padding:0 2px}
 
-.footer-note { text-align: center; color: var(--muted); font-size: 11px; margin-top: 16px; border-top: 1px solid var(--border); padding-top: 12px; }
+/* Chat */
+.chat-area{
+  flex:1;overflow-y:auto;padding:16px;
+  display:flex;flex-direction:column;gap:11px;
+  background:var(--bg);
+}
+.msg{max-width:80%;animation:fadeUp .3s ease}
+.msg.examiner{align-self:flex-start}
+.msg.student {align-self:flex-end}
+.msg-label{font-size:11px;color:var(--muted);margin-bottom:3px}
+.msg.student .msg-label{text-align:right}
+.bubble{padding:11px 14px;border-radius:16px;font-size:15px;line-height:1.55}
+.msg.examiner .bubble{background:var(--ex-bubble);border-bottom-left-radius:3px}
+.msg.student  .bubble{background:var(--primary);color:#fff;border-bottom-right-radius:3px}
+.msg.student.ph2 .bubble{background:var(--ph2)}
+
+.phase-marker{
+  text-align:center;font-size:11px;font-weight:700;padding:6px 14px;
+  border-radius:20px;color:#fff;align-self:center;margin:4px 0;
+}
+.phase-marker.phase1{background:var(--primary)}
+.phase-marker.phase2{background:var(--ph2)}
+
+.q-hint{
+  align-self:center;background:#FEF3C7;border:1px solid #FCD34D;
+  border-radius:8px;padding:7px 12px;font-size:12px;color:#92400E;
+  display:flex;align-items:center;gap:6px;animation:fadeUp .3s ease;
+}
+html[data-dark] .q-hint{background:#451A03;color:#FCD34D;border-color:#92400E}
+.q-hint button{background:none;border:none;font-size:13px;cursor:pointer;
+               color:inherit;opacity:.6;margin-left:2px}
+
+/* Typing */
+.typing{align-self:flex-start;display:none}
+.typing.show{display:flex}
+.typing-dots{background:var(--ex-bubble);padding:12px 15px;border-radius:16px;
+             border-bottom-left-radius:3px;display:flex;gap:5px}
+.dot{width:7px;height:7px;background:#94a3b8;border-radius:50%;animation:bounce 1.3s infinite}
+.dot:nth-child(2){animation-delay:.2s}
+.dot:nth-child(3){animation-delay:.4s}
+
+/* Input area */
+.input-area{
+  padding:12px 16px 16px;background:var(--surface);
+  border-top:1px solid var(--border);flex-shrink:0;
+}
+.mode-toggle{display:flex;gap:7px;margin-bottom:9px}
+.mode-btn{
+  padding:5px 13px;border:2px solid var(--border);border-radius:20px;
+  background:none;cursor:pointer;font-size:13px;font-weight:600;
+  transition:all .2s;color:var(--text);
+}
+.mode-btn.active{border-color:var(--primary);background:var(--primary);color:#fff}
+.text-row{display:flex;gap:8px}
+.text-row input{
+  flex:1;padding:11px 13px;border:2px solid var(--border);
+  border-radius:9px;font-size:15px;outline:none;
+  letter-spacing:0;margin-top:0;background:var(--surface);color:var(--text);
+}
+.text-row input:focus{border-color:var(--primary)}
+.send-btn{
+  padding:11px 16px;background:var(--primary);color:#fff;
+  border:none;border-radius:9px;cursor:pointer;font-size:18px;transition:background .2s;
+}
+.send-btn:hover{background:var(--primary-dk)}
+.voice-area{text-align:center;padding:6px 0}
+.mic-btn{
+  width:58px;height:58px;border-radius:50%;border:none;
+  background:var(--primary);color:#fff;font-size:24px;
+  cursor:pointer;box-shadow:var(--shadow);transition:all .2s;
+}
+.mic-btn.recording{background:var(--danger);animation:pulse 1s infinite}
+.mic-hint{font-size:12px;color:var(--muted);margin-top:5px}
+
+/* ══════════════════════════════════════════════════════
+   SCORING SCREEN
+══════════════════════════════════════════════════════ */
+.scoring-loading{
+  display:flex;flex-direction:column;align-items:center;
+  padding:40px 0;gap:14px;
+}
+.spinner{
+  width:40px;height:40px;border:4px solid var(--border);
+  border-top-color:var(--primary);border-radius:50%;
+  animation:spin .8s linear infinite;
+}
+.loading-text{font-size:14px;color:var(--muted)}
+
+.overall-wrap{text-align:center;padding:20px 0 14px}
+.overall-circle{
+  display:inline-flex;flex-direction:column;align-items:center;justify-content:center;
+  width:90px;height:90px;border-radius:50%;border:5px solid var(--primary);
+  margin-bottom:8px;transition:border-color .3s;
+}
+.overall-num{font-size:34px;font-weight:900;line-height:1;color:var(--primary)}
+.overall-den{font-size:13px;color:var(--muted)}
+.overall-label{font-size:13px;font-weight:700;color:var(--muted)}
+
+.crit-card{
+  background:var(--surface2);border-radius:10px;padding:14px 15px;
+  margin-bottom:9px;
+}
+.crit-header{display:flex;align-items:center;gap:8px;margin-bottom:6px}
+.crit-label{font-weight:700;font-size:14px;flex:1}
+.crit-score{font-size:14px;font-weight:800}
+.bar-wrap{height:7px;background:var(--border);border-radius:20px;margin-bottom:9px;overflow:hidden}
+.bar-fill{height:100%;border-radius:20px;transition:width .6s ease}
+.crit-text{font-size:13px;line-height:1.65;color:var(--text)}
+.crit-tip{
+  margin-top:8px;padding:8px 11px;background:var(--primary-lt);
+  border-radius:7px;font-size:12px;color:var(--primary);font-weight:600;
+}
+html[data-dark] .crit-tip{background:var(--primary-lt);color:#93C5FD}
+
+.next-steps{
+  background:var(--surface2);border-radius:10px;padding:14px 15px;margin-top:2px;
+}
+.ns-title{font-weight:800;font-size:14px;margin-bottom:10px}
+.ns-list{padding-left:18px;display:flex;flex-direction:column;gap:6px}
+.ns-list li{font-size:13px;line-height:1.55}
+
+.mode-note{
+  font-size:12px;color:var(--muted);text-align:center;
+  padding:8px;margin-bottom:4px;font-style:italic;
+}
+
+/* ══════════════════════════════════════════════════════
+   TEACHER DASHBOARD
+══════════════════════════════════════════════════════ */
+.pwd-display{
+  text-align:center;padding:20px;margin:16px 0;
+  background:var(--primary-lt);border-radius:12px;border:2px dashed var(--primary);
+}
+.pwd-label{font-size:12px;color:var(--muted);margin-bottom:6px}
+.pwd-value{font-size:34px;font-weight:900;letter-spacing:.22em;color:var(--primary)}
+.pwd-date {font-size:12px;color:var(--muted);margin-top:6px}
+
+.tab-row{display:flex;gap:0;border-bottom:2px solid var(--border);margin-bottom:16px}
+.tab-btn{
+  flex:1;padding:9px;border:none;background:none;cursor:pointer;
+  font-size:13px;font-weight:700;color:var(--muted);transition:all .2s;
+}
+.tab-btn.active{color:var(--primary);border-bottom:2px solid var(--primary);margin-bottom:-2px}
+
+.stats-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px}
+.stat-card{
+  background:var(--surface2);border-radius:9px;padding:12px 14px;
+}
+.stat-card .sc-label{font-size:11px;color:var(--muted);margin-bottom:4px}
+.stat-card .sc-val{font-size:20px;font-weight:800;color:var(--text)}
+.stat-card .sc-sub{font-size:11px;color:var(--muted);margin-top:2px}
+
+.chart-title{font-size:12px;font-weight:700;color:var(--muted);margin-bottom:8px;text-transform:uppercase;letter-spacing:.05em}
+.bar-chart{display:flex;align-items:flex-end;gap:5px;height:80px;padding-bottom:22px;position:relative}
+.bar-chart-bar{flex:1;background:var(--primary);border-radius:4px 4px 0 0;min-height:4px;
+               transition:height .4s ease;opacity:.8}
+.bar-chart-bar:hover{opacity:1}
+.bar-chart-label{
+  position:absolute;bottom:0;width:100%;
+  display:flex;gap:5px;
+}
+.bcl{flex:1;text-align:center;font-size:10px;color:var(--muted);overflow:hidden}
+.kv-setup{
+  background:var(--surface2);border-radius:9px;padding:16px;
+  font-size:13px;line-height:1.7;color:var(--muted);text-align:center;
+}
+.kv-setup a{color:var(--primary);text-decoration:none}
+
+/* ══════════════════════════════════════════════════════
+   UTILITIES & ANIMATIONS
+══════════════════════════════════════════════════════ */
+.hidden{display:none!important}
+.mt-s{margin-top:8px}
+
+@keyframes bounce{0%,60%,100%{transform:translateY(0)}30%{transform:translateY(-6px)}}
+@keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(239,68,68,.4)}50%{box-shadow:0 0 0 10px rgba(239,68,68,0)}}
   </style>
 </head>
 <body>
 
-  <div class="app-container">
-    <header>
-      <h1>🇬🇧 B1 GESE Practice</h1>
-      <button class="theme-btn" id="themeBtn" aria-label="Toggle dark mode" onclick="toggleDarkMode()">🌙</button>
-    </header>
+<!-- Dark mode toggle (fixed) -->
+<button class="dm-toggle" id="dmToggle" onclick="toggleDark()" title="Toggle dark mode">🌙</button>
 
-    <div class="view active" id="viewPassword">
-      <div style="text-align: center;">
-        <div class="version-badge">🚀 v2.5.0 • Audio Report Reader Engine Added</div>
-      </div>
-      <div class="input-group" style="margin-top:20px">
-        <label class="label" for="dailyPasswordInput">Daily Access Password</label>
-        <input type="text" id="dailyPasswordInput" placeholder="Enter today's 6-character code" maxlength="12" autocomplete="off"/>
-        <span class="helper-text">Ask your teacher for today's daily access key.</span>
-      </div>
-      <div class="err" id="pwdErr">❌ Invalid password. Please double-check or ask your instructor.</div>
-      <button class="btn" id="loginBtn" onclick="verifyPassword()">Verify & Enter →</button>
-      
-      <div class="pwd-footer">
-        <button onclick="switchView('viewTeacherLogin')">Teacher / Admin Access</button>
-      </div>
+<!-- ══════════════════════════════════════════════════
+     S1 · Password
+══════════════════════════════════════════════════ -->
+<div class="screen active" id="s-password">
+  <div class="card">
+    <div class="logo">
+      <span class="icon">🎓</span>
+      <h1>Trinity GESE B1 Practice</h1>
+      <p>英國B1英語口語模擬練習</p>
     </div>
-
-    <div class="view" id="viewDashboard">
-      <div class="dash-card">
-        Welcome to the Trinity College London <strong>GESE Grade 5 (B1)</strong> Practice System. Choose your practice path.
-      </div>
-      <label class="label">Select Practice Mode</label>
-      <div class="topics-container">
-        <button class="topic-opt" onclick="choosePracticeMode('full')" style="border: 2px solid var(--ph2); background: var(--ph2-lt)">
-          <span>🏆</span>
-          <div style="text-align:left">
-            <div style="font-weight:700;color:var(--ph2)">Full Mock Exam (100% Full Session)</div>
-            <div style="font-size:12px;color:var(--muted);font-weight:400;margin-top:2px">Intro (1 min) ➔ Topic (5 mins) ➔ Conversation (5 mins, AI picks 2 subjects).</div>
-          </div>
-        </button>
-
-        <button class="topic-opt" onclick="choosePracticeMode('intro')">
-          <span>👋</span>
-          <div style="text-align:left">
-            <div>Introduction & Greeting (Isolated)</div>
-            <div style="font-size:12px;color:var(--muted);font-weight:400;margin-top:2px">Warm-up and simple background questions (1 min)</div>
-          </div>
-        </button>
-        <button class="topic-opt" onclick="choosePracticeMode('topic')">
-          <span>📋</span>
-          <div style="text-align:left">
-            <div>Topic Phase (Isolated)</div>
-            <div style="font-size:12px;color:var(--muted);font-weight:400;margin-top:2px">Discuss your 1 main topic and 5 sub-points (5 mins)</div>
-          </div>
-        </button>
-        <button class="topic-opt" onclick="choosePracticeMode('conversation')">
-          <span>💬</span>
-          <div style="text-align:left">
-            <div>Conversation Phase (Isolated)</div>
-            <div style="font-size:12px;color:var(--muted);font-weight:400;margin-top:2px">Choose 1 specific subject area to practice intensely (2.5 mins).</div>
-          </div>
-        </button>
-      </div>
-      <button class="btn btn-sec" onclick="logout()">🔒 Lock Application</button>
-    </div>
-
-    <div class="view" id="viewTopicSetup">
-      <div id="topicIntroText" class="dash-card" style="margin-bottom:16px"></div>
-      
-      <div class="input-group">
-        <label class="label" for="examinerGender">Select Examiner Voice (選擇考官聲音)</label>
-        <div style="display: flex; gap: 8px;">
-          <select id="examinerGender" onchange="resetSpeechState()">
-            <option value="male">🧔 Mr. Smith (Male UK Voice)</option>
-            <option value="female" selected>👩 Ms. Davis (Female UK Voice)</option>
-          </select>
-          <button class="btn" id="testVoiceBtn" onclick="testCurrentVoice()" style="width: auto; padding: 0 16px; white-space: nowrap; background: var(--surface2); color: var(--text); border: 1px solid var(--border);">🎵 Test Voice</button>
-        </div>
-      </div>
-
-      <div id="topicFormFields" style="display:none">
-        <div class="input-group">
-          <label class="label" for="topicTitle">Overall Topic Title (主標題)</label>
-          <input type="text" id="topicTitle" placeholder="e.g., My Festive Trip to Japan" maxlength="50"/>
-        </div>
-        <div class="input-group" style="margin-bottom:10px">
-          <label class="label">5 Discussion Sub-points (分項點)</label>
-          <input type="text" id="tp1" placeholder="Point 1: e.g., Preparing traditional clothing" maxlength="60" style="margin-bottom:8px"/>
-          <input type="text" id="tp2" placeholder="Point 2: e.g., Trying local street food" maxlength="60" style="margin-bottom:8px"/>
-          <input type="text" id="tp3" placeholder="Point 3: e.g., Visiting historic temples" maxlength="60" style="margin-bottom:8px"/>
-          <input type="text" id="tp4" placeholder="Point 4: e.g., Buying souvenirs for my family" maxlength="60" style="margin-bottom:8px"/>
-          <input type="text" id="tp5" placeholder="Point 5: e.g., Travelling on the bullet train" maxlength="60"/>
-          <span class="helper-text">Input your points here. The AI examiner will use natural conversation to cross-examine you.</span>
-        </div>
-      </div>
-
-      <div id="conversationSubjectField" class="input-group" style="display:none">
-        <label class="label" for="convoSubject">Choose a Spontaneous Subject Area</label>
-        <select id="convoSubject">
-          <option value="Festivals">Festivals / Celebrations</option>
-          <option value="Means of Transport">Means of Transport</option>
-          <option value="Special Occasions (e.g. weddings, birthdays)">Special Occasions (e.g. weddings, birthdays)</option>
-          <option value="Entertainment (e.g. cinema, music, television)">Entertainment (e.g. cinema, music, television)</option>
-          <option value="Music">Music</option>
-          <option value="Recent Personal Experiences">Recent Personal Experiences</option>
-        </select>
-        <span class="helper-text">Select the topic you want to focus on for this session.</span>
-      </div>
-
-      <div class="err" id="setupErr"></div>
-      <button class="btn" onclick="startExamSession()">🚀 Start Practice Session</button>
-      <button class="btn btn-sec" onclick="switchView('viewDashboard')">← Back to Dashboard</button>
-    </div>
-
-    <div class="view" id="viewChat">
-      <div class="exam-header">
-        <div class="exam-title" id="examRoomTitle">Examiner Room</div>
-        <div class="timer" id="examTimer">00:00</div>
-      </div>
-
-      <div class="chat-box" id="chatBox"></div>
-
-      <div class="status-txt" id="statusText">Initialising session...</div>
-      
-      <div class="controls-area">
-        <button class="mic-btn" id="micBtn" onclick="handleMicClick()" disabled>🎙️</button>
-        <button class="btn btn-danger" id="finishExamBtn" onclick="confirmFinishExam()" style="display:none;width:auto;padding:8px 16px;font-size:13px;margin:0">Finish & Grade Exam</button>
-      </div>
-    </div>
-    
-<div style="margin-bottom: 15px; text-align: center;">
-  <label class="label" style="font-size: 11px; margin-bottom: 4px;">選擇朗讀語言 (Read Language)</label>
-  <select id="reportLangSelect" style="max-width: 200px; padding: 6px 10px; font-size: 13px;">
-    <option value="both">英文 + 繁中 (Both)</option>
-    <option value="en">僅英文 (English Only)</option>
-    <option value="zh">僅繁中 (Traditional Chinese Only)</option>
-  </select>
+    <label>Today's Password / 今日密碼</label>
+    <input type="password" id="pwdInput" placeholder="Ask your teacher for today's password"
+           maxlength="8" style="text-transform:uppercase"
+           onkeyup="if(event.key==='Enter')checkPassword()"/>
+    <div class="err" id="pwdErr">❌ Wrong password — 密碼錯誤，請向老師查詢</div>
+    <button class="btn btn-primary" onclick="checkPassword()">Enter / 進入 →</button>
+  </div>
+  <div class="teacher-link"><span onclick="goTeacherLogin()">教師入口</span></div>
 </div>
-    
-    <div class="view" id="viewScoring">
-      <div class="score-header">
-        <div class="score-icon" id="scoringIcon">📊</div>
-        <div class="score-title">Performance Feedback Report</div>
-        <button class="btn btn-sec" id="readReportBtn" onclick="toggleReadReport()" style="margin: 10px auto 0 auto; max-width: 280px; font-size: 13.5px; padding: 8px 14px; border-color: var(--primary); color: var(--primary);">🔊 語音朗讀完整報告 (Read Full Report)</button>
-      </div>
 
-      <div class="scoring-scroll" id="scoringContent"></div>
+<!-- ══════════════════════════════════════════════════
+     S2 · Practice Mode Selection
+══════════════════════════════════════════════════ -->
+<div class="screen" id="s-mode">
+  <div class="page-title">What to practise today?</div>
+  <div class="page-sub">今天想練習哪個部份？</div>
 
-      <button class="btn" id="tryAgainBtn" onclick="restartSameMode()" style="display:none">🔄 Practice This Component Again</button>
-      <button class="btn btn-sec" id="changeTopicBtn" onclick="switchView('viewDashboard')" style="display:none">🏠 Return to Dashboard</button>
+  <div class="mode-grid">
+    <div class="mode-card" id="mc-intro" onclick="pickMode('intro')">
+      <div class="mc-icon">🗣️</div>
+      <div class="mc-title">Intro Only</div>
+      <div class="mc-sub">簡短介紹 · 2個來回</div>
+      <span class="mc-badge badge-grey">Not assessed</span>
     </div>
-
-    <div class="view" id="viewTeacherLogin">
-      <div class="input-group" style="margin-top:20px">
-        <label class="label" for="masterPasswordInput">Master System Password</label>
-        <input type="password" id="masterPasswordInput" placeholder="Enter secure admin password"/>
-      </div>
-      <div class="err" id="teacherErr"></div>
-      <button class="btn" onclick="authenticateTeacher()">Admin Login →</button>
-      <button class="btn btn-sec" onclick="switchView('viewPassword')">← Back to Student Access</button>
+    <div class="mode-card" id="mc-phase1" onclick="pickMode('phase1')">
+      <div class="mc-icon">📝</div>
+      <div class="mc-title">Phase 1: Topic</div>
+      <div class="mc-sub">話題討論 · 6個來回</div>
+      <span class="mc-badge badge-blue">~5 min</span>
     </div>
-
-    <div class="view" id="viewTeacherDash">
-      <div class="dash-card" style="background:var(--ph2-lt);border-left-color:var(--ph2);margin-bottom:16px">
-        <strong>Teacher Portal</strong> — Access tokens and real-time environment telemetry.
-      </div>
-      
-      <div class="overall-wrap" style="padding:12px;margin-bottom:16px">
-        <div class="label" style="margin-bottom:2px">Today's Daily Password</div>
-        <div style="font-size:28px;font-weight:800;letter-spacing:2px;color:var(--ph2)" id="tTodayPassword">------</div>
-        <div style="font-size:12px;color:var(--muted);margin-top:4px" id="tTodayDate">Date: -----</div>
-      </div>
-
-      <div id="statsBlock" style="display:none">
-        <div class="chart-title">Usage Statistics</div>
-        <div class="stats-grid">
-          <div class="stat-card">
-            <div class="sc-label">Today's Calls</div>
-            <div class="sc-val" id="stCalls">0</div>
-            <div class="sc-sub" id="stCostToday">$0.00 est.</div>
-          </div>
-          <div class="stat-card">
-            <div class="sc-label">Today's Tokens</div>
-            <div class="sc-val" id="stTokens">0</div>
-            <div class="sc-sub" id="stTokenBreakdown">in:0 out:0</div>
-          </div>
-          <div class="stat-card">
-            <div class="sc-label">Total Calls</div>
-            <div class="sc-val" id="stTotalCalls">0</div>
-            <div class="sc-sub">all time</div>
-          </div>
-          <div class="stat-card">
-            <div class="sc-label">Est. Total Cost</div>
-            <div class="sc-val" id="stTotalCost">$0.00</div>
-            <div class="sc-sub">Gemini 2.5 Flash</div>
-          </div>
-        </div>
-        <div class="chart-title" id="chartTitle">API Traffic Trend</div>
-        <div id="chartContainer" style="display:flex;align-items:flex-end;gap:6px;height:100px;padding:12px;background:var(--surface2);border-radius:9px;margin-bottom:14px"></div>
-      </div>
-      
-      <button class="btn btn-sec" onclick="switchView('viewPassword')">🚪 Exit Admin Portal</button>
+    <div class="mode-card" id="mc-phase2" onclick="pickMode('phase2')">
+      <div class="mc-icon">💬</div>
+      <div class="mc-title">Phase 2: Conversation</div>
+      <div class="mc-sub">對話練習 · 7個來回</div>
+      <span class="mc-badge badge-purple">~5 min</span>
     </div>
-
-    <footer class="footer-note">
-      Aligned with CEFR B1 • Trinity GESE Grade 5 Spec • Secure Cloud Architecture
-    </footer>
+    <div class="mode-card" id="mc-full" onclick="pickMode('full')">
+      <div class="mc-icon">🎓</div>
+      <div class="mc-title">Full Exam</div>
+      <div class="mc-sub">完整模擬 · 全部3個部份</div>
+      <span class="mc-badge badge-green">~12 min</span>
+    </div>
   </div>
 
-  <script>
-    const WORKER_URL = 'https://b1-trinity.jingplus.workers.dev';
-
-    let dailyPassword = '';
-    let practiceMode  = ''; 
-    let history       = [];  
-    let targetTimeLimit = 660; 
-    let systemInstructionGlobal = ''; 
-    let chosenGender  = 'female'; 
-    let examinerName  = 'Ms. Davis'; 
-    
-    let recognition       = null;
-    let isRecording       = false;
-    let currentUtterance  = null;
-    let audioSynthesizer  = window.speechSynthesis;
-    let speechTokenBox    = []; 
-    let currentLiveText   = ''; 
-
-    let examTimeSeconds   = 0;
-    let timerInterval     = null;
-    let masterTeacherPwd  = '';
-
-    // ⚡️ 全域快取，儲存當前解析好的評分 JSON 資料與朗讀狀態
-    let activeScoreObject = null;
-    let isReadingReport   = false;
-
-    window.addEventListener('DOMContentLoaded', () => {
-      const SpeechComp = window.SpeechRecognition || window.webkitSpeechRecognition;
-      if (SpeechComp) {
-        recognition = new SpeechComp();
-        recognition.continuous = true;
-        recognition.interimResults = true;
-        recognition.lang = 'en-GB';
-
-        recognition.onstart = () => {
-          isRecording = true;
-          setMicUI(true);
-          updateStatus('Listening... Click the red button 🛑 to STOP and SEND.');
-        };
-
-        recognition.onresult = (e) => {
-          let interimText = '';
-          let finalizedText = '';
-          for (let i = e.resultIndex; i < e.results.length; ++i) {
-            if (e.results[i].isFinal) finalizedText += e.results[i][0].transcript;
-            else interimText += e.results[i][0].transcript;
-          }
-          if (finalizedText) speechTokenBox.push(finalizedText);
-          
-          currentLiveText = (speechTokenBox.join(' ') + ' ' + interimText).trim();
-          renderLiveTranscription(currentLiveText);
-        };
-
-        recognition.onerror = (e) => {
-          if (e.error !== 'no-speech') {
-            console.error('STT Subsystem Fault:', e.error);
-            stopRecordingContext();
-            updateStatus('Microphone error occurred.');
-          }
-        };
-        recognition.onend = () => { isRecording = false; setMicUI(false); };
-      } else {
-        updateStatus('Critical Error: Web Speech API unsupported in this browser.', true);
-      }
-
-      if (audioSynthesizer) {
-        audioSynthesizer.getVoices();
-        if (speechSynthesis.onvoiceschanged !== undefined) {
-          speechSynthesis.onvoiceschanged = () => audioSynthesizer.getVoices();
-        }
-      }
-
-      if (localStorage.getItem('dark-mode') === 'true') {
-        document.documentElement.setAttribute('data-dark', '');
-        document.getElementById('themeBtn').textContent = '☀️';
-      }
-    });
-
-    async function apiRequest(path, payload) {
-      const response = await fetch(`${WORKER_URL}${path}`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
-      });
-      if (!response.ok) {
-        const data = await response.json().catch(() => ({}));
-        throw new Error(data.error || `Server responded with status ${response.status}`);
-      }
-      return response.json();
-    }
-
-    async function verifyPassword() {
-      const input = document.getElementById('dailyPasswordInput').value.trim().toUpperCase();
-      const errEl = document.getElementById('pwdErr');
-      errEl.classList.remove('show');
-      if (!input) return;
-
-      try {
-        await apiRequest('/chat', { dailyPassword: input, checkOnly: true });
-        dailyPassword = input;
-        switchView('viewDashboard');
-      } catch (err) { errEl.classList.add('show'); }
-    }
-
-    function logout() {
-      dailyPassword = '';
-      document.getElementById('dailyPasswordInput').value = '';
-      switchView('viewPassword');
-    }
-    
-    function testCurrentVoice() {
-      if (audioSynthesizer) audioSynthesizer.cancel();
-      chosenGender = document.getElementById('examinerGender').value;
-      const exName = (chosenGender === 'male') ? 'Mr. Smith' : 'Ms. Davis';
-      speakOutputText(`Hello, I am ${exName}. Nice to meet you.`, () => {
-        console.log(`Voice test completed for ${exName}`);
-      });
-    }
-    
-    function switchView(viewId) {
-      document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
-      document.getElementById(viewId).classList.add('active');
-      // 離開評分畫面時，自動停止任何正在進行的報告朗讀
-      if (viewId !== 'viewScoring' && audioSynthesizer) {
-        stopReadingReportState();
-      }
-    }
-
-    function resetSpeechState() {
-      if (audioSynthesizer) audioSynthesizer.cancel();
-      stopRecordingContext();
-    }
-
-    function toggleDarkMode() {
-      const isDark = document.documentElement.hasAttribute('data-dark');
-      if (isDark) {
-        document.documentElement.removeAttribute('data-dark');
-        document.getElementById('themeBtn').textContent = '🌙';
-        localStorage.setItem('dark-mode', 'false');
-      } else {
-        document.documentElement.setAttribute('data-dark', '');
-        document.getElementById('themeBtn').textContent = '☀️';
-        localStorage.setItem('dark-mode', 'true');
-      }
-    }
-
-    function choosePracticeMode(mode) {
-      practiceMode = mode;
-      const introText = document.getElementById('topicIntroText');
-      const formFields = document.getElementById('topicFormFields');
-      const convoField = document.getElementById('conversationSubjectField');
-      
-      formFields.style.display = 'none';
-      convoField.style.display = 'none';
-      document.getElementById('setupErr').classList.remove('show');
-
-      if (mode === 'full') {
-        targetTimeLimit = 660; 
-        introText.innerHTML = `<h3>🏆 Full Mock Exam (完整模擬考試)</h3><p style="margin-top:6px;font-size:13.5px;color:var(--muted)">AI將精準掌控時間比例：<strong>Phase 1 熱身 (1 分鐘)</strong> ➔ <strong>Phase 2 Topic 盤問 (5 分鐘)</strong> ➔ <strong>Phase 3 隨機雙主題即興交流 (5 分鐘)</strong>。請在下方輸入您的題目：</p>`;
-        formFields.style.display = 'block';
-      } else if (mode === 'intro') {
-        targetTimeLimit = 60; 
-        introText.innerHTML = `<h3>👋 Component 1: Introduction</h3><p style="margin-top:6px;font-size:13.5px;color:var(--muted)">The examiner will greet you and ask basic background questions about your life, hobbies, or studies (Target: 1 minute).</p>`;
-      } else if (mode === 'topic') {
-        targetTimeLimit = 300; 
-        introText.innerHTML = `<h3>📋 Component 2: Topic Phase</h3><p style="margin-top:6px;font-size:13.5px;color:var(--muted)">Please input your pre-prepared Topic Form details. The AI will cross-examine you on these 5 nodes (Target: 5 minutes).</p>`;
-        formFields.style.display = 'block';
-      } else if (mode === 'conversation') {
-        targetTimeLimit = 150; 
-        introText.innerHTML = `<h3>💬 Component 3: Conversation Phase (單選練習)</h3><p style="margin-top:6px;font-size:13.5px;color:var(--muted)">在此模式下，您只需選擇一個主題。考官將針對該主題與您進行密集的 <strong>2.5 分鐘</strong> 深入交流。</p>`;
-        convoField.style.display = 'block';
-      }
-      switchView('viewTopicSetup');
-    }
-
-    function startExamSession() {
-      const errEl = document.getElementById('setupErr');
-      errEl.classList.remove('show');
-
-      chosenGender = document.getElementById('examinerGender').value;
-      examinerName = (chosenGender === 'male') ? 'Mr. Smith' : 'Ms. Davis';
-      const genderEmoji = (chosenGender === 'male') ? '🧔' : '👩';
-
-      const allSubjects = [
-        "Festivals / Celebrations",
-        "Means of Transport",
-        "Special Occasions (e.g. weddings, birthdays)",
-        "Entertainment (e.g. cinema, music, television)",
-        "Music",
-        "Recent Personal Experiences"
-      ];
-
-      let systemInstruction = `You are a British UK oral examiner named ${examinerName} (${chosenGender}) for Trinity GESE Grade 5 (CEFR B1). 
-Be friendly but brief. Speak clearly with a natural British tone fitting your character name.
-Rules:
-1. Ask EXACTLY ONE short question at a time. Never group questions.
-2. Keep your spoken responses ultra-short (under 25 words).
-3. Test B1 structures: Past Simple, Future (going to), Present Perfect, giving reasons (because).`;
-
-      if (practiceMode === 'full') {
-        const title = document.getElementById('topicTitle').value.trim();
-        const pts = [
-          document.getElementById('tp1').value.trim(),
-          document.getElementById('tp2').value.trim(),
-          document.getElementById('tp3').value.trim(),
-          document.getElementById('tp4').value.trim(),
-          document.getElementById('tp5').value.trim()
-        ].filter(t => t.length > 0);
-
-        if (!title || pts.length < 5) {
-          errEl.textContent = '❌ Full Mock Exam requires a Topic Title and exactly 5 discussion sub-points.';
-          errEl.classList.add('show');
-          return;
-        }
-
-        const shuffled = [...allSubjects].sort(() => 0.5 - Math.random());
-        const chosenSubj1 = shuffled[0];
-        const chosenSubj2 = shuffled[1];
-
-        document.getElementById('examRoomTitle').textContent = `${genderEmoji} Full Mock Exam — ${examinerName}`;
-        
-        systemInstruction += `\n- PHASE 1 (Intro, 1m): Ask 1 quick greeting/background question.
-- TRANSITION TO PHASE 2 (CRITICAL): Right after the first greeting question, you MUST say exactly: "Thank you. Now, what are you going to talk about today and what are your discussion points?" to let the candidate state their topic orally. Do NOT skip this mouth-reporting step!
-- PHASE 2 (Topic, 5m): After they tell you their topic orally, cross-examine them naturally on their topic '${title}' and its nodes:\n${pts.map((p,i)=>` * ${p}`).join('\n')}
-- PHASE 3 (Convo, 5m): Discuss two areas: "${chosenSubj1}" then "${chosenSubj2}".
-- Conclude exactly with: "Thank you very much. That is the end of the test."`;
-
-      } else if (practiceMode === 'intro') {
-        document.getElementById('examRoomTitle').textContent = `${genderEmoji} Intro Room — ${examinerName}`;
-        systemInstruction += `\nEngage in a 1-minute greeting and simple background questions. End with: "Thank you very much. That is the end of the test."`;
-      } else if (practiceMode === 'topic') {
-        const title = document.getElementById('topicTitle').value.trim();
-        const pts = [
-          document.getElementById('tp1').value.trim(),
-          document.getElementById('tp2').value.trim(),
-          document.getElementById('tp3').value.trim(),
-          document.getElementById('tp4').value.trim(),
-          document.getElementById('tp5').value.trim()
-        ].filter(t => t.length > 0);
-
-        if (!title || pts.length < 5) {
-          errEl.textContent = '❌ Please provide a Topic Title and all 5 discussion sub-points.';
-          errEl.classList.add('show');
-          return;
-        }
-        document.getElementById('examRoomTitle').textContent = `${genderEmoji} Topic Form — ${examinerName}`;
-        
-        systemInstruction += `\n- START STEP: Your very first sentence MUST be: "Hello. What are you going to talk about today and what are your discussion points?"
-- PHASE 2: After they tell you, cross-examine them on the topic "${title}" and these 5 points:\n${pts.map((p,i) => `* ${p}`).join('\n')}\nEnd at 5 mins with: "Thank you very much. That is the end of the test."`;
-      } else if (practiceMode === 'conversation') {
-        const subj = document.getElementById('convoSubject').value;
-        document.getElementById('examRoomTitle').textContent = `${genderEmoji} Convo Room — ${examinerName}`;
-        systemInstruction += `\nIntensely discuss the subject: "${subj}". Keep it strictly within 2.5 minutes. End with: "Thank you very much. That is the end of the test."`;
-      }
-
-      systemInstructionGlobal = systemInstruction; 
-      history = [{ role: 'user', parts: [{ text: `SYSTEM_CONFIG: ${systemInstructionGlobal}` }] }];
-      
-      document.getElementById('chatBox').innerHTML = '';
-      document.getElementById('finishExamBtn').style.display = 'block';
-      
-      examTimeSeconds = 0;
-      document.getElementById('examTimer').textContent = '00:00';
-      document.getElementById('examTimer').classList.remove('warn');
-      clearInterval(timerInterval);
-      
-      timerInterval = setInterval(() => {
-        examTimeSeconds++;
-        const m = String(Math.floor(examTimeSeconds / 60)).padStart(2, '0');
-        const s = String(examTimeSeconds % 60).padStart(2, '0');
-        document.getElementById('examTimer').textContent = `${m}:${s}`;
-        
-        if (examTimeSeconds >= targetTimeLimit) {
-          document.getElementById('examTimer').classList.add('warn');
-        }
-      }, 1000);
-
-      switchView('viewChat');
-      executeExaminerTurn();
-    }
-
-  async function executeExaminerTurn() {
-      updateStatus('Examiner is thinking...');
-      document.getElementById('micBtn').disabled = true;
-
-      // ⚡️ 修正：時間判斷邏輯
-      // 如果時間已經超標，但不強制打斷，而是標記為「最後一輪」
-      let isFinalRound = (examTimeSeconds >= targetTimeLimit);
-
-      if (history.length > 7) { 
-        const latestExchanges = history.slice(-6); 
-        history = [
-          { role: 'user', parts: [{ text: `SYSTEM_CONFIG: ${systemInstructionGlobal} (Context active)` }] },
-          ...latestExchanges
-        ];
-      }
-
-      try {
-        let currentPrompt = [...history]; // 複製歷史紀錄
-        
-        // 如果是最後一輪，給 AI 指令：完成這次問答後，下一次就必須結束
-        if (isFinalRound) {
-           currentPrompt.push({ role: 'user', parts: [{ text: "TIME_UP: You have reached the time limit. After this exchange, you MUST conclude the test by saying: 'Thank you very much. That is the end of the test.' Do not start any new discussion topics." }] });
-        }
-
-        const payload = { contents: currentPrompt };
-        const data = await apiRequest('/chat', { dailyPassword, payload });
-        
-        const responseText = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
-        if (!responseText) throw new Error('Empty response');
-
-        history.push({ role: 'model', parts: [{ text: responseText }] });
-        appendMessage('examiner', responseText);
-        updateStatus('Examiner speaking...');
-        
-        speakOutputText(responseText, () => {
-          // 檢查 AI 是否已經說出了結束詞
-          if (responseText.toLowerCase().includes("end of the test")) {
-            document.getElementById('micBtn').style.display = 'none';
-            document.getElementById('finishExamBtn').style.display = 'block';
-            updateStatus('Exam finished. Please click "Finish & Grade Exam".');
-          } else {
-            updateStatus('Your turn. Click the mic button 🎙️ to start speaking.');
-            document.getElementById('micBtn').disabled = false;
-          }
-        });
-
-      } catch (err) {
-        console.error(err);
-        updateStatus('Session disruption. Failed to contact Examiner.', true);
-      }
-    }
-
-    function speakOutputText(text, callback, customVoiceLang = null) {
-      if (!audioSynthesizer) return callback();
-      audioSynthesizer.cancel();
-
-      const cleanText = text.replace(/SYSTEM_CONFIG:.*$/gi, '').trim();
-      currentUtterance = new SpeechSynthesisUtterance(cleanText);
-      
-      let voices = audioSynthesizer.getVoices();
-      if (!voices || voices.length === 0) {
-        window.speechSynthesis.getVoices();
-        voices = audioSynthesizer.getVoices();
-      }
-      
-      // 如果有指定特定語言（如讀中文報告內容），優先尋找對應語音
-      if (customVoiceLang) {
-        const targetVoice = voices.find(v => v.lang.toLowerCase().replace('_', '-').startsWith(customVoiceLang.toLowerCase()));
-        if (targetVoice) {
-          currentUtterance.voice = targetVoice;
-          currentUtterance.lang = targetVoice.lang;
-          currentUtterance.rate = 1.0;
-          currentUtterance.onend = () => callback();
-          currentUtterance.onerror = (e) => { callback(); };
-          audioSynthesizer.speak(currentUtterance);
-          return;
-        }
-      }
-
-      const enVoices = voices.filter(v => v.lang.toLowerCase().startsWith('en'));
-      const ukVoices = enVoices.filter(v => v.lang.toLowerCase().replace('_', '-').startsWith('en-gb'));
-      
-      let matchedVoice = null;
-
-      if (chosenGender === 'male') {
-        matchedVoice = ukVoices.find(v => {
-          const name = v.name.toLowerCase();
-          return name.includes('male') || name.includes('david') || name.includes('george') || name.includes('james') || name.includes('oliver');
-        });
-
-        if (!matchedVoice) {
-          matchedVoice = enVoices.find(v => {
-            const name = v.name.toLowerCase();
-            return name.includes('google') && name.includes('male');
-          });
-        }
-
-        if (!matchedVoice) {
-          matchedVoice = enVoices.find(v => {
-            const name = v.name.toLowerCase();
-            return name.includes('male') || name.includes('david') || name.includes('george') || name.includes('guy') || name.includes('andrew') || name.includes('brian');
-          });
-        }
-
-        if (!matchedVoice && enVoices.length > 0) {
-          matchedVoice = enVoices.find(v => {
-            const name = v.name.toLowerCase();
-            return !name.includes('female') && !name.includes('zira') && !name.includes('hazel') && !name.includes('susan') && !name.includes('alice');
-          });
-        }
-      } else {
-        matchedVoice = ukVoices.find(v => {
-          const name = v.name.toLowerCase();
-          return name.includes('female') || name.includes('hazel') || name.includes('zira') || name.includes('susan') || name.includes('alice');
-        }) || ukVoices[0];
-      }
-
-      if (matchedVoice) {
-        currentUtterance.voice = matchedVoice;
-        currentUtterance.lang = matchedVoice.lang;
-      } else {
-        currentUtterance.lang = (chosenGender === 'male') ? 'en-US' : 'en-GB';
-      }
-
-      currentUtterance.rate = 0.95; 
-      currentUtterance.onend = () => callback();
-      currentUtterance.onerror = (e) => { console.error(e); callback(); };
-      audioSynthesizer.speak(currentUtterance);
-    }
-    
-    function handleMicClick() {
-      if (isRecording) commitUserSpeech();
-      else startRecordingContext();
-    }
-
-    function startRecordingContext() {
-      if (!recognition || isRecording) return;
-      if (audioSynthesizer && audioSynthesizer.speaking) audioSynthesizer.cancel();
-      speechTokenBox = [];
-      currentLiveText = ''; 
-      try { recognition.start(); } catch (e) {}
-    }
-
-    function stopRecordingContext() {
-      if (!recognition || !isRecording) return;
-      try { recognition.stop(); } catch (e) {}
-      isRecording = false;
-      setMicUI(false);
-    }
-
-    function commitUserSpeech() {
-      stopRecordingContext();
-      clearLiveTranscriptionBubble();
-
-      let finalPhrase = speechTokenBox.join(' ').trim();
-      if (!finalPhrase && currentLiveText) {
-        finalPhrase = currentLiveText;
-      }
-
-      if (!finalPhrase) {
-        updateStatus('No speech captured. Click mic to try again.');
-        document.getElementById('micBtn').disabled = false;
-        return;
-      }
-
-      appendMessage('user', finalPhrase);
-      history.push({ role: 'user', parts: [{ text: finalPhrase }] });
-      
-      currentLiveText = ''; 
-      executeExaminerTurn();
-    }
-
-    function setMicUI(active) {
-      const btn = document.getElementById('micBtn');
-      if (active) { btn.classList.add('recording'); btn.textContent = '🛑'; }
-      else { btn.classList.remove('recording'); btn.textContent = '🎙️'; }
-    }
-
-    function updateStatus(txt, isErr = false) {
-      const el = document.getElementById('statusText');
-      el.textContent = txt;
-      el.style.color = isErr ? 'var(--danger)' : 'var(--muted)';
-    }
-
-    function appendMessage(role, text) {
-      const box = document.getElementById('chatBox');
-      const el = document.createElement('div');
-      el.className = `msg ${role}`;
-      el.textContent = (role === 'examiner') ? `[${examinerName}]: ${text}` : text;
-      box.appendChild(el);
-      box.scrollTop = box.scrollHeight;
-    }
-
-    document.addEventListener('keydown', (e) => {
-      if (e.code === 'Space' && document.activeElement.tagName !== 'INPUT' && document.activeElement.tagName !== 'SELECT') {
-        const activeView = document.querySelector('.view.active');
-        if (activeView && activeView.id === 'viewChat') {
-          e.preventDefault();
-          const micBtn = document.getElementById('micBtn');
-          if (!micBtn.disabled) handleMicClick();
-        }
-      }
-    });
-
-    function renderLiveTranscription(text) {
-      const box = document.getElementById('chatBox');
-      let liveEl = document.getElementById('liveTransBubble');
-      if (!liveEl) {
-        liveEl = document.createElement('div');
-        liveEl.id = 'liveTransBubble';
-        liveEl.className = 'msg live-trans';
-        box.appendChild(liveEl);
-      }
-      liveEl.textContent = text;
-      box.scrollTop = box.scrollHeight;
-    }
-
-    function clearLiveTranscriptionBubble() {
-      const liveEl = document.getElementById('liveTransBubble');
-      if (liveEl) liveEl.remove();
-    }
-
-    function restartSameMode() { choosePracticeMode(practiceMode); }
-
-    function confirmFinishExam() {
-      if (history.length < 3) {
-        clearInterval(timerInterval);
-        resetSpeechState();
-        switchView('viewDashboard');
-        return;
-      }
-      if (confirm('Are you ready to submit your spoken transcript to the evaluation engine?')) {
-        executeGradingProtocol();
-      }
-    }
-
-    async function executeGradingProtocol() {
-      clearInterval(timerInterval);
-      resetSpeechState();
-
-      switchView('viewScoring');
-      document.getElementById('readReportBtn').style.display = 'none';
-      document.getElementById('tryAgainBtn').style.display = 'none';
-      document.getElementById('changeTopicBtn').style.display = 'none';
-      displayScoring(null, '連結評分引擎中，正在深度分析您的口說盲點並生成繁中翻譯報告...');
-
-      const exchangeLogs = history.filter(h => !h.parts[0].text.startsWith('SYSTEM_CONFIG:'));
-
-      const gradingPrompt = `You are the lead linguistic grading engine for Trinity College London assessments. Evaluate the following dialogue transcript against CEFR B1 / Grade 5 speaking criteria.
-
-Dialogue Context:
-${exchangeLogs.map(m => `${m.role.toUpperCase()}: ${m.parts[0].text}`).join('\n')}
-
-You MUST respond with a single, valid JSON object matching this exact schema. 
-CRITICAL REQUIREMENT FOR TEXT AND TIP FIELDS: You must write the English feedback first, followed IMMEDIATELY by its Traditional Chinese (繁體中文) translation in parentheses.
-Example format for text/tip fields: "Your grammar was mostly correct. (您的語法基本正確。)"
-
-Schema:
-{
-  "overall": 7,
-  "overall_zh": "良好 (Merit)",
-  "fluency": { "score": 8, "text": "English text (繁中翻譯)", "tip": "English tip (繁中建議)" },
-  "vocabulary": { "score": 6, "text": "English text (繁中翻譯)", "tip": "English tip (繁中建議)" },
-  "grammar": { "score": 7, "text": "English text (繁中翻譯)", "tip": "English tip (繁中建議)" },
-  "communication": { "score": 7, "text": "English text (繁中翻譯)", "tip": "English tip (繁中建議)" },
-  "nextSteps": [
-    "First action item in English (第一個繁中行動建議)",
-    "Second action item in English (第二個繁中行動建議)"
-  ]
-}
-Scores must be integers between 1 and 10. Respond only with the raw object without markdown blocks.`;
-
-      try {
-        const payload = { contents: [{ role: 'user', parts: [{ text: gradingPrompt }] }] };
-        const data = await apiRequest('/chat', { dailyPassword, payload });
-        let rawText = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
-        rawText = rawText.replace(/```json/g, '').replace(/```/g, '').trim();
-        const scoreObj = JSON.parse(rawText);
-        
-        // 保存到全域快取供讀取報告引擎使用
-        activeScoreObject = scoreObj; 
-        displayScoring(scoreObj, null);
-      } catch (err) {
-        console.error(err);
-        displayScoring(null, '❌ 評分解析失敗。請確認網路連線或嘗試重新評分。');
-      }
-    }
-
-    function splitEnZh(rawString) {
-      if (!rawString) return '';
-      const match = rawString.match(/^([\s\S]*?)\(([\s\S]*?)\)\s*$/);
-      if (match) {
-        return `<div class="crit-en">${match[1].trim()}</div><div class="crit-zh">➔ ${match[2].trim()}</div>`;
-      }
-      return `<div class="crit-en">${rawString}</div>`;
-    }
-
-    function crit(label, emoji, data){
-      if (!data) return '';
-      const c = scoreColor(data.score);
-      return `
-      <div class="crit-card">
-        <div class="crit-header">
-          <span>${emoji}</span>
-          <span class="crit-label">${label}</span>
-          <span class="crit-score" style="color:${c}">${data.score}/10</span>
+  <button class="btn btn-primary" id="modeNextBtn" onclick="afterModeSelect()" disabled>
+    Next / 繼續 →
+  </button>
+  <button class="btn btn-secondary" onclick="showScreen('s-password')">← Back / 返回</button>
+</div>
+
+<!-- ══════════════════════════════════════════════════
+     S3 · Topic Selection (Phase 1 / Full only)
+══════════════════════════════════════════════════ -->
+<div class="screen" id="s-topic">
+  <div class="page-title">Choose Your Topic</div>
+  <div class="page-sub">選擇話題 — 不可與Phase 2的6個科目重複</div>
+
+  <div class="format-box">
+    <strong>Phase 2 Conversation subjects (fixed):</strong><br>
+    Festivals · Means of transport · Special occasions · Entertainment · Music · Recent personal experiences
+    <div class="format-tip">💡 Remember to ask the examiner at least one question per phase! / 每個Phase記得問考官一個問題！</div>
+  </div>
+
+  <div class="topic-grid" id="topicGrid"></div>
+
+  <button class="btn btn-primary" id="startBtn" onclick="startExam()" disabled>
+    Start / 開始 →
+  </button>
+  <button class="btn btn-secondary" onclick="showScreen('s-mode')">← Back / 返回</button>
+</div>
+
+<!-- ══════════════════════════════════════════════════
+     S4 · Exam
+══════════════════════════════════════════════════ -->
+<div class="screen" id="examScreen">
+  <div class="exam-header intro" id="examHeader">
+    <div>
+      <div class="htitle" id="examPhaseLabel">🎓 Introduction</div>
+      <div class="htopic" id="examTopicLabel"></div>
+    </div>
+    <div style="display:flex;align-items:center;gap:8px">
+      <button id="ttsToggle" onclick="toggleTTS()" title="Examiner voice on/off"
+        style="background:rgba(255,255,255,.2);border:none;border-radius:20px;padding:4px 10px;font-size:15px;cursor:pointer;line-height:1">🔊</button>
+      <div class="exam-counter" id="exchCount"></div>
+    </div>
+  </div>
+
+  <div class="phase-bar" id="phaseBar">
+    <div class="phase-step active" id="pi-intro">Intro</div>
+    <div class="phase-sep">›</div>
+    <div class="phase-step" id="pi-phase1">Phase 1: Topic</div>
+    <div class="phase-sep">›</div>
+    <div class="phase-step" id="pi-phase2">Phase 2: Conversation</div>
+  </div>
+
+  <div class="chat-area" id="chatArea">
+    <div class="typing" id="typing">
+      <div class="typing-dots">
+        <div class="dot"></div><div class="dot"></div><div class="dot"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="input-area">
+    <div class="mode-toggle">
+      <button class="mode-btn active" id="btnText"  onclick="setInputMode('text')">⌨️ Text</button>
+      <button class="mode-btn"        id="btnVoice" onclick="setInputMode('voice')">🎤 Voice</button>
+    </div>
+    <div id="textArea" class="text-row">
+      <input type="text" id="txtIn" placeholder="Type your answer here…"
+             onkeyup="if(event.key==='Enter')sendMsg()"/>
+      <button class="send-btn" onclick="sendMsg()">➤</button>
+    </div>
+    <div id="voiceArea" class="voice-area hidden">
+      <button class="mic-btn" id="micBtn" onclick="toggleMic()">🎤</button>
+      <div class="mic-hint" id="micHint">Tap to speak / 點擊說話</div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════
+     S5 · Scoring
+══════════════════════════════════════════════════ -->
+<div class="screen" id="s-scoring">
+  <div class="card" style="max-height:90vh;overflow-y:auto">
+    <div class="logo">
+      <span class="icon" id="scoringIcon">📊</span>
+      <h1>Assessment</h1>
+      <p id="scoringSubtitle">B1 Standard Feedback</p>
+    </div>
+    <div id="scoringContent">
+      <div class="scoring-loading">
+        <div class="spinner"></div>
+        <div class="loading-text">Generating your B1 assessment… / 正在生成評分…</div>
+      </div>
+    </div>
+    <button class="btn btn-primary mt-s" id="tryAgainBtn" onclick="tryAgain()" style="display:none">
+      Try Again / 再試一次
+    </button>
+    <button class="btn btn-secondary" id="changeTopicBtn" onclick="showScreen('s-mode')" style="display:none">
+      Change Mode / 換模式
+    </button>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════
+     S6 · Teacher Login
+══════════════════════════════════════════════════ -->
+<div class="screen" id="s-teacher-login">
+  <div class="card">
+    <div class="logo">
+      <span class="icon">👩‍🏫</span>
+      <h1>Teacher Portal</h1>
+      <p>教師入口</p>
+    </div>
+    <label>Master Password / 主密碼</label>
+    <input type="password" id="masterPwdInput" placeholder="Enter master password"
+           onkeyup="if(event.key==='Enter')checkMasterPwd()"/>
+    <div class="err" id="masterErr">❌ Invalid password / 密碼錯誤</div>
+    <button class="btn btn-primary"   onclick="checkMasterPwd()">Login / 登入</button>
+    <button class="btn btn-secondary" onclick="showScreen('s-password')">← Back / 返回</button>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════
+     S7 · Teacher Dashboard
+══════════════════════════════════════════════════ -->
+<div class="screen" id="s-teacher">
+  <div class="card" style="max-height:90vh;overflow-y:auto">
+    <div class="logo">
+      <span class="icon">📋</span>
+      <h1>Teacher Dashboard</h1>
+      <p>教師控制台</p>
+    </div>
+
+    <!-- Tabs -->
+    <div class="tab-row">
+      <button class="tab-btn active" id="tab-pwd"   onclick="switchTab('pwd')">🔑 Password</button>
+      <button class="tab-btn"        id="tab-stats" onclick="switchTab('stats')">📊 Usage Stats</button>
+    </div>
+
+    <!-- Password tab -->
+    <div id="panel-pwd">
+      <div class="pwd-display">
+        <div class="pwd-label">Today's Student Password / 今日學生密碼</div>
+        <div class="pwd-value" id="todayPwd">------</div>
+        <div class="pwd-date"  id="todayDate"></div>
+      </div>
+      <p style="font-size:13px;color:var(--muted);text-align:center">
+        Share this with students each morning<br>每天早上告訴學生此密碼
+      </p>
+    </div>
+
+    <!-- Stats tab -->
+    <div id="panel-stats" class="hidden">
+      <div id="statsContent">
+        <div class="scoring-loading">
+          <div class="spinner"></div>
+          <div class="loading-text">Loading usage data…</div>
         </div>
-        <div class="bar-wrap"><div class="bar-fill" style="width:${data.score*10}%;background:${c}"></div></div>
-        <div class="crit-text">${splitEnZh(data.text)}</div>
-        ${data.tip ? `<div class="crit-tip">💡 ${splitEnZh(data.tip)}</div>` : ''}
-      </div>`;
+      </div>
+    </div>
+
+    <button class="btn btn-secondary" onclick="showScreen('s-password')" style="margin-top:18px">← Back / 返回</button>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════
+     JAVASCRIPT
+══════════════════════════════════════════════════ -->
+<script>
+// ── CONFIG ────────────────────────────────────────────────────────
+const WORKER_URL = 'https://b1-trinity.jingplus.workers.dev';
+
+// ── TOPICS (must NOT match the 6 Conversation subjects) ───────────
+const TOPICS = [
+  {e:'🏙️',en:'My Hometown',       zh:'我的家鄉'    },
+  {e:'📚',en:'My Studies',         zh:'我的學習'    },
+  {e:'👨‍👩‍👧',en:'My Family',          zh:'我的家人'    },
+  {e:'⚽',en:'A Sport I Play',     zh:'我的運動'    },
+  {e:'💼',en:'My Career Plans',    zh:'我的職業計劃' },
+  {e:'🍳',en:'Cooking & Food',     zh:'烹飪飲食'    },
+  {e:'🌿',en:'The Environment',    zh:'環境保護'    },
+  {e:'📱',en:'Technology',         zh:'科技'        },
+  {e:'🌟',en:'A Person I Admire',  zh:'我欣賞的人'  },
+  {e:'🗺️',en:'A Place I Love',     zh:'我喜愛的地方'},
+  {e:'🌅',en:'My Daily Routine',   zh:'我的日常生活'},
+  {e:'🎨',en:'A Creative Hobby',   zh:'我的創意嗜好'},
+];
+
+const CONV_SUBJECTS = [
+  'Festivals','Means of transport','Special occasions',
+  'Entertainment','Music','Recent personal experiences',
+];
+
+const PHASE_MAX = {intro:2, phase1:6, phase2:7};
+
+// ── STATE ─────────────────────────────────────────────────────────
+let dailyPassword = null;
+let selectedTopic = null;
+let practiceMode  = null;  // 'intro'|'phase1'|'phase2'|'full'
+let history       = [];
+let phase         = 'intro';
+let phaseCount    = {intro:0, phase1:0, phase2:0};
+let convSubjects  = [];
+let qHintShown    = {phase1:false, phase2:false};
+let inputMode     = 'text';
+let recognition   = null;
+let micActive     = false;
+let masterPwdCache = null; // remember master pwd for stats tab
+
+// ── INIT ──────────────────────────────────────────────────────────
+(function init(){
+  renderTopics();
+  setupSpeech();
+  // Restore dark mode preference
+  if(localStorage.getItem('dm')==='1') applyDark(true);
+})();
+
+function renderTopics(){
+  document.getElementById('topicGrid').innerHTML = TOPICS.map((t,i)=>`
+    <div class="topic-card" id="tc-${i}" onclick="pickTopic(${i})">
+      <div class="em">${t.e}</div>
+      <div class="en">${t.en}</div>
+      <div class="zh">${t.zh}</div>
+    </div>`).join('');
+}
+
+// ── DARK MODE ─────────────────────────────────────────────────────
+function toggleDark(){
+  const isDark = document.documentElement.hasAttribute('data-dark');
+  applyDark(!isDark);
+}
+function applyDark(on){
+  if(on){
+    document.documentElement.setAttribute('data-dark','');
+    document.getElementById('dmToggle').textContent='☀️';
+    localStorage.setItem('dm','1');
+  } else {
+    document.documentElement.removeAttribute('data-dark');
+    document.getElementById('dmToggle').textContent='🌙';
+    localStorage.setItem('dm','0');
+  }
+}
+
+// ── PASSWORD ──────────────────────────────────────────────────────
+async function checkPassword(){
+  const val = document.getElementById('pwdInput').value.toUpperCase().trim();
+  if(!val) return;
+  try{
+    const r = await fetch(`${WORKER_URL}/chat`,{
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({dailyPassword:val, checkOnly:true}),
+    });
+    if(r.status===401){showErr('pwdErr');return}
+    if(!r.ok) throw new Error();
+    dailyPassword = val;
+    showScreen('s-mode');
+  }catch{
+    document.getElementById('pwdErr').textContent='⚠️ Cannot connect to server. Check setup.';
+    showErr('pwdErr');
+  }
+}
+
+// ── MODE SELECTION ────────────────────────────────────────────────
+function pickMode(m){
+  practiceMode = m;
+  document.querySelectorAll('.mode-card').forEach(c=>c.classList.remove('selected'));
+  document.getElementById(`mc-${m}`).classList.add('selected');
+  document.getElementById('modeNextBtn').disabled = false;
+}
+
+function afterModeSelect(){
+  if(!practiceMode) return;
+  startExam();
+}
+
+function pickTopic(i){
+  document.querySelectorAll('.topic-card').forEach(c=>c.classList.remove('selected'));
+  document.getElementById(`tc-${i}`).classList.add('selected');
+  selectedTopic = TOPICS[i];
+  document.getElementById('startBtn').disabled = false;
+}
+
+// ── START EXAM ────────────────────────────────────────────────────
+function startExam(){
+  // Pick 2 random conversation subjects for Phase 2
+  const pool = [...CONV_SUBJECTS];
+  const i1   = Math.floor(Math.random()*pool.length);
+  const s1   = pool.splice(i1,1)[0];
+  convSubjects = [s1, pool[Math.floor(Math.random()*pool.length)]];
+
+  window.speechSynthesis && window.speechSynthesis.cancel();
+  history    = [];
+  phaseCount = {intro:0, phase1:0, phase2:0};
+  qHintShown = {phase1:false, phase2:false};
+
+  // Set starting phase based on mode
+  if(practiceMode==='phase2'){ phase='phase2'; }
+  else if(practiceMode==='phase1'){ phase='phase1'; }
+  else { phase='intro'; }
+
+  const modeLabels = {intro:'Brief Introduction',phase1:'Phase 1: Topic',phase2:`Phase 2: Conversation`,full:'Full Exam'};
+  document.getElementById('examTopicLabel').textContent = modeLabels[practiceMode] || '';
+  document.getElementById('chatArea').innerHTML=`
+    <div class="typing show" id="typing">
+      <div class="typing-dots">
+        <div class="dot"></div><div class="dot"></div><div class="dot"></div>
+      </div>
+    </div>`;
+  document.getElementById('txtIn').value='';
+  updatePhaseUI();
+  showScreen('examScreen');
+  openExam();
+}
+
+async function openExam(){
+  const seed=[{role:'user',parts:[{text:'Please begin.'}]}];
+  const reply = await callGemini(buildPrompt(), seed);
+  hideTyping();
+  if(reply){
+    const clean = stripKeys(reply);
+    history = [...seed, {role:'model',parts:[{text:clean}]}];
+    addBubble('examiner', clean);
+  }
+}
+
+// ── SEND / RECEIVE ────────────────────────────────────────────────
+async function sendMsg(){
+  const inp = document.getElementById('txtIn');
+  const txt = inp.value.trim();
+  if(!txt || phase==='done') return;
+  inp.value='';
+  await handleStudent(txt);
+}
+
+async function handleStudent(txt){
+  if(!txt || phase==='done') return;
+  addBubble('student', txt);
+  history.push({role:'user',parts:[{text:txt}]});
+  phaseCount[phase]++;
+  updatePhaseUI();
+
+  // Question hint after 2nd exchange in each assessed phase
+  if((phase==='phase1'&&phaseCount.phase1===2&&!qHintShown.phase1)||
+     (phase==='phase2'&&phaseCount.phase2===2&&!qHintShown.phase2)){
+    addQHint();
+    qHintShown[phase]=true;
+  }
+
+  showTyping();
+  const reply = await callGemini(buildPrompt(), history);
+  hideTyping();
+  if(!reply) return;
+
+  // Transition keywords
+  if(reply.includes('[TO_PHASE1]')){
+    const clean=stripKeys(reply);
+    history.push({role:'model',parts:[{text:clean}]});
+    addBubble('examiner',clean);
+    setTimeout(()=>enterPhase('phase1'),700);
+    return;
+  }
+  if(reply.includes('[TO_PHASE2]')){
+    const clean=stripKeys(reply);
+    history.push({role:'model',parts:[{text:clean}]});
+    addBubble('examiner',clean);
+    setTimeout(async()=>{
+      enterPhase('phase2');
+      await autoTrigger(); // examiner asks first Phase 2 question automatically
+    },700);
+    return;
+  }
+  if(reply.includes('[DONE]')){
+    const clean=stripKeys(reply);
+    if(clean) addBubble('examiner',clean);
+    history.push({role:'model',parts:[{text:reply}]});
+    phase='done';
+    updatePhaseUI();
+    setTimeout(()=>generateScoring(),800);
+    return;
+  }
+
+  history.push({role:'model',parts:[{text:reply}]});
+  addBubble('examiner',reply);
+
+  // Safety fallbacks
+  if(phase==='intro'  && phaseCount.intro  >=PHASE_MAX.intro)  { setTimeout(()=>enterPhase('phase1'),600); return; }
+  if(phase==='phase1' && phaseCount.phase1 >=PHASE_MAX.phase1) { setTimeout(()=>enterPhase(practiceMode==='full'?'phase2':'done_phase1'),600); return; }
+  if(phase==='phase2' && phaseCount.phase2 >=PHASE_MAX.phase2) { phase='done'; setTimeout(()=>generateScoring(),800); }
+}
+
+// ── PHASE MANAGEMENT ─────────────────────────────────────────────
+function enterPhase(newPhase){
+  if(newPhase==='done_phase1'){
+    // Single-phase end for phase1 mode
+    phase='done';
+    updatePhaseUI();
+    setTimeout(()=>generateScoring(),800);
+    return;
+  }
+  phase=newPhase;
+  updatePhaseUI();
+  addPhaseMarker(newPhase);
+}
+
+function addPhaseMarker(p){
+  const labels={
+    phase1:`📝 Phase 1: Topic Discussion`,
+    phase2:`💬 Phase 2: Conversation — ${convSubjects[0]} & ${convSubjects[1]}`,
+  };
+  const el=document.createElement('div');
+  el.className=`phase-marker ${p}`;
+  el.textContent=labels[p]||'';
+  document.getElementById('chatArea').insertBefore(el,document.getElementById('typing'));
+  document.getElementById('chatArea').scrollTop=9999;
+}
+
+// ── SYSTEM PROMPTS ────────────────────────────────────────────────
+function buildPrompt(){
+  const n  =phaseCount[phase]||0;
+  const max=PHASE_MAX[phase] ||2;
+
+  // Single-mode opening prompts (no intro for phase1/phase2 modes)
+  if(phase==='phase1' && practiceMode==='phase1' && n===0){
+    return `You are a Trinity College London GESE Grade 5 (B1) English examiner.
+Start Phase 1: Topic Discussion directly (no introduction needed for this practice).
+Open with: "Let's practise the Topic Phase. What is your topic today?"
+Wait for the student to name and describe their topic. Then ask natural follow-up questions.
+Keep responses SHORT — 1-2 sentences, one question at a time.
+Encourage B1 language: present perfect, will for future, I prefer/I'd rather, because, for/since.
+After ${max} student responses, end warmly and write [DONE].`;
+  }
+
+  if(phase==='phase2' && (practiceMode==='phase2'||phase==='phase2')){
+    const sub1=convSubjects[0], sub2=convSubjects[1];
+    const isPhase2Only = practiceMode==='phase2';
+    const isLast = n+1>=max;
+    const switchAt=3;
+    const curSubj = n<switchAt ? sub1 : sub2;
+    if(isPhase2Only && n===0){
+      return `You are a Trinity College London GESE Grade 5 (B1) English examiner.
+Start Phase 2: Conversation directly. Say: "Let's practise the Conversation Phase. I'd like to talk to you about ${sub1} first." then ask your first question.
+Two subjects for this phase: "${sub1}" and "${sub2}".
+Keep responses SHORT — 1-2 sentences, one question at a time.
+After about ${switchAt} exchanges, naturally move to "${sub2}".
+${isLast?`This is the final exchange. End warmly then write [DONE].`:''}`;
     }
+    return buildPhase2Prompt(n, max, sub1, sub2, curSubj, n===switchAt, isLast);
+  }
+
+  if(phase==='intro'){
+    const isFullMode = practiceMode==='full';
+    const isLast = n+1>=max;
+    return `You are a friendly Trinity College London GESE Grade 5 (B1) English examiner.
+This is the brief introduction (NOT assessed in the real exam). Be warm and welcoming.
+Exchange ${n+1} of ${max}.
+Greet the student and ask their name and one simple question (e.g. "How are you today?").
+${isLast
+  ? `This is the last intro exchange. After their answer, naturally say: "Thank you! Now let's start the exam. Could you tell me your topic today?" then end with [TO_PHASE1]`
+  : ''}`;
+  }
+
+  if(phase==='phase1'){
+    const isLast = n+1>=PHASE_MAX.phase1;
+    return `You are a Trinity College London GESE Grade 5 (B1) English examiner — Phase 1: Topic Discussion.
+The student has chosen their own topic (stated earlier in the conversation). Follow up on it.
+Exchange ${n+1} of ${PHASE_MAX.phase1}.
+- Ask natural follow-up questions about different aspects of the topic (aim for 4+ angles)
+- ONE short question per response (1-2 sentences max)
+- Encourage B1 language: present perfect, will for future, I prefer/I'd rather, because, for/since
+- If student asks you a question, answer briefly and continue
+${isLast
+  ? `Last exchange in Phase 1. After their answer: "Thank you, that was a very interesting topic!" then${practiceMode==='full'?' transition: "Now let\'s move to the second part." End with [TO_PHASE2]':' say "Well done!" and end with [DONE]'}`
+  : ''}`;
+  }
+
+  if(phase==='phase2'){
+    const sub1=convSubjects[0], sub2=convSubjects[1];
+    const isLast=n+1>=PHASE_MAX.phase2;
+    return buildPhase2Prompt(n, PHASE_MAX.phase2, sub1, sub2, n<3?sub1:sub2, n===3, isLast);
+  }
+
+  return '';
+}
+
+function buildPhase2Prompt(n, max, sub1, sub2, curSubj, switching, isLast){
+  return `You are a Trinity College London GESE Grade 5 (B1) English examiner — Phase 2: Conversation Phase.
+Subjects: "${sub1}" and "${sub2}". Current: "${curSubj}". Exchange ${n+1} of ${max}.
+- ONE short question per response (1-2 sentences max) — testing LANGUAGE, not knowledge
+- Ask open B1-level questions; encourage present perfect, will, prefer/rather, because, for/since
+- If student asks you a question, answer briefly and continue
+${switching?`Transition smoothly from "${sub1}" to "${sub2}" now.`:''}
+${isLast
+  ? `Final exchange. After their answer: "Thank you very much — that's the end of our practice session! You did really well." then write [DONE].`
+  : ''}`;
+}
+
+// ── GEMINI CALL ───────────────────────────────────────────────────
+async function callGemini(systemInstruction, contents){
+  try{
+    const payload={
+      systemInstruction:{parts:[{text:systemInstruction}]},
+      contents,
+      generationConfig:{temperature:0.75, maxOutputTokens:300},
+    };
+    const r=await fetch(`${WORKER_URL}/chat`,{
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({dailyPassword, payload}),
+    });
+    const data=await r.json();
+    const parts=data?.candidates?.[0]?.content?.parts||[];
+    const text=(parts.find(p=>!p.thought)?.text || parts[0]?.text || '').trim();
+    if(text) return text;
+    // Surface the actual Gemini error so the user can see what's wrong
+    const errDetail = data?.error?.message || data?.error?.status || JSON.stringify(data).substring(0,120);
+    console.error('Gemini error:', errDetail);
+    return `⚠️ API error: ${errDetail}`;
+  }catch(err){
+    console.error('Fetch error:', err);
+    return `⚠️ Cannot reach server. Check Worker URL and network. (${err.message})`;
+  }
+}
+
+// ── AUTO-TRIGGER (phase transition → examiner asks first question) ─
+async function autoTrigger(){
+  showTyping();
+  // Add a hidden user nudge so history stays valid (must alternate user/model)
+  const trigger=[...history,{role:'user',parts:[{text:'Please go ahead.'}]}];
+  const reply=await callGemini(buildPrompt(), trigger);
+  hideTyping();
+  if(reply){
+    const clean=stripKeys(reply);
+    history.push({role:'user',parts:[{text:'Please go ahead.'}]});
+    history.push({role:'model',parts:[{text:clean}]});
+    addBubble('examiner',clean);
+  }
+}
+
+// ── SCORING ───────────────────────────────────────────────────────
+async function generateScoring(){
+  // Show scoring screen with loading state
+  document.getElementById('scoringIcon').textContent='📊';
+  document.getElementById('scoringSubtitle').textContent=modeLabel(practiceMode)+' · B1 Assessment';
+  document.getElementById('scoringContent').innerHTML=`
+    <div class="scoring-loading">
+      <div class="spinner"></div>
+      <div class="loading-text">Generating your B1 assessment… / 正在生成B1評分…</div>
+    </div>`;
+  document.getElementById('tryAgainBtn').style.display='none';
+  document.getElementById('changeTopicBtn').style.display='none';
+  showScreen('s-scoring');
+
+  // Format conversation for assessment
+  const convText = history
+    .filter(m=>m.parts[0].text!=='Please begin.')
+    .map(m=>`${m.role==='model'?'Examiner':'Student'}: ${stripKeys(m.parts[0].text)}`)
+    .join('\n');
+
+  const modeNote = practiceMode==='intro'
+    ? '\nNote: The Introduction is not formally assessed in the real Trinity exam. This feedback is for practice purposes only.'
+    : '';
+
+  const scoringPrompt=`You are a Trinity College London GESE Grade 5 (B1) examiner writing a candidate assessment.
+
+Practice mode: ${modeLabel(practiceMode)}${modeNote}
+${convSubjects.length?`Conversation subjects: ${convSubjects.join(', ')}`:'' }
+
+Conversation transcript:
+${convText}
+
+Write your assessment in this EXACT format (do not add extra headers or change the labels):
+
+OVERALL: [1-10]
+
+FLUENCY: [1-10]
+[2-3 sentences on pace, naturalness, hesitation, confidence]
+TIP: [one specific actionable tip]
+
+VOCABULARY: [1-10]
+[2-3 sentences on vocabulary range; note use of present perfect, will for future, I prefer/I'd rather, because, for/since, quantity expressions]
+TIP: [one example sentence they could use]
+
+GRAMMAR: [1-10]
+[2-3 sentences on accuracy and key patterns]
+TIP: [a before/after correction example if applicable, otherwise a general tip]
+
+COMMUNICATION: [1-10]
+[2-3 sentences on answering questions, giving details, asking the examiner questions, maintaining conversation]
+TIP: [one specific tip]
+
+NEXT_STEPS:
+1. [actionable tip]
+2. [actionable tip]
+3. [actionable tip]
+
+Be encouraging, specific, and constructive. Quote from their actual responses where helpful.`;
+
+  try{
+    const payload={
+      systemInstruction:{parts:[{text:'You are a language assessment specialist providing structured feedback.'}]},
+      contents:[{role:'user',parts:[{text:scoringPrompt}]}],
+      generationConfig:{temperature:0.3, maxOutputTokens:700},
+    };
+    const r=await fetch(`${WORKER_URL}/chat`,{
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({dailyPassword, payload}),
+    });
+    const data=await r.json();
+    const parts2=data?.candidates?.[0]?.content?.parts||[];
+    const text=(parts2.find(p=>!p.thought)?.text||parts2[0]?.text||'').trim();
+    displayScoring(parseScoring(text));
+  }catch{
+    displayScoring(null,'Could not generate assessment. Please try again.');
+  }
+}
+
+function parseScoring(text){
+  const num = s => parseFloat((text.match(new RegExp(s+':\\s*(\\d+(?:\\.\\d+)?)', 'i'))||[])[1])||0;
+
+  function section(name){
+    const re = new RegExp(name+':\\s*\\d+(?:\\.\\d+)?\\s*\\n([\\s\\S]*?)(?=\\n(?:FLUENCY|VOCABULARY|GRAMMAR|COMMUNICATION|NEXT_STEPS):|$)','i');
+    const m  = text.match(re);
+    if(!m) return {score:num(name), text:'', tip:''};
+    const body = m[1];
+    const tipM = body.match(/TIP:\s*(.+)/i);
+    return {
+      score: num(name),
+      text:  body.replace(/TIP:.*/i,'').replace(/^\s+|\s+$/g,''),
+      tip:   tipM ? tipM[1].trim() : '',
+    };
+  }
+
+  const nsM = text.match(/NEXT_STEPS:\s*\n([\s\S]+?)$/i);
+  const nextSteps = nsM
+    ? nsM[1].split('\n').filter(l=>l.trim()).map(l=>l.replace(/^\d+\.\s*/,'').trim()).filter(Boolean)
+    : [];
+
+  return {
+    overall:       num('OVERALL'),
+    fluency:       section('FLUENCY'),
+    vocabulary:    section('VOCABULARY'),
+    grammar:       section('GRAMMAR'),
+    communication: section('COMMUNICATION'),
+    nextSteps,
+  };
+}
+
+function scoreColor(n){
+  if(n>=9) return '#2563EB';
+  if(n>=7) return '#10B981';
+  if(n>=5) return '#F59E0B';
+  return '#EF4444';
+}
 
 function displayScoring(s, errMsg){
-      const contentEl = document.getElementById('scoringContent');
-      
-      // 1. 如果有錯誤，顯示錯誤訊息與重試按鈕
-      if (errMsg) {
-        contentEl.innerHTML = `
-          <div style="text-align:center; margin:20px 0;">
-            <p class="err show" style="margin-bottom: 15px;">${errMsg}</p>
-            <button class="btn" onclick="executeGradingProtocol()" 
-                    style="background:var(--primary); color:white; padding:12px 24px; border-radius:var(--radius); border:none; cursor:pointer; font-weight:bold;">
-              🔄 重新評分 (Retry Grading)
-            </button>
-          </div>
-        `;
-        document.getElementById('readReportBtn').style.display = 'none';
-        document.getElementById('tryAgainBtn').style.display = 'block';
-        document.getElementById('changeTopicBtn').style.display = 'block';
-        return;
-      }
-      
-      // 2. 如果正常，則執行原有的顯示邏輯
-      const oc = scoreColor(s.overall);
-      let displayLabel = overallLabel(s.overall);
-      if (s.overall_zh) {
-        displayLabel = `${displayLabel.split('(')[0]} (${s.overall_zh})`;
-      }
-
-      contentEl.innerHTML = `
-        <div class="overall-wrap">
-          <div class="overall-circle" style="border-color:${oc}">
-            <div class="overall-num" style="color:${oc}">${s.overall}</div>
-            <div class="overall-den">/10</div>
-          </div>
-          <div class="overall-label">${displayLabel}</div>
-        </div>
-        ${crit('Fluency & Spontaneity (流暢度)', '🗣️', s.fluency)}
-        ${crit('Vocabulary (詞彙豐富度)', '📚', s.vocabulary)}
-        ${crit('Grammar (文法準確度)', '✏️', s.grammar)}
-        ${crit('Communication (溝通成效)', '💬', s.communication)}
-        ${s.nextSteps ? `<div class="next-steps"><div class="ns-title">📋 Next Steps / 衝刺改善建議</div><ul class="ns-list">${s.nextSteps.map(t=>`<li>${splitEnZh(t)}</li>`).join('')}</ul></div>`:''}`;
-
-      document.getElementById('scoringIcon').textContent = s.overall >= 7 ? '🏆' : '📊';
-      document.getElementById('readReportBtn').style.display = 'block';
-      document.getElementById('tryAgainBtn').style.display  = 'block';
-      document.getElementById('changeTopicBtn').style.display = 'block';
-    }
-
-    function scoreColor(v) { return v >= 8 ? 'var(--success)' : (v >= 5 ? 'var(--warn)' : 'var(--danger)'); }
-    function overallLabel(v) { return v >= 8.5 ? 'Distinction' : (v >= 7.0 ? 'Merit' : (v >= 5.0 ? 'Pass' : 'Fail')); }
-
-    // ⚡️ 全新功能：音訊報告朗讀佇列控制引擎
-function toggleReadReport() {
-  if (!activeScoreObject) return;
-  if (isReadingReport) { stopReadingReportState(); return; }
-
-  const langMode = document.getElementById('reportLangSelect').value; // 獲取選單值
-  isReadingReport = true;
-      const btn = document.getElementById('readReportBtn');
-      btn.textContent = '⏹️ 停止朗讀報告 (Stop Reading)';
-      btn.style.color = 'var(--danger)';
-      btn.style.borderColor = 'var(--danger)';
-
-      // 建立播放音訊佇列任務
-      const speechQueue = [];
-
-      // 1. 總評分
-      speechQueue.push({ text: `Overall Score: ${activeScoreObject.overall} out of 10. Band level is ${overallLabel(activeScoreObject.overall)}.`, lang: 'en' });
-      if (activeScoreObject.overall_zh) {
-        speechQueue.push({ text: `整體評價為：${activeScoreObject.overall_zh}。`, lang: 'zh' });
-      }
-
-      // 2. 處理四大指標項目
-      const categories = [
-        { label: 'Fluency', key: 'fluency' },
-        { label: 'Vocabulary', key: 'vocabulary' },
-        { label: 'Grammar', key: 'grammar' },
-        { label: 'Communication', key: 'communication' }
-      ];
-
-      categories.forEach(c => {
-        const item = activeScoreObject[c.key];
-        if (item) {
-          speechQueue.push({ text: `${c.label} score: ${item.score} out of 10.`, lang: 'en' });
-          
-          // 擷取括號前後的英、中反饋
-          const textMatch = item.text.match(/^([\s\S]*?)\(([\s\S]*?)\)\s*$/);
-          if (textMatch) {
-            speechQueue.push({ text: textMatch[1].trim(), lang: 'en' });
-            speechQueue.push({ text: textMatch[2].trim(), lang: 'zh' });
-          } else {
-            speechQueue.push({ text: item.text, lang: 'en' });
-          }
-
-          // 擷取括號前後的英、中💡建議
-          if (item.tip) {
-            const tipMatch = item.tip.match(/^([\s\S]*?)\(([\s\S]*?)\)\s*$/);
-            if (tipMatch) {
-              speechQueue.push({ text: "Teacher's tip: " + tipMatch[1].trim(), lang: 'en' });
-              speechQueue.push({ text: "修補建議：" + tipMatch[2].trim(), lang: 'zh' });
-            } else {
-              speechQueue.push({ text: item.tip, lang: 'en' });
-            }
-          }
-        }
-      });
-
-      // 3. 處理衝刺建議 (Next Steps)
-      if (activeScoreObject.nextSteps && activeScoreObject.nextSteps.length > 0) {
-        speechQueue.push({ text: "Next steps for improvements.", lang: 'en' });
-        speechQueue.push({ text: "後續衝刺行動指引。", lang: 'zh' });
-        
-        activeScoreObject.nextSteps.forEach((ns, index) => {
-          const nsMatch = ns.match(/^([\s\S]*?)\(([\s\S]*?)\)\s*$/);
-          if (nsMatch) {
-            speechQueue.push({ text: `Point ${index + 1}: ${nsMatch[1].trim()}`, lang: 'en' });
-            speechQueue.push({ text: `第 ${index + 1} 點：${nsMatch[2].trim()}`, lang: 'zh' });
-          } else {
-            speechQueue.push({ text: ns, lang: 'en' });
-          }
-        });
-      }
-
-      speechQueue.push({ text: "End of the feedback report.", lang: 'en' });
-      speechQueue.push({ text: "報告朗讀完畢。", lang: 'zh' });
-
-      // 依序遞迴執行播放佇列
-function playNextToken() {
-    if (!isReadingReport) return;
-    if (speechQueue.length === 0) { stopReadingReportState(); return; }
-    const nextItem = speechQueue.shift();
-
-    // 核心優化：根據選擇決定是否跳過某種語言
-    if ((langMode === 'en' && nextItem.lang === 'zh') || 
-        (langMode === 'zh' && nextItem.lang === 'en')) {
-      playNextToken(); // 直接跳過並執行下一個
-      return;
-    }
-
-    speakOutputText(nextItem.text, () => {
-      setTimeout(playNextToken, 250);
-    }, nextItem.lang);
+  if(errMsg){
+    document.getElementById('scoringContent').innerHTML=`
+      <div style="text-align:center;margin:24px 0">
+        <p class="err show" style="margin-bottom:16px">${errMsg}</p>
+        <button class="btn btn-primary" onclick="generateScoring()" style="margin-bottom:8px">
+          🔄 Retry Scoring / 重新評分
+        </button>
+      </div>`;
+    document.getElementById('tryAgainBtn').style.display='none';
+    document.getElementById('changeTopicBtn').style.display='block';
+    return;
   }
-  playNextToken();
+
+  const oc = scoreColor(s.overall);
+
+  // Uses the global crit(label, emoji, data) defined below
+  const modeNote = practiceMode==='intro'
+    ? '<div class="mode-note">* Introduction is not assessed in the real exam — this feedback is for practice only.</div>'
+    : '';
+
+  document.getElementById('scoringContent').innerHTML=`
+    ${modeNote}
+    <div class="overall-wrap">
+      <div class="overall-circle" style="border-color:${oc}">
+        <div class="overall-num" style="color:${oc}">${s.overall}</div>
+        <div class="overall-den">/10</div>
+      </div>
+      <div class="overall-label">${overallLabel(s.overall)}</div>
+    </div>
+    ${crit('Fluency','🗣️',s.fluency)}
+    ${crit('Vocabulary','📚',s.vocabulary)}
+    ${crit('Grammar','✏️',s.grammar)}
+    ${crit('Communication','💬',s.communication)}
+    ${s.nextSteps.length?`
+    <div class="next-steps">
+      <div class="ns-title">📋 Next Steps / 改善建議</div>
+      <ul class="ns-list">${s.nextSteps.map(t=>`<li>${t}</li>`).join('')}</ul>
+    </div>`:''}`;
+
+  // Fix: crit function signature was wrong — fix inline
+  document.getElementById('scoringIcon').textContent = s.overall>=7?'🏆':'📊';
+  document.getElementById('tryAgainBtn').style.display  = 'block';
+  document.getElementById('changeTopicBtn').style.display = 'block';
 }
 
-    function stopReadingReportState() {
-      isReadingReport = false;
-      if (audioSynthesizer) audioSynthesizer.cancel();
-      const btn = document.getElementById('readReportBtn');
-      if (btn) {
-        btn.textContent = '🔊 語音朗讀完整報告 (Read Full Report)';
-        btn.style.color = 'var(--primary)';
-        btn.style.borderColor = 'var(--primary)';
-      }
-    }
+// Separate crit renderer (hoisted correctly)
+function crit(label, emoji, data){
+  const c=scoreColor(data.score);
+  return `
+  <div class="crit-card">
+    <div class="crit-header">
+      <span>${emoji}</span>
+      <span class="crit-label">${label}</span>
+      <span class="crit-score" style="color:${c}">${data.score}/10</span>
+    </div>
+    <div class="bar-wrap"><div class="bar-fill" style="width:${data.score*10}%;background:${c}"></div></div>
+    <p class="crit-text">${data.text.replace(/\n/g,'<br>')}</p>
+    ${data.tip?`<div class="crit-tip">💡 ${data.tip}</div>`:''}
+  </div>`;
+}
 
-    async function authenticateTeacher() {
-      const pwd = document.getElementById('masterPasswordInput').value;
-      const errEl = document.getElementById('teacherErr');
-      errEl.classList.remove('show');
+function overallLabel(n){
+  if(n>=9) return '🌟 Excellent B1+';
+  if(n>=7) return '✅ Good B1 Level';
+  if(n>=5) return '📈 Developing — keep practising!';
+  return '💪 Keep going — practice makes perfect!';
+}
 
-      try {
-        const response = await fetch(`${WORKER_URL}/teacher`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ masterPassword: pwd })
-        });
+function modeLabel(m){
+  return {intro:'Introduction',phase1:'Phase 1: Topic',phase2:'Phase 2: Conversation',full:'Full Exam'}[m]||m;
+}
 
-        if (!response.ok) throw new Error('Rejected');
+function tryAgain(){
+  if(practiceMode==='phase1'||practiceMode==='full') startExam();
+  else startExam();
+}
 
-        const data = await response.json();
-        masterTeacherPwd = pwd;
-        
-        document.getElementById('tTodayPassword').textContent = data.password;
-        document.getElementById('tTodayDate').textContent = `Date: ${data.date}`;
-        switchView('viewTeacherDash');
-        fetchTelemetryStats();
-      } catch (err) {
-        errEl.textContent = '❌ Credentials rejected.';
-        errEl.classList.add('show');
-      }
-    }
+// ── TTS (Examiner Voice) ──────────────────────────────────────────
+let ttsOn = localStorage.getItem('tts') !== '0'; // default ON
 
-    async function fetchTelemetryStats() {
-      try {
-        const response = await fetch(`${WORKER_URL}/stats`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ masterPassword: masterTeacherPwd })
-        });
-        if (!response.ok) return;
-        const data = await response.json();
-        if (!data.configured) return;
+function toggleTTS(){
+  ttsOn = !ttsOn;
+  localStorage.setItem('tts', ttsOn ? '1' : '0');
+  document.getElementById('ttsToggle').textContent = ttsOn ? '🔊' : '🔇';
+  if(!ttsOn) window.speechSynthesis.cancel();
+}
 
-        document.getElementById('statsBlock').style.display = 'block';
-        document.getElementById('stCalls').textContent = data.today?.calls || 0;
-        const todayTok = (data.daily?.[data.today]?.inputTokens || 0) + (data.daily?.[data.today]?.outputTokens || 0);
-        document.getElementById('stTokens').textContent = todayTok.toLocaleString();
-        document.getElementById('stTokenBreakdown').textContent = `in:${(data.daily?.[data.today]?.inputTokens || 0).toLocaleString()} out:${(data.daily?.[data.today]?.outputTokens || 0).toLocaleString()}`;
-        
-        const cToday = ((data.daily?.[data.today]?.inputTokens || 0) * 0.075 / 1000000) + ((data.daily?.[data.today]?.outputTokens || 0) * 0.30 / 1000000);
-        const cTotal = (data.total.inputTokens * 0.075 / 1000000) + (data.total.outputTokens * 0.30 / 1000000);
-        document.getElementById('stCostToday').textContent = `$${cToday.toFixed(4)} est.`;
-        document.getElementById('stTotalCalls').textContent = data.total.calls.toLocaleString();
-        document.getElementById('stTotalCost').textContent = `$${cTotal.toFixed(3)}`;
-        renderAnalyticsChart(data.daily);
-      } catch (e) { console.error(e); }
-    }
+function speakExaminer(text){
+  if(!ttsOn || !window.speechSynthesis) return;
+  window.speechSynthesis.cancel();
+  // Strip emoji and markdown
+  const clean = text.replace(/[\u{1F000}-\u{1FFFF}]|[☀-➿]/gu,'').replace(/\*+/g,'').trim();
+  const utt = new SpeechSynthesisUtterance(clean);
+  utt.lang = 'en-GB';
+  utt.rate = 0.92;
+  utt.pitch = 1.0;
+  // Prefer a female en-GB voice if available
+  const voices = window.speechSynthesis.getVoices();
+  const preferred = voices.find(v=>v.lang==='en-GB' && /female|woman|serena|kate|amy|google uk/i.test(v.name))
+                 || voices.find(v=>v.lang==='en-GB')
+                 || voices.find(v=>v.lang.startsWith('en'));
+  if(preferred) utt.voice = preferred;
+  window.speechSynthesis.speak(utt);
+}
 
-    function renderAnalyticsChart(dailyObj) {
-      const container = document.getElementById('chartContainer');
-      container.innerHTML = '';
-      if (!dailyObj) return;
-      const days = Object.keys(dailyObj).sort().slice(-14);
-      if (!days.length) { container.innerHTML = `<div style="margin:auto">No data.</div>`; return; }
-      const maxCalls = Math.max(...days.map(d => dailyObj[d].calls || 1));
-      days.forEach(d => {
-        const node = document.createElement('div');
-        node.className = 'bar-node';
-        node.style.height = `${Math.max(((dailyObj[d].calls || 0) / maxCalls) * 100, 8)}%`;
-        node.setAttribute('data-tip', `${d}: ${dailyObj[d].calls} calls`);
-        container.appendChild(node);
-      });
-    }
-  </script>
+// Voices load asynchronously on some browsers
+if(window.speechSynthesis) window.speechSynthesis.onvoiceschanged = ()=>{};
+
+(function initTTS(){
+  const btn = document.getElementById('ttsToggle');
+  if(btn) btn.textContent = ttsOn ? '🔊' : '🔇';
+})();
+
+// ── UI HELPERS ────────────────────────────────────────────────────
+function addBubble(role, text){
+  const area  = document.getElementById('chatArea');
+  const typing= document.getElementById('typing');
+  const d=document.createElement('div');
+  d.className=`msg ${role}${role==='student'&&phase==='phase2'?' ph2':''}`;
+  d.innerHTML=`
+    <div class="msg-label">${role==='examiner'?'🎓 Examiner':'👤 You'}</div>
+    <div class="bubble">${text.replace(/\n/g,'<br>')}</div>`;
+  area.insertBefore(d,typing);
+  area.scrollTop=area.scrollHeight;
+  if(role==='examiner') speakExaminer(text);
+}
+
+function addQHint(){
+  const area=document.getElementById('chatArea');
+  const typing=document.getElementById('typing');
+  const id=`qh${Date.now()}`;
+  const d=document.createElement('div');
+  d.className='q-hint';d.id=id;
+  d.innerHTML=`💡 Remember to ask the examiner a question! / 記得問考官問題！
+    <button onclick="document.getElementById('${id}').remove()">✕</button>`;
+  area.insertBefore(d,typing);
+  area.scrollTop=area.scrollHeight;
+}
+
+function updatePhaseUI(){
+  const hdr=document.getElementById('examHeader');
+  const cfg={
+    intro: {cls:'intro',  title:'🎓 Introduction — Not Assessed'},
+    phase1:{cls:'phase1', title:'📝 Phase 1: Topic Discussion'},
+    phase2:{cls:'phase2', title:'💬 Phase 2: Conversation'},
+    done:  {cls:'scoring',title:'✅ Generating Assessment…'},
+  }[phase]||{cls:'intro',title:''};
+
+  hdr.className=`exam-header ${cfg.cls}`;
+  document.getElementById('examPhaseLabel').textContent=cfg.title;
+
+  const allPhases=['intro','phase1','phase2'];
+  const cur=phase==='done'?2:allPhases.indexOf(phase);
+  // Only show steps relevant to current mode
+  const modeSteps={intro:['intro'],phase1:['phase1'],phase2:['phase2'],full:['intro','phase1','phase2']}[practiceMode]||['intro','phase1','phase2'];
+  allPhases.forEach((s,i)=>{
+    const el=document.getElementById(`pi-${s}`);
+    const modeIdx=modeSteps.indexOf(s);
+    if(modeIdx<0){el.style.opacity='.3';el.className='phase-step';return;}
+    el.style.opacity='1';
+    if(i<cur) el.className='phase-step done';
+    else if(i===cur) el.className='phase-step active';
+    else el.className='phase-step';
+  });
+
+  const n  =phaseCount[phase]||0;
+  const max=PHASE_MAX[phase] ||0;
+  document.getElementById('exchCount').textContent=
+    (phase==='done'||phase==='intro'&&practiceMode==='full')?'':`${n}/${max}`;
+}
+
+function showTyping(){
+  const t=document.getElementById('typing');
+  if(t){t.className='typing show';document.getElementById('chatArea').scrollTop=9999;}
+}
+function hideTyping(){
+  const t=document.getElementById('typing');
+  if(t) t.className='typing';
+}
+
+function stripKeys(s){
+  return (s||'').replace(/\[TO_PHASE1\]|\[TO_PHASE2\]|\[DONE\]/g,'').trim();
+}
+
+// ── INPUT MODE ────────────────────────────────────────────────────
+function setInputMode(mode){
+  inputMode=mode;
+  document.getElementById('btnText').className =`mode-btn${mode==='text' ?' active':''}`;
+  document.getElementById('btnVoice').className=`mode-btn${mode==='voice'?' active':''}`;
+  document.getElementById('textArea').className =mode==='text' ?'text-row'  :'text-row hidden';
+  document.getElementById('voiceArea').className=mode==='voice'?'voice-area':'voice-area hidden';
+}
+
+// ── SPEECH ────────────────────────────────────────────────────────
+function setupSpeech(){
+  const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+  if(!SR){document.getElementById('btnVoice').disabled=true;return;}
+  recognition=new SR();
+  recognition.continuous=false;recognition.interimResults=false;recognition.lang='en-GB';
+  recognition.onresult=e=>{
+    const t=e.results[0][0].transcript;
+    document.getElementById('micHint').textContent=`"${t}"`;
+    stopMic();handleStudent(t);
+  };
+  recognition.onerror=()=>{stopMic();document.getElementById('micHint').textContent='Error — tap to try again';};
+  recognition.onend=()=>{if(micActive)stopMic();};
+}
+function toggleMic(){micActive?stopMic():startMic();}
+function startMic(){
+  if(!recognition)return;
+  recognition.start();micActive=true;
+  document.getElementById('micBtn').className='mic-btn recording';
+  document.getElementById('micHint').textContent='Listening… / 聆聽中…';
+}
+function stopMic(){
+  try{recognition.stop();}catch{}
+  micActive=false;
+  document.getElementById('micBtn').className='mic-btn';
+  document.getElementById('micHint').textContent='Tap to speak / 點擊說話';
+}
+
+// ── SCREEN ────────────────────────────────────────────────────────
+function showScreen(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+function showErr(id){
+  const el=document.getElementById(id);
+  el.classList.add('show');
+  setTimeout(()=>el.classList.remove('show'),3500);
+}
+
+// ── TEACHER ───────────────────────────────────────────────────────
+function goTeacherLogin(){
+  document.getElementById('masterPwdInput').value='';
+  document.getElementById('masterErr').classList.remove('show');
+  showScreen('s-teacher-login');
+}
+
+async function checkMasterPwd(){
+  const pwd=document.getElementById('masterPwdInput').value.trim();
+  if(!pwd)return;
+  try{
+    const r=await fetch(`${WORKER_URL}/teacher`,{
+      method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({masterPassword:pwd}),
+    });
+    if(r.status===401){showErr('masterErr');return;}
+    const data=await r.json();
+    masterPwdCache=pwd;
+    document.getElementById('todayPwd').textContent =data.password;
+    document.getElementById('todayDate').textContent=`Date: ${data.date} (HKT)`;
+    showScreen('s-teacher');
+    switchTab('pwd');
+  }catch{
+    document.getElementById('masterErr').textContent='⚠️ Connection error';
+    showErr('masterErr');
+  }
+}
+
+// ── TEACHER TABS ──────────────────────────────────────────────────
+function switchTab(tab){
+  ['pwd','stats'].forEach(t=>{
+    document.getElementById(`tab-${t}`).className=`tab-btn${t===tab?' active':''}`;
+    document.getElementById(`panel-${t}`).className=t===tab?'':'hidden';
+  });
+  if(tab==='stats') loadStats();
+}
+
+async function loadStats(){
+  const el=document.getElementById('statsContent');
+  el.innerHTML=`<div class="scoring-loading"><div class="spinner"></div><div class="loading-text">Loading…</div></div>`;
+  try{
+    const r=await fetch(`${WORKER_URL}/stats`,{
+      method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({masterPassword:masterPwdCache}),
+    });
+    const data=await r.json();
+    renderStats(el,data);
+  }catch{
+    el.innerHTML='<p class="err show" style="text-align:center;margin:16px 0">⚠️ Could not load stats</p>';
+  }
+}
+
+function renderStats(el, data){
+  if(!data.configured){
+    el.innerHTML=`
+      <div class="kv-setup">
+        <div style="font-size:28px;margin-bottom:10px">📦</div>
+        <strong>KV Storage not configured</strong><br><br>
+        To enable usage tracking, create a KV namespace in Cloudflare and bind it to this Worker as <code>USAGE_KV</code>.<br><br>
+        See <a href="#" onclick="return false">b1-trinity-setup.md</a> for instructions.
+      </div>`;
+    return;
+  }
+
+  const today    = data.today||'';
+  const todayD   = data.daily?.[today]||{calls:0,inputTokens:0,outputTokens:0};
+  const total    = data.total||{calls:0,inputTokens:0,outputTokens:0};
+
+  // Estimate cost: Gemini 2.0 Flash ~$0.075/1M input, ~$0.30/1M output
+  const costTotal = ((total.inputTokens/1e6)*0.075 + (total.outputTokens/1e6)*0.30).toFixed(4);
+  const costToday = ((todayD.inputTokens/1e6)*0.075 + (todayD.outputTokens/1e6)*0.30).toFixed(4);
+
+  // Last 7 days bar chart
+  const allDays  = Object.keys(data.daily||{}).sort().slice(-7);
+  const maxCalls = Math.max(...allDays.map(d=>data.daily[d].calls),1);
+
+  const barHTML = allDays.map(d=>{
+    const calls = data.daily[d].calls;
+    const pct   = Math.max(8, Math.round((calls/maxCalls)*100));
+    const label = d.slice(5); // MM-DD
+    return `<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:3px">
+      <div style="font-size:10px;color:var(--muted)">${calls}</div>
+      <div style="flex:1;width:100%;background:var(--primary);border-radius:4px 4px 0 0;height:${pct}%;min-height:4px;opacity:.8"></div>
+      <div style="font-size:10px;color:var(--muted)">${label}</div>
+    </div>`;
+  }).join('');
+
+  el.innerHTML=`
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="sc-label">Today's Calls</div>
+        <div class="sc-val">${todayD.calls}</div>
+        <div class="sc-sub">~$${costToday} est.</div>
+      </div>
+      <div class="stat-card">
+        <div class="sc-label">Today's Tokens</div>
+        <div class="sc-val">${(todayD.inputTokens+todayD.outputTokens).toLocaleString()}</div>
+        <div class="sc-sub">in:${todayD.inputTokens.toLocaleString()} out:${todayD.outputTokens.toLocaleString()}</div>
+      </div>
+      <div class="stat-card">
+        <div class="sc-label">Total Calls</div>
+        <div class="sc-val">${total.calls.toLocaleString()}</div>
+        <div class="sc-sub">all time</div>
+      </div>
+      <div class="stat-card">
+        <div class="sc-label">Est. Total Cost</div>
+        <div class="sc-val">$${costTotal}</div>
+        <div class="sc-sub">Gemini 2.0 Flash</div>
+      </div>
+    </div>
+
+    <div class="chart-title">API Calls — Last ${allDays.length} Days</div>
+    <div style="display:flex;align-items:flex-end;gap:6px;height:100px;padding-bottom:0;background:var(--surface2);border-radius:9px;padding:12px;margin-bottom:6px">
+      ${barHTML||'<div style="color:var(--muted);font-size:13px;margin:auto">No data yet</div>'}
+    </div>
+    <div style="font-size:11px;color:var(--muted);margin-top:4px">
+      * Cost estimate based on Gemini 2.0 Flash pricing ($0.075/1M input, $0.30/1M output). Actual cost may vary.
+    </div>`;
+}
+</script>
 </body>
 </html>
